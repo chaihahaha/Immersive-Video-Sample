@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <link rel="shortcut icon" href="#"/>
+</head>
+
+<body>
+
+    <!-- Create the canvas that the C++ code will draw into -->
+    <canvas id="canvas" width="960" height="960" oncontextmenu="event.preventDefault()"></canvas>
+
+<canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+<script>
+  var Module = {
+    canvas: (function() { return document.getElementById('canvas'); })(),
+      printErr: function(text) {
+          console.error(text);
+      },
+      //websocket: {
+      //    url: 'ws://127.0.0.1:8000',
+      //    subprotocol: 'binary',
+      //}
+  };
+  Module.onRuntimeInitialized = function() {
+        FS.mkdir('/cache');
+        FS.mount(IDBFS, {}, '/cache');
+        FS.syncfs(true, (err) => {
+              if (err) console.error(err);
+              else console.log('FS synced');
+        });
+        console.log("WASM initialized!");
+        //Module._start_app();
+        //Module.ccall('start_app_fake_curl_test_main_loop', null, [], []); 
+      };
+
+  Module.canvas.addEventListener("click", function() {
+    // Call an exported C++ function if you want C++ to handle it
+    // Module.ccall('enablePointerLock', 'void', []);
+    // OR directly call the GLFW function if accessible (less common)
+    // OR (most common) use the browser's Pointer Lock API directly
+    Module.canvas.requestPointerLock();
+  });
+
+  // Optional: Handle pointer lock changes/errors
+  document.addEventListener('pointerlockchange', lockChangeAlert, false);
+  document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
+  document.addEventListener('pointerlockerror', lockErrorAlert, false);
+  document.addEventListener('mozpointerlockerror', lockErrorAlert, false);
+
+  function lockChangeAlert() {
+    if (document.pointerLockElement === Module.canvas ||
+        document.mozPointerLockElement === Module.canvas) {
+      console.log('The pointer lock status is now locked');
+      // You could potentially call a C++ function here to notify it
+      // Module.ccall('notifyPointerLockAcquired', 'void', []);
+    } else {
+      console.log('The pointer lock status is now unlocked');
+      // You could potentially call a C++ function here to notify it
+      // Module.ccall('notifyPointerLockReleased', 'void', []);
+    }
+  }
+  function lockErrorAlert() {
+    console.error('Error locking pointer.');
+  }
+</script>
+<!-- Load your main render.js script AFTER the Module definition -->
+<script src="render.js"></script>    
+   
+<p>Animate VR canvas through WebAssembly.</p>
+
+</body>
+
+</html>
