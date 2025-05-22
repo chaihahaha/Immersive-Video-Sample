@@ -98,7 +98,7 @@ int32_t Mp4Reader::Initialize(StreamIO* stream)
     }
 
     auto& io  = m_initSegProps[initSegId].segPropMap[segIndex].io;
-    io.strIO = move(internalStream);
+    io.strIO = std::move(internalStream);
     io.size   = io.strIO->GetStreamSize();
 
     try
@@ -111,12 +111,10 @@ int32_t Mp4Reader::Initialize(StreamIO* stream)
     }
     catch (const Exception& exc)
     {
-        ISO_LOG(LOG_ERROR, "Error: %s\n", exc.what());
 		return OMAF_FILE_READ_ERROR;
     }
     catch (const exception& e)
     {
-        ISO_LOG(LOG_ERROR, "Error: %s\n", e.what());
 		return OMAF_FILE_READ_ERROR;
     }
     return ERROR_NONE;
@@ -334,7 +332,6 @@ void Mp4Reader::RefreshCompTimes(InitSegmentId initSegId, SegmentId segIndex)
                 PMapTSRevIt iter3 = trackDecInfo.pMapTS.rbegin();
                 if (iter3 == trackDecInfo.pMapTS.rend())
                 {
-                    ISO_LOG(LOG_ERROR, "Failed to get TimeStamp !\n");
 					throw exception();
                 }
                 trackDecInfo.samples.at(iter3->second).sampleDuration =
@@ -375,7 +372,6 @@ int32_t Mp4Reader::ParseInitSeg(StreamIO* strIO, uint32_t initSegId)
     {
         m_readerSte = prevState;
         io.strIO.reset();
-        ISO_LOG(LOG_ERROR, "Peek to EOS\n");
         return OMAF_FILE_READ_ERROR;
     }
     io.size = strIO->GetStreamSize();
@@ -403,12 +399,10 @@ int32_t Mp4Reader::ParseInitSeg(StreamIO* strIO, uint32_t initSegId)
             error = ReadAtomParams(io, boxType, boxSize);
             if (!error)
             {
-                ISO_LOG(LOG_INFO, "boxType is %s\n", boxType.c_str());
                 if (boxType == "ftyp")
                 {
                     if (ftypFound == true)
                     {
-                        ISO_LOG(LOG_ERROR, "boxType is ftyp and is True!!!\n");
                         error = OMAF_FILE_READ_ERROR;
                         break;
                     }
@@ -427,7 +421,6 @@ int32_t Mp4Reader::ParseInitSeg(StreamIO* strIO, uint32_t initSegId)
                             supportedBrands.insert("[nvr1] ");
                         }
 
-                        ISO_LOG(LOG_INFO, "Compatible brands found\n");
 
                         m_initSegProps[initSegmentId].ftyp = ftyp;
                     }
@@ -452,7 +445,6 @@ int32_t Mp4Reader::ParseInitSeg(StreamIO* strIO, uint32_t initSegId)
                 {
                     if (moovFound == true)
                     {
-                        ISO_LOG(LOG_ERROR, "boxType is moov and is Found!!!\n");
                         error = OMAF_FILE_READ_ERROR;
                         break;
                     }
@@ -473,7 +465,6 @@ int32_t Mp4Reader::ParseInitSeg(StreamIO* strIO, uint32_t initSegId)
                 }
                 else if (boxType == "moof")
                 {
-                    ISO_LOG(LOG_WARNING, "Skipping root level 'moof' box - not allowed in Initialization Segment\n");
                     error = SkipAtom(io);
                 }
                 else if (boxType == "mdat")
@@ -482,7 +473,6 @@ int32_t Mp4Reader::ParseInitSeg(StreamIO* strIO, uint32_t initSegId)
                 }
                 else
                 {
-                    ISO_LOG(LOG_WARNING, "Skipping root level box of unknown type '%s'\n", boxType.c_str());
 					error = SkipAtom(io);
                 }
             }
@@ -490,12 +480,10 @@ int32_t Mp4Reader::ParseInitSeg(StreamIO* strIO, uint32_t initSegId)
     }
     catch (Exception& exc)
     {
-        ISO_LOG(LOG_ERROR, "ParseInitSegment Exception Error: %s\n", exc.what());
         error = OMAF_FILE_READ_ERROR;
     }
     catch (exception& e)
     {
-        ISO_LOG(LOG_ERROR, "ParseInitSegment exception Error:: %s\n", e.what());
         error = OMAF_FILE_READ_ERROR;
     }
 
@@ -515,8 +503,6 @@ int32_t Mp4Reader::ParseInitSeg(StreamIO* strIO, uint32_t initSegId)
 
         if ((!io.strIO->IsStreamGood()) && (!io.strIO->IsReachEOS()))
         {
-            ISO_LOG(LOG_ERROR, "Stream is Good? %d\n", int32_t(io.strIO->IsStreamGood()));
-            ISO_LOG(LOG_ERROR, "Reach EOS? %d\n", int32_t(io.strIO->IsReachEOS()));
             return OMAF_FILE_READ_ERROR;
         }
         io.strIO->ClearStatus();
@@ -572,7 +558,6 @@ int32_t Mp4Reader::ParseSeg(StreamIO* strIO,
     {
         m_readerSte = prevState;
         io.strIO.reset();
-        ISO_LOG(LOG_ERROR, "Peek to EOS!!!\n");
         return OMAF_FILE_READ_ERROR;
     }
     io.size = strIO->GetStreamSize();
@@ -596,7 +581,6 @@ int32_t Mp4Reader::ParseSeg(StreamIO* strIO,
             error = ReadAtomParams(io, boxType, boxSize);
             if (!error)
             {
-                ISO_LOG(LOG_INFO, "boxType is %s\n", boxType.c_str());
                 if (boxType == "styp")
                 {
                     error = ReadAtom(io, bitstream);
@@ -706,7 +690,6 @@ int32_t Mp4Reader::ParseSeg(StreamIO* strIO,
                 }
                 else
                 {
-                    ISO_LOG(LOG_WARNING, "Skipping root level box of unknown type '%s'\n", boxType.c_str());
                     error = SkipAtom(io);
                 }
             }
@@ -714,12 +697,10 @@ int32_t Mp4Reader::ParseSeg(StreamIO* strIO,
     }
     catch (Exception& exc)
     {
-        ISO_LOG(LOG_ERROR, "parseSegment Exception Error: %s\n", exc.what());
         error = OMAF_FILE_READ_ERROR;
     }
     catch (exception& e)
     {
-        ISO_LOG(LOG_ERROR, "parseSegment exception Error: %s\n", e.what());
         error = OMAF_FILE_READ_ERROR;
     }
 
@@ -734,8 +715,6 @@ int32_t Mp4Reader::ParseSeg(StreamIO* strIO,
 
         if ((!io.strIO->IsStreamGood()) && (!io.strIO->IsReachEOS()))
         {
-            ISO_LOG(LOG_ERROR, "Stream is Good? %d\n", int32_t(io.strIO->IsStreamGood()));
-            ISO_LOG(LOG_ERROR, "Reach to EOS? %d\n", int32_t(io.strIO->IsReachEOS()));
             return OMAF_FILE_READ_ERROR;
         }
         io.strIO->ClearStatus();
@@ -807,7 +786,6 @@ int32_t Mp4Reader::ParseSegIndex(StreamIO* strIO,
     if (io.strIO->PeekEOS())
     {
         io.strIO.reset();
-        ISO_LOG(LOG_ERROR, "PeekEOS is true!!!\n");
         return OMAF_FILE_READ_ERROR;
     }
     io.size = strIO->GetStreamSize();
@@ -842,7 +820,6 @@ int32_t Mp4Reader::ParseSegIndex(StreamIO* strIO,
                 }
                 else
                 {
-                    ISO_LOG(LOG_WARNING, "Skipping root level box of unknown type '%s\n'", boxType.c_str());
 					error = SkipAtom(io);
                 }
             }
@@ -850,18 +827,15 @@ int32_t Mp4Reader::ParseSegIndex(StreamIO* strIO,
     }
     catch (Exception& exc)
     {
-        ISO_LOG(LOG_ERROR, "ParseSegmentIndex Exception Error: %s\n", exc.what());
 		error = OMAF_FILE_READ_ERROR;
     }
     catch (exception& e)
     {
-        ISO_LOG(LOG_ERROR, "ParseSegmentIndex exception Error: %s\n", e.what());
 		error = OMAF_FILE_READ_ERROR;
     }
 
     if (!segIndexFound)
     {
-        ISO_LOG(LOG_ERROR, "ParseSegmentIndex couldn't find sidx box!\n");
 		error = OMAF_INVALID_SEGMENT;
     }
 
@@ -906,7 +880,6 @@ int32_t Mp4Reader::GetSegIndexSize(uint8_t version, int32_t ref_cnt, uint64_t& s
         firstOffsetSize = 64;
     }
     else {
-        ISO_LOG(LOG_ERROR, "SegmentIndexAtom supports only 'sidx' version 0 or 1\n");
         throw Exception();
     }
     uint32_t reservedSize = 16;
@@ -970,7 +943,6 @@ int32_t Mp4Reader::GetSegIndexRangeFromSidx(char* buf, size_t size, IndexMap& se
 
     segIndexMap.clear();
     for (uint32_t i = 0; i < ref.size(); i++) {
-        // LOG(INFO) << "Push back " << i << " size " << ref[i].referencedSize << endl;
         uint32_t chunk_id = i; // index from 0
         uint32_t referencedSize = ref[i].referencedSize;
         segIndexMap.insert(std::make_pair(chunk_id, referencedSize));
@@ -1009,7 +981,6 @@ void Mp4Reader::IsInited() const
 {
     if (!(m_readerSte == ReaderState::INITIALIZING || m_readerSte == ReaderState::READY))
     {
-        ISO_LOG(LOG_ERROR, "Mp4Reader is not initialized !\n");
 		throw exception();
     }
 }
@@ -1028,7 +999,6 @@ Mp4Reader::CtxType Mp4Reader::GetCtxType(const InitSegmentTrackId trackIdPair) c
     const auto contextInfo = m_ctxInfoMap.find(trackIdPair);
     if (contextInfo == m_ctxInfoMap.end())
     {
-        ISO_LOG(LOG_ERROR, "Context ID is invalide !\n");
 		throw exception();
     }
 
@@ -1073,7 +1043,6 @@ int32_t Mp4Reader::ReadStream(InitSegmentId initSegId, SegmentId segIndex)
         error = ReadAtomParams(io, boxType, boxSize);
         if (!error)
         {
-            ISO_LOG(LOG_INFO, "boxType is %s\n", boxType.c_str());
             if (boxType == "ftyp")
             {
                 if (ftypFound == true)
@@ -1095,7 +1064,6 @@ int32_t Mp4Reader::ReadStream(InitSegmentId initSegId, SegmentId segIndex)
                         supportedBrands.insert("[nvr1] ");
                     }
 
-                    ISO_LOG(LOG_INFO, "Compatible brands found\n");
 
                     m_initSegProps[initSegId].ftyp = ftyp;
                 }
@@ -1110,7 +1078,6 @@ int32_t Mp4Reader::ReadStream(InitSegmentId initSegId, SegmentId segIndex)
 
                     std::set<std::string> supportedBrands;
 
-                    ISO_LOG(LOG_INFO, "Compatible brands found\n");
                 }
             }
             else if (boxType == "sidx")
@@ -1126,7 +1093,6 @@ int32_t Mp4Reader::ReadStream(InitSegmentId initSegId, SegmentId segIndex)
             {
                 if (moovFound == true)
                 {
-                    ISO_LOG(LOG_ERROR, "boxType is moov and is True!!!\n");
                     return OMAF_FILE_READ_ERROR;
                 }
                 moovFound = true;
@@ -1173,7 +1139,6 @@ int32_t Mp4Reader::ReadStream(InitSegmentId initSegId, SegmentId segIndex)
                             trackDecInfo.samples.rbegin()->dataOffset + trackDecInfo.samples.rbegin()->dataLength);
                             if (sampleDataEndOffset > io.size || sampleDataEndOffset < 0)
                             {
-                                ISO_LOG(LOG_ERROR, "Sample data offset exceeds movie fragment !\n");
                                 throw exception();
                             }
                         }
@@ -1186,7 +1151,6 @@ int32_t Mp4Reader::ReadStream(InitSegmentId initSegId, SegmentId segIndex)
             }
             else
             {
-                ISO_LOG(LOG_WARNING, "Skipping root level box of unknown type '%s'\n", boxType.c_str());
                 error = SkipAtom(io);
             }
         }
@@ -1203,8 +1167,6 @@ int32_t Mp4Reader::ReadStream(InitSegmentId initSegId, SegmentId segIndex)
 
         if ((!io.strIO->IsStreamGood()) && (!io.strIO->IsReachEOS()))
         {
-	    ISO_LOG(LOG_ERROR, "Stream is Good? %d\n", int32_t(io.strIO->IsStreamGood()));
-	    ISO_LOG(LOG_ERROR, "Reach to EOS? %d\n", int32_t(io.strIO->IsReachEOS()));
             return OMAF_FILE_READ_ERROR;
         }
         io.strIO->ClearStatus();
@@ -1617,9 +1579,9 @@ TrackPropertiesMap Mp4Reader::FillTrackProps(InitSegmentId initSegId,
 
             auto& storedTrackInfo =
                 initSegProps.segPropMap[segIndex].trackDecInfos[trackIdPair.second];
-            storedTrackInfo = move(trackDecInfo);
+            storedTrackInfo = std::move(trackDecInfo);
             m_initSegProps[initSegId].basicTrackInfos[trackIdPair.second] =
-                move(basicTrackInfo);
+                std::move(basicTrackInfo);
 
             FillSampEntryMap(trackAtom, initSegId);
             RefreshDecCodeType(initSegId, segTrackId, storedTrackInfo.samples);
@@ -1638,7 +1600,7 @@ TrackPropertiesMap Mp4Reader::FillTrackProps(InitSegmentId initSegId,
             contextInfo.ctxType         = CtxType::TRACK;
             m_ctxInfoMap[trackIdPair] = contextInfo;
 
-            trackPropsMap.insert(make_pair(trackIdPair.second, move(trackProps)));
+            trackPropsMap.insert(make_pair(trackIdPair.second, std::move(trackProps)));
         }
     }
 
@@ -2037,7 +1999,6 @@ TypeToCtxIdsMap Mp4Reader::GetRefTrackIds(TrackAtom* trackAtom) const
                 trackReferenceTypeAtom.GetTrackIds(), [](std::uint32_t x) {
                     if ((x >> 16) != 0)
                     {
-                        ISO_LOG(LOG_ERROR, "Context ID is invalid !\n");
 						throw exception();
                     }
                     return ContextId(x);
@@ -2203,7 +2164,6 @@ SampleInfoVector Mp4Reader::GenSampInfo(TrackAtom* trackAtom) const
 
     if (sampCnt > entrySize.size() || sampCnt > sampleDeltas.size())
     {
-        ISO_LOG(LOG_ERROR, "Segment file header is not correct !\n");
 		throw exception();
     }
 
@@ -2216,7 +2176,6 @@ SampleInfoVector Mp4Reader::GenSampInfo(TrackAtom* trackAtom) const
         uint32_t sampDescId = 0;
         if (!stsc.GetSampleDescrIndex(sampId, sampDescId))
         {
-            ISO_LOG(LOG_ERROR, "Segment file header is not correct !\n");
 			throw exception();
         }
 
@@ -2227,7 +2186,6 @@ SampleInfoVector Mp4Reader::GenSampInfo(TrackAtom* trackAtom) const
         uint32_t chunkIndex = 0;
         if (!stsc.GetSampleChunkIndex(sampId, chunkIndex))
         {
-            ISO_LOG(LOG_ERROR, "Segment file header is not correct !\n");
             throw exception();
         }
 
@@ -2338,7 +2296,6 @@ void Mp4Reader::FillSampEntryMap(TrackAtom* trackAtom, InitSegmentId initSegId)
             const auto* clapAtom = entry->GetClap();
             if (clapAtom != NULL)
             {
-                ISO_LOG(LOG_INFO, "CleanApertureAtom reading not implemented\n");
             }
 
             SampleRes size = {entry->GetWidth(), entry->GetHeight()};
@@ -2388,7 +2345,6 @@ void Mp4Reader::FillSampEntryMap(TrackAtom* trackAtom, InitSegmentId initSegId)
             const auto* clapAtom = entry->GetClap();
             if (clapAtom != NULL)
             {
-                ISO_LOG(LOG_INFO, "CleanApertureAtom reading not implemented\n");
             }
 
             SampleRes size = {entry->GetWidth(), entry->GetHeight()};
@@ -2551,7 +2507,6 @@ unsigned Mp4Reader::GenTrackId(InitSegmentTrackId idPair) const
 
     if ((ctxIndex.GetIndex() >> 16) != 0)
     {
-        ISO_LOG(LOG_ERROR, "Segment file header is not correct !\n");
         throw exception();
     }
 
@@ -2589,7 +2544,6 @@ void Mp4Reader::WriteNalLen(uint64_t length, char* buffer) const
 {
     if (!buffer)
     {
-        ISO_LOG(LOG_ERROR, "The buffer is NULL for Nal Length !\n");
         throw exception();
     }
 
@@ -3335,7 +3289,6 @@ int32_t Mp4Reader::GetPlaybackDurationInSecs(uint32_t trackId, double& durInSecs
                     }
                     else
                     {
-                        ISO_LOG(LOG_WARNING, "GetPlaybackDurationInSecs() called for meta context, but forced FPS was not set\n");
                     }
                     break;
                 case CtxType::FILE:
@@ -3685,7 +3638,6 @@ bool ParseExtractorNal(const DataVector& NalData,
         }
         else
         {
-            ISO_LOG(LOG_ERROR, "Length field size is not correct !\n");
             throw exception();
         }
 

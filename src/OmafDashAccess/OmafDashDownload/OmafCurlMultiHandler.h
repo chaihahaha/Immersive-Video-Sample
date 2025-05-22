@@ -52,7 +52,7 @@ namespace OMAF {
 class OmafCurlMultiDownloader;
 class OmafDownloadTask;
 
-const int DEFAULT_MAX_PARALLER_TRANSFERS = 50;
+const int DEFAULT_MAX_PARALLER_TRANSFERS = 5;
 
 class OmafDownloadTaskPerfCounter : public VCD::NonCopyable {
  public:
@@ -113,15 +113,19 @@ class OmafDownloadTask : public VCD::NonCopyable {
 
  public:
   virtual ~OmafDownloadTask() {
+ OMAF_LOG(LOG_INFO, "OmafDownloadTask DESTRUCTOR: id=%zu, url=%s, state=%d. Downloader Ptr: %p, Header Downloader Ptr: %p\n",
+           id_, url_.c_str(), static_cast<int>(state_),
+           static_cast<void*>(easy_d_downloader_.get()), static_cast<void*>(easy_h_downloader_.get()));
     dcb_ = nullptr;
     scb_ = nullptr;
     cdcb_ = nullptr;
-    OMAF_LOG(LOG_INFO, "Release the %s\n", this->to_string().c_str());
   }
 
  public:
   static Ptr createTask(const SourceParams &params, OmafDashSegmentClient::OnData dcb, OmafDashSegmentClient::OnChunkData cdcb, OmafDashSegmentClient::OnState scb) {
     Ptr task = std::make_shared<OmafDownloadTask>(params, dcb, cdcb, scb);
+    std::cout << "download task get_info"<< std::endl;
+    std::cout << task->get_info() << std::endl;
     return task;
   }
 
@@ -224,7 +228,6 @@ class OmafDownloadTask : public VCD::NonCopyable {
   void setEndTime(int64_t time) {
     download_end_time_ = time;
     download_latency_ = download_end_time_ - download_start_time_;
-    LOG(WARNING) << "Task download data: " << get_info().c_str() << endl;
   }
  private:
  inline void parseTask() {
@@ -292,7 +295,6 @@ class OmafCurlMultiDownloader : public VCD::NonCopyable {
   inline size_t size() const noexcept {  // return ready_task_list_.size() + run_task_map_.size();
     int size = task_size_.load();
     if (size < 0) {
-      OMAF_LOG(LOG_WARNING, "The task size is in invalid state!\n");
     }
     return static_cast<size_t>(size);
   }

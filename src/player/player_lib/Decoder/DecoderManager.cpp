@@ -86,6 +86,7 @@ RenderStatus DecoderManager::Initialize(FrameHandlerFactory* factory)
 ///Video-relative operations
 RenderStatus DecoderManager::CreateVideoDecoder(uint32_t video_id, Codec_Type video_codec, uint64_t startPts)
 {
+    std::cout << "DecoderManager::CreateVideoDecoder" << std::endl;
 #ifdef _LINUX_OS_
     VideoDecoder* pDecoder = new VideoDecoder();
 #endif
@@ -94,6 +95,7 @@ RenderStatus DecoderManager::CreateVideoDecoder(uint32_t video_id, Codec_Type vi
 #endif
     pDecoder->SetSurface(m_surfaces[video_id]);
     pDecoder->SetDecodeInfo(m_decodeInfo);
+    std::cout << "decoder manager initialize pdecoder" << std::endl;
     RenderStatus ret = pDecoder->Initialize(video_id, video_codec, m_handlerFactory->CreateHandler(video_id, m_textures[video_id]), startPts);
     if( RENDER_STATUS_OK != ret ){
         SAFE_DELETE(pDecoder);
@@ -114,6 +116,7 @@ RenderStatus DecoderManager::CreateVideoDecoder(uint32_t video_id, Codec_Type vi
 
 RenderStatus DecoderManager::CheckVideoDecoders(vector<DashPacket*> packets, std::map<uint32_t, MediaDecoder*> decoderMap, uint32_t cnt, bool isCatchup)
 {
+    std::cout << "DecoderManager::CheckVideoDecoders" << std::endl;
     RenderStatus ret = RENDER_STATUS_OK;
     // condition 1: pending decoders
     if (!isCatchup) {
@@ -180,6 +183,11 @@ RenderStatus DecoderManager::CheckVideoDecoders(vector<DashPacket*> packets, std
 
 RenderStatus DecoderManager::SendVideoPackets( DashPacket* packets, uint32_t cnt )
 {
+    std::cout << "decoder manager got dash packet size: ";
+    for (int i=0; i< 16; i++) {
+        std::cout <<  packets[i].size << ",";
+    }
+    std::cout << std::endl;
     RenderStatus ret = RENDER_STATUS_OK;
 
     //1. separate normal packets and catch-up packets
@@ -221,6 +229,7 @@ RenderStatus DecoderManager::SendVideoPackets( DashPacket* packets, uint32_t cnt
 
 RenderStatus DecoderManager::UpdateVideoFrame( uint32_t video_id, uint64_t pts, int64_t *corr_pts, HeadPose* pose )
 {
+    std::cout << "DecoderManager::UpdateVideoFrame" << std::endl;
     RenderStatus ret = RENDER_STATUS_OK;
     if (video_id < OFFSET_VIDEO_ID_FOR_CATCHUP) {
         if(m_mapVideoDecoder.find(video_id)!=m_mapVideoDecoder.end()){
@@ -269,6 +278,7 @@ RenderStatus DecoderManager::UpdateVideoFrame( uint32_t video_id, uint64_t pts, 
 
 RenderStatus DecoderManager::UpdateVideoFrames( uint64_t pts, int64_t *corr_pts, HeadPose *pose )
 {
+    std::cout << "DecoderManager::UpdateVideoFrames" << std::endl;
     RenderStatus ret = RENDER_STATUS_OK;
     uint32_t errorCnt = 0;
     ScopeLock lock(m_mapDecoderLock);
@@ -373,6 +383,7 @@ RenderStatus DecoderManager::UpdateVideoFrames( uint64_t pts, int64_t *corr_pts,
 }
 
 RenderStatus DecoderManager::CheckViewIdAvailability(HeadPose *pose) {
+    std::cout << "DecoderManager::CheckViewIdAvailability" << std::endl;
 #ifdef _LINUX_OS_
     if (pose == nullptr) return RENDER_ERROR;
 #endif

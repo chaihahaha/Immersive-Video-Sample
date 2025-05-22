@@ -157,7 +157,6 @@ int32_t DashAccessWrapper::Init(DashStreamingClient *pCtxDashStreaming) {
 
     m_handler = OmafAccess_Init(pCtxDashStreaming);
     if (nullptr == m_handler) {
-        LOG(ERROR) << "handler init failed!" << endl;
         return ERROR_NULL_PTR;
     }
 
@@ -168,7 +167,6 @@ int32_t DashAccessWrapper::Init(DashStreamingClient *pCtxDashStreaming) {
     HeadSetInfo clientInfo;
     clientInfo.pose = new HeadPose;
     if (nullptr == clientInfo.pose) {
-        LOG(ERROR) << "client info malloc failed!" << endl;
         return ERROR_NULL_PTR;
     }
     clientInfo.pose->yaw = 0;
@@ -192,7 +190,6 @@ int32_t DashAccessWrapper::Init(DashStreamingClient *pCtxDashStreaming) {
 int32_t DashAccessWrapper::Open(DashStreamingClient *pCtxDashStreaming) {
     // open media
     if (ERROR_NONE != OmafAccess_OpenMedia(m_handler, pCtxDashStreaming, false, (char *)"", (char *)"")) {
-        LOG(ERROR) << "Open media failed!" << endl;
         return ERROR_INVALID;
     }
     // Get media info
@@ -279,17 +276,14 @@ int32_t DashAccessWrapper::Retrive() {
         currentWaitTime++;
         if (currentWaitTime > maxWaitTimeout) // wait but get packet failed
         {
-            LOG(ERROR) << " Wait too long to get packet from Omaf Dash Access library! Force to quit! " << endl;
         }
         return OMAF_ERROR_TIMED_OUT;
     }
     currentWaitTime = 0;
     if (dashPkt[0].bEOS && !dashPkt[0].bCatchup) {
-        LOG(INFO) << "IS quit!" << endl;
         m_bQuit = true;
     }
     for (int i = 0; i < dashPktNum; i++) {
-        LOG(INFO) << "Get packet has done! and pts is " << dashPkt[i].pts  << " video id " << dashPkt[i].videoID << endl;
     }
 
     for (int i = 0; i < dashPktNum; i++) {
@@ -306,12 +300,10 @@ int32_t DashAccessWrapper::Destroy() {
     int32_t res = ERROR_NONE;
     res = OmafAccess_CloseMedia(m_handler);
     if (res != ERROR_NONE) {
-        LOG(ERROR) << "Close media failed!" << endl;
         return res;
     }
     res = OmafAccess_Close(m_handler);
     if (res != ERROR_NONE) {
-        LOG(ERROR) << "Close failed!" << endl;
         return res;
     }
     return ERROR_NONE;
@@ -446,7 +438,6 @@ int main(int argc, char* argv[]) {
 
     res = daWrapper->Init(dsClient);
     if (res != ERROR_NONE) {
-        LOG(ERROR) << "Dash Access init failed!" << endl;
         SAFE_DELETE(daWrapper);
         SAFE_DELETE(dsClient);
         return ERROR_INVALID;
@@ -454,7 +445,6 @@ int main(int argc, char* argv[]) {
 
     res = daWrapper->Open(dsClient);
     if (res != ERROR_NONE) {
-        LOG(ERROR) << "Dash Access open failed!" << endl;
         SAFE_DELETE(daWrapper);
         SAFE_DELETE(dsClient);
         return ERROR_INVALID;
@@ -462,7 +452,6 @@ int main(int argc, char* argv[]) {
 
     res = daWrapper->Start();
     if (res != ERROR_NONE) {
-        LOG(ERROR) << "Dash Access start failed!" << endl;
         SAFE_DELETE(daWrapper);
         SAFE_DELETE(dsClient);
         return ERROR_INVALID;
@@ -482,7 +471,6 @@ int main(int argc, char* argv[]) {
     string outfile = out;
     string cmd = "grep \"Task download data\" ./logfiles/WARNING/glogClient.WARNING >> " + outfile;
     int ret = system(cmd.c_str());
-    if (ret) LOG(WARNING) << "Process glog file failed!" << endl;
 
     //data analysis
     daWrapper->DataAnalysis();

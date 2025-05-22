@@ -36,6 +36,7 @@
 #include "GLFWRenderContext.h"
 #include "../../../utils/tinyxml2.h"
 #include <math.h>
+#include <iostream>
 
 #define SPEED_CNT_THRESHOLD 150
 
@@ -148,7 +149,6 @@ void GLFWRenderContext::AutoChangePos(float *hPos, float *vPos)
     }
     else //xml input check
     {
-        LOG(ERROR)<<"test motion option support only smooth and sharp mode!"<<std::endl;
         m_needMotionTest = false;
     }
 }
@@ -160,7 +160,6 @@ RenderStatus GLFWRenderContext::GetMotionOptionParams()
     XMLElement *info = config.RootElement();
     if (NULL == info)
     {
-        LOG(ERROR) << " XML parse failed! " << std::endl;
         return RENDER_ERROR;
     }
     XMLElement *motionElem = info->FirstChildElement("testMotionOption");
@@ -171,7 +170,6 @@ RenderStatus GLFWRenderContext::GetMotionOptionParams()
     const XMLAttribute *attOfMotion = motionElem->FirstAttribute();
     if (NULL == attOfMotion)
     {
-        LOG(ERROR) << "XML parse failed!" << std::endl;
         return RENDER_ERROR;
     }
     m_motionConfig.mode = new char[128]();
@@ -181,7 +179,6 @@ RenderStatus GLFWRenderContext::GetMotionOptionParams()
     }
     else
     {
-        LOG(ERROR) << " Mode is invalid! " << std::endl;
         return RENDER_ERROR;
     }
     XMLElement* freqElem = motionElem->FirstChildElement("freq");
@@ -193,7 +190,6 @@ RenderStatus GLFWRenderContext::GetMotionOptionParams()
     }
     else
     {
-        LOG(ERROR) << " freq OR timeInterval is invalid! " << std::endl;
         return RENDER_ERROR;
     }
 
@@ -540,7 +536,6 @@ RenderStatus GLFWRenderContext::GetStatusAndPose(HeadPose *pose, uint32_t* statu
 {
     if (m_projFormat == VCD::OMAF::PF_UNKNOWN)
     {
-        LOG(INFO) << " projection format in render context is unknown!" << std::endl;
         return RENDER_ERROR;
     }
     else if (m_projFormat == VCD::OMAF::PF_ERP || m_projFormat == VCD::OMAF::PF_CUBEMAP)
@@ -557,7 +552,6 @@ RenderStatus GLFWRenderContext::GetStatusAndPose(HeadPose *pose, uint32_t* statu
         return GetStatusAndPoseFor2DFix(pose, status);
     }
     else {
-        LOG(ERROR) << "projection format and source mode are not compliant!" << endl;
         return RENDER_ERROR;
     }
     return RENDER_ERROR;
@@ -568,27 +562,29 @@ void* GLFWRenderContext::InitContext()
     // initialize glfw
     if (!glfwInit())
     {
-        LOG(ERROR)<< "glfw failed to init" << std::endl;
         glfwTerminate();
         return NULL;
     }
     //tranverse();
     // open a window
     //glfwWindowHint(GLFW_SAMPLES, 4);
+    //glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
+    glfwWindowHint(GLFW_DEPTH_BITS, 24);
     m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "VR Player", NULL, NULL); //done
     if (!m_window)
     {
-        LOG(ERROR)<< "failed to open window" << std::endl;
+        std::cout << "GLFW window create error" << std::endl;
         glfwTerminate();
         return NULL;
     }
     glfwMakeContextCurrent((GLFWwindow *)m_window);
-    glfwSetInputMode((GLFWwindow *)m_window, GLFW_STICKY_KEYS, GL_TRUE);
-    glfwSetInputMode((GLFWwindow *)m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode((GLFWwindow *)m_window, GLFW_STICKY_KEYS, GL_TRUE);
+    //glfwSetInputMode((GLFWwindow *)m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glfwPollEvents();
     glfwSetCursorPos((GLFWwindow *)m_window, m_windowWidth / 2, m_windowHeight / 2); //done
@@ -596,10 +592,14 @@ void* GLFWRenderContext::InitContext()
     // initialize opengl
     // glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+    std::cout << "enable texture 2d" << std::endl;
     glEnable(GL_TEXTURE_2D);
+    std::cout << "enable depth" << std::endl;
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    std::cout << "enable cull face" << std::endl;
     glEnable(GL_CULL_FACE);
+    std::cout << "enabled" << std::endl;
     glFrontFace(GL_CCW);
     glCullFace(GL_BACK);
 

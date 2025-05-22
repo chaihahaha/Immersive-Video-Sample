@@ -304,7 +304,6 @@ class MediaPacket : public VCD::NonCopyable {
     if (srcId >= 0 && static_cast<size_t>(srcId) < m_qtyResolution.size()) {
       m_qtyResolution[srcId] = resolution;
     } else {
-      OMAF_LOG(LOG_ERROR, "Invalid source index %d !\n", srcId);
       return OMAF_ERROR_INVALID_DATA;
     }
 

@@ -45,7 +45,7 @@
 #ifdef _USE_TRACE_
 #include "../../../trace/MtHQ_tp.h"
 #endif
-#include "../Common/RegionData.h"
+#include "Common/RegionData.h"
 #include "ShaderString.h"
 #include "../Mesh/Render2TextureMesh_android.h"
 
@@ -93,15 +93,12 @@ RenderStatus ERPRenderTarget_hw::CreateRenderTarget()
 
     glGenFramebuffers(1, &m_fboOnScreenHandle);
     glBindFramebuffer(GL_FRAMEBUFFER, m_fboOnScreenHandle);
-    // ANDROID_LOGD("display_surface_context_global.textureIds[0] %d", m_textureOfR2S);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureOfR2S[0], 0);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
-        ANDROID_LOGD("glCheckFramebufferStatus not complete");
     }
     else
     {
-        ANDROID_LOGD("glCheckFramebufferStatus complete");
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     return RENDER_STATUS_OK;
@@ -138,25 +135,20 @@ RenderStatus ERPRenderTarget_hw::UpdateDisplayTex()
     for(auto it=mQualityRankingInfo.mapQualitySelection.begin(); it!=mQualityRankingInfo.mapQualitySelection.end(); it++){
         //render low quality first
         std::vector<TileInformation> vec_tile = it->second;
-        // ANDROID_LOGD("vec_tile is %d", vec_tile.size());
         if(it->first != mQualityRankingInfo.mainQualityRanking){
             for(auto itq=vec_tile.begin(); itq!=vec_tile.end(); itq++)
             {
                 TileInformation ti = *itq;
                 glBindFramebuffer(GL_FRAMEBUFFER, m_fboOnScreenHandle);
-                // ANDROID_LOGD("m_fboOnScreenHandle : %d", m_fboOnScreenHandle);
                 m_videoShaderOfR2T.Bind();
                 uint32_t vertexAttribOfOnScreen = m_videoShaderOfR2T.SetAttrib("anPosition");
                 uint32_t texCoordAttribOfOnScreen = m_videoShaderOfR2T.SetAttrib("anTexCoords");
-                // ANDROID_LOGD("tile id is %d", ti.tile_id);
                 m_meshOfR2T->BufferUpdate((void *)&ti);
                 m_meshOfR2T->Bind(vertexAttribOfOnScreen, texCoordAttribOfOnScreen);
                 glActiveTexture(GL_TEXTURE0);
                 RenderSource* rs = mapRenderSources[ti.video_id];
                 glBindTexture(GL_TEXTURE_EXTERNAL_OES, rs->GetTextureOfR2T());
-                // ANDROID_LOGD("low texture of r2t : %d video id is %d", rs->GetTextureOfR2T(), ti.video_id);
                 glViewport(0, 0, ti.picWidth, ti.picHeight);
-                // ANDROID_LOGD("viewport w %d, h %d", ti.picWidth, ti.picHeight);
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
             }
@@ -167,7 +159,6 @@ RenderStatus ERPRenderTarget_hw::UpdateDisplayTex()
     for(auto itm=vec_main.begin(); itm!=vec_main.end(); itm++){
         TileInformation ti = *itm;
         glBindFramebuffer(GL_FRAMEBUFFER, m_fboOnScreenHandle);
-        // ANDROID_LOGD("m_fboOnScreenHandle : %d", m_fboOnScreenHandle);
         m_videoShaderOfR2T.Bind();
         uint32_t vertexAttribOfOnScreen = m_videoShaderOfR2T.SetAttrib("anPosition");
         uint32_t texCoordAttribOfOnScreen = m_videoShaderOfR2T.SetAttrib("anTexCoords");
@@ -176,13 +167,11 @@ RenderStatus ERPRenderTarget_hw::UpdateDisplayTex()
         glActiveTexture(GL_TEXTURE0);
         RenderSource* rs = mapRenderSources[ti.video_id];
         glBindTexture(GL_TEXTURE_EXTERNAL_OES, rs->GetTextureOfR2T());
-        // ANDROID_LOGD("high texture of r2t is %d and video id is %d", rs->GetTextureOfR2T(), ti.video_id);
         glViewport(0, 0, ti.picWidth, ti.picHeight);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     static int cnt = 0;
-    ANDROID_LOGD("TEST: Update frame at %d", cnt);
     cnt++;
     return RENDER_STATUS_OK;
 }
@@ -209,11 +198,9 @@ RenderStatus ERPRenderTarget_hw::CalcQualityRanking()
         if (regionInfo == NULL || regionInfo->GetRegionWisePacking() == NULL \
              || regionInfo->GetSourceInfo() == NULL || regionInfo->GetSourceInRegion() > 2)
         {
-            LOG(INFO)<<"region information is invalid!"<<endl;
             errorCnt++;
             continue;
         }
-        // LOG(INFO)<<"regionInfo ptr:"<<regionInfo->GetSourceInRegion()<<" rwpk:"<<regionInfo->GetRegionWisePacking()->rectRegionPacking<<" source:"<<regionInfo->GetSourceInfo()->width<<endl;
         for(int32_t i=0; i<regionInfo->GetSourceInRegion(); i++)
             listQuality.push_back(regionInfo->GetSourceInfo()[i].qualityRanking);
     }
@@ -230,7 +217,6 @@ RenderStatus ERPRenderTarget_hw::CalcQualityRanking()
     mQualityRankingInfo.mapQualitySelection.clear();
     std::vector<TileInformation> TileIDs[mQualityRankingInfo.numQuality];
     int i = 0;
-    // ANDROID_LOGD("listQuality is %d", listQuality.size());
 
     for(auto it=listQuality.begin(); it!=listQuality.end();it++){
         mQualityRankingInfo.mapQualitySelection[*it]=TileIDs[i];
@@ -274,7 +260,6 @@ int32_t ERPRenderTarget_hw::findQuality(RegionData *regionInfo, RectangularRegio
         || regionInfo->GetSourceInfo() == NULL || regionInfo->GetSourceInRegion() > 2 || regionInfo->GetSourceInRegion() <= 0){
             continue;
         }
-        // ANDROID_LOGD("regioninfo rwpk num: %d, one rrwpk w: %d, h: %d, l: %d, t: %d", regionInfo->GetRegionWisePacking()->numRegions, regionInfo->GetRegionWisePacking()->rectRegionPacking[0].projRegWidth,
         // regionInfo->GetRegionWisePacking()->rectRegionPacking[0].projRegHeight, regionInfo->GetRegionWisePacking()->rectRegionPacking[0].projRegLeft, regionInfo->GetRegionWisePacking()->rectRegionPacking[0].projRegTop);
         uint16_t numRegion = regionInfo->GetRegionWisePacking()->numRegions;
         for(int32_t idx=0; idx<numRegion; idx++){
@@ -297,13 +282,11 @@ int32_t ERPRenderTarget_hw::findQuality(RegionData *regionInfo, RectangularRegio
             int32_t source_idx = 0;
             int32_t quality = findQuality(regionInfo, regionInfo->GetRegionWisePacking()->rectRegionPacking[idx], source_idx);
             tile_info.tile_id = (coord.first + 1) + m_rsFactory->GetHighTileCol() * coord.second;
-            // ANDROID_LOGD("quality is %d, and tile_id is %d", quality, tile_info.tile_id);
             mQualityRankingInfo.mapQualitySelection[quality].push_back(tile_info);
         }
         it->second->SafeDeleteRegionInfo();
         static int cnt = 0;
         cnt++;
-        ANDROID_LOGD("get rwpk at %d", cnt);
         regionInfo = NULL;
     }
     return ret;
@@ -385,7 +368,6 @@ RenderStatus ERPRenderTarget_hw::GetTilesInViewport(float yaw, float pitch, floa
 {
     if (hFOV <= 0 || vFOV <= 0)
     {
-        LOG(ERROR)<<"FOV input invalid!"<<std::endl;
         return RENDER_ERROR;
     }
     struct SphereRegion region;

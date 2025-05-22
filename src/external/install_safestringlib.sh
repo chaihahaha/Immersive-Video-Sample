@@ -3,7 +3,7 @@
 mkdir -p ../build/external
 cd ../build/external
 if [ ! -d "./safestringlib" ] ; then
-    git clone https://github.com/intel/safestringlib.git
+    git clone https://ghfast.top/github.com/intel/safestringlib.git
 fi
 
 cd safestringlib

@@ -146,9 +146,13 @@ int OmafAccess_OpenMedia(Handler hdl, DashStreamingClient *pCtx, bool enablePred
   pSource->SetLoop(false);
   // for android ndk compile, transform char* to string is mandatory
   string media_url = pCtx->media_url;
+  std::cout << "openmedia media_url: " << media_url << std::endl;
   string cache_path = pCtx->cache_path;
+  std::cout << "openmedia: cache_path: " << cache_path << std::endl;
   string s_predictPluginName = predictPluginName;
   string s_libPath = libPath;
+  std::cout << "openmedia: s_predictPluginName: " << s_predictPluginName << std::endl;
+  std::cout << "openmedia: s_libPath: " << s_libPath << std::endl;
   return pSource->OpenMedia(media_url, cache_path, pCtx->log_callback, pCtx->plugin_def, pCtx->enable_extractor, enablePredictor,
                             s_predictPluginName, s_libPath, pCtx->enable_autoView, pCtx->bSync_time);
 }
@@ -186,11 +190,13 @@ int OmafAccess_GetMediaInfo(Handler hdl, DashMediaInfo *info) {
 
 int OmafAccess_GetPacket(Handler hdl, int stream_id, DashPacket *packet, int *size, uint64_t *pts, bool needParams,
                          bool clearBuf) {
+  std::cout << "OmafAccess_GetPacket" << std::endl;
   OmafMediaSource *pSource = (OmafMediaSource *)hdl;
   std::list<MediaPacket *> pkts;
   pSource->GetPacket(stream_id, &pkts, needParams, clearBuf);
 
   if (0 == pkts.size()) {
+  std::cout << "OmafAccess_GetPacket null packet" << std::endl;
     return ERROR_NULL_PACKET;
   }
 

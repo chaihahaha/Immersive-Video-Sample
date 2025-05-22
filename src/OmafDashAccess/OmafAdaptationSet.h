@@ -176,6 +176,7 @@ class OmafAdaptationSet {
   OmafDashMode GetMode() { return mMode; };
   QualityRank GetRepresentationQualityRanking() {
     try {
+        //std::cout << "GetRepresentationQualityRanking stoi" << mRepresentation->GetQualityRanking() << std::endl;
       int rank = stoi(mRepresentation->GetQualityRanking());
 
       switch (rank) {
@@ -189,7 +190,6 @@ class OmafAdaptationSet {
           return INVALID_QUALITY_RANKING;
       }
     } catch (const std::exception& ex) {
-      OMAF_LOG(LOG_ERROR, "Exception when parse the quality ranking. ex: %s\n", ex.what());
       return INVALID_QUALITY_RANKING;
     }
   };

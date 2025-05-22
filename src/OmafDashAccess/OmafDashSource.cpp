@@ -113,17 +113,19 @@ int OmafDashSource::OpenMedia(std::string url, std::string cacheDir, void* exter
   else
     logCallBack = GlogFunction;
 
-  DIR* dir = opendir(cacheDir.c_str());
-  if (dir) {
-    closedir(dir);
-  } else {
-    OMAF_LOG(LOG_INFO, "Failed to open the cache path: %s, create a folder with this path!\n", cacheDir.c_str());
-    int checkdir = mkdir(cacheDir.c_str(), 0777);
-    if (checkdir) {
-      OMAF_LOG(LOG_ERROR, "Uable to create cache path: %s\n", cacheDir.c_str());
-      return ERROR_INVALID;
-    }
-  }
+  std::cout << "OmafDashSource::OpenMedia cacheDir  " << cacheDir << std::endl;
+
+  //DIR* dir = opendir(cacheDir.c_str());
+  //if (dir) {
+  //  closedir(dir);
+  //} else {
+  //  OMAF_LOG(LOG_INFO, "Failed to open the cache path: %s, create a folder with this path!\n", cacheDir.c_str());
+  //  int checkdir = mkdir(cacheDir.c_str(), 0777);
+  //  if (checkdir) {
+  //    OMAF_LOG(LOG_ERROR, "Uable to create cache path: %s\n", cacheDir.c_str());
+  //    return ERROR_INVALID;
+  //  }
+  //}
   // FIXME, support more platform
   if (cacheDir.size() && cacheDir[cacheDir.size() - 1] == '/') {
     cacheDir = cacheDir.substr(0, cacheDir.size() - 1);
@@ -329,9 +331,12 @@ int OmafDashSource::OpenMedia(std::string url, std::string cacheDir, void* exter
 
 int OmafDashSource::StartStreaming()
 {
+        std::cout << "start streaming" << std::endl;
   if (!mIsLocalMedia) {
+        std::cout << "start thread not localmedia" << std::endl;
     StartThread();
     if (omaf_dash_params_.enable_in_time_viewport_update) {
+        std::cout << "starting CatchupThreadWrapper" << std::endl;
       int32_t ret = pthread_create(&m_catchupThread, NULL, CatchupThreadWrapper, this);
       if (ret) {
         OMAF_LOG(LOG_ERROR, "Failed to create tiles stitching thread !\n");
@@ -375,6 +380,7 @@ int OmafDashSource::CloseMedia() {
 }
 
 int OmafDashSource::GetPacket(int streamID, std::list<MediaPacket*>* pkts, bool needParams, bool clearBuf) {
+    std::cout << "  OmafDashSource::GetPacke "<< std::endl;
   OmafMediaStream* pStream = this->GetStream(streamID);
 
   MediaPacket* pkt = nullptr;
@@ -475,16 +481,19 @@ int OmafDashSource::GetPacket(int streamID, std::list<MediaPacket*>* pkts, bool 
           }
       }
     } else {
+        //std::cout << "pStream->GetDashMode() == OmafDashMode::LATER_BINDING" << std::endl;
+    std::cout << "  OmafDashSource::LATER_BINDING "<< std::endl;
       std::list<MediaPacket*> mergedPackets;
       pStream->SetNeedVideoParams(needParams);
       mergedPackets = pStream->GetOutTilesMergedPackets();
-      // OMAF_LOG(LOG_INFO, " merged packets has the size of %lld\n", mergedPackets.size());
+      OMAF_LOG(LOG_INFO, " merged packets has the size of %d\n", mergedPackets.size());
       std::list<MediaPacket*>::iterator itPacket;
       for (itPacket = mergedPackets.begin(); itPacket != mergedPackets.end(); itPacket++) {
         MediaPacket* onePacket = *itPacket;
         onePacket->SetPTS(onePacket->GetPTS() - omaf_reader_mgr_->GetStartOffsetPts());
         pkts->push_back(onePacket);
       }
+    std::cout << "  OmafDashSource::pkts " << pkts->size()<< std::endl;
       mergedPackets.clear();
     }
   }
@@ -524,11 +533,15 @@ int OmafDashSource::ChangeViewport(HeadPose* pose) {
 }
 
 int OmafDashSource::GetMediaInfo(DashMediaInfo* media_info) {
+    std::cout << "inside int OmafDashSource::GetMediaInfo" << std::endl;
   MPDInfo* mInfo = this->GetMPDInfo();
   if (!mInfo) return ERROR_NULL_PTR;
 
+    std::cout << "inside int OmafDashSource::GetMediaInfo 1" << std::endl;
   media_info->duration = mInfo->media_presentation_duration;
+    std::cout << "inside int OmafDashSource::GetMediaInfo 2" << std::endl;
   media_info->stream_count = this->GetStreamCount();
+    std::cout << "inside int OmafDashSource::GetMediaInfo 3" << std::endl;
   if (mInfo->type == TYPE_STATIC) {
     media_info->streaming_type = DASH_STREAM_STATIC;
     media_info->target_latency = 0;
@@ -536,8 +549,10 @@ int OmafDashSource::GetMediaInfo(DashMediaInfo* media_info) {
     media_info->streaming_type = DASH_STREAM_DYNMIC;
     media_info->target_latency = mInfo->target_latency; // for LL-DASH
   }
+    std::cout << "inside int OmafDashSource::GetMediaInfo 4, stream cout: " <<  media_info->stream_count << std::endl;
 
   for (int i = 0; i < media_info->stream_count; i++) {
+    std::cout << "inside int OmafDashSource::GetMediaInfo 5" << std::endl;
     DashStreamInfo* pStreamInfo = this->mMapStream[i]->GetStreamInfo();
     media_info->stream_info[i].bit_rate = pStreamInfo->bit_rate;
     media_info->stream_info[i].height = pStreamInfo->height;
@@ -564,6 +579,7 @@ int OmafDashSource::GetMediaInfo(DashMediaInfo* media_info) {
     DELETE_ARRAY(pStreamInfo->mime_type);
   }
 
+    std::cout << "success" << std::endl;
   return ERROR_NONE;
 }
 
@@ -576,6 +592,7 @@ void OmafDashSource::Run() {
 }
 
 int OmafDashSource::DownloadSegments(bool bFirst) {
+    std::cout << "inside OmafDashSource::DownloadSegments" << std::endl;
 #ifndef _ANDROID_NDK_OPTION_
 #ifdef _USE_TRACE_
   // trace
@@ -601,6 +618,7 @@ int OmafDashSource::DownloadSegments(bool bFirst) {
       if (m_enableCMAF)
         pStream->GetChunkInfoType();
     }
+    std::cout << "iter downloadsegment" << std::endl;
     pStream->DownloadSegments(m_enableCMAF);
   }
 #ifndef _ANDROID_NDK_OPTION_
@@ -624,6 +642,7 @@ int OmafDashSource::DownloadSegments(bool bFirst) {
 }
 
 int OmafDashSource::StartReadThread() {
+    std::cout << "StartReadThread" << std::endl;
   int ret = SelectSegements(true);
 
   if (ERROR_NONE != ret) {
@@ -760,6 +779,7 @@ int OmafDashSource::DownloadInitSeg() {
 uint64_t OmafDashSource::GetSegmentDuration(int stream_id) { return mMapStream[stream_id]->GetSegmentDuration(); }
 
 void OmafDashSource::thread_dynamic() {
+    std::cout << "thread_dynamic" << std::endl;
   int ret = ERROR_NONE;
   bool go_on = true;
 
@@ -792,6 +812,7 @@ void OmafDashSource::thread_dynamic() {
   m_enableCMAF = omaf_reader_mgr_->IsCmafContent();
 
   while ((ERROR_NONE != StartReadThread())) {
+    std::cout << "run startreadthread" << std::endl;
     ::usleep(1000);
   }
 
@@ -861,6 +882,7 @@ void OmafDashSource::thread_dynamic() {
 }
 
 void OmafDashSource::thread_static() {
+    std::cout << "thread_static" << std::endl;
   int ret = ERROR_NONE;
   bool go_on = true;
 
@@ -892,6 +914,7 @@ void OmafDashSource::thread_static() {
   m_enableCMAF = omaf_reader_mgr_->IsCmafContent();
 
   while ((ERROR_NONE != StartReadThread())) {
+    std::cout << "run startreadthread" << std::endl;
     ::usleep(1000);
   }
 

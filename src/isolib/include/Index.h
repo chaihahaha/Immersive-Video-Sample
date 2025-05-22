@@ -88,7 +88,6 @@ public:
     }
 
     IndexCalculation<T, Tag>& operator++();
-    ;
     IndexCalculation<T, Tag>& operator--();
 };
 

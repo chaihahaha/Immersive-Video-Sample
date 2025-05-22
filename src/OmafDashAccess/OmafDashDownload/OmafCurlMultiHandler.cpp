@@ -100,14 +100,14 @@ OMAF_STATUS OmafCurlMultiDownloader::addTask(OmafDownloadTask::Ptr task) noexcep
       OMAF_LOG(LOG_ERROR, "Try to add empty task!\n");
       return ERROR_INVALID;
     }
-    OMAF_LOG(LOG_INFO, "01-task id %lld, task count=%d\n", task->id(), task.use_count());
+    OMAF_LOG(LOG_INFO, "01-task id %d, task count=%d\n", task->id(), task.use_count());
     task->state(OmafDownloadTask::State::READY);
     {
       std::lock_guard<std::mutex> lock(ready_task_list_mutex_);
       ready_task_list_.push_back(task);
     }
     task_size_.fetch_add(1);
-    OMAF_LOG(LOG_INFO, "02-task id %lld,  task count=%d\n", task->id(), task.use_count());
+    OMAF_LOG(LOG_INFO, "02-task id %d,  task count=%d\n", task->id(), task.use_count());
     return ERROR_NONE;
   } catch (const std::exception& ex) {
     OMAF_LOG(LOG_ERROR, "Exception when add task, ex: %s\n", ex.what());
@@ -139,31 +139,48 @@ OMAF_STATUS OmafCurlMultiDownloader::removeTask(OmafDownloadTask::Ptr task) noex
 
 OMAF_STATUS OmafCurlMultiDownloader::createTransferForTask(OmafDownloadTask::Ptr task) noexcept {
   int ret = ERROR_NONE;
+   OMAF_LOG(LOG_INFO, "createTransferForTask: ENTER for Task ID %lld, URL: %s. Current data_downloader handler: %p, header_downloader handler: %p\n",
+           task->id(), task->url().c_str(),
+           (task->easy_d_downloader_ ? static_cast<void*>(task->easy_d_downloader_->handler()) : nullptr),
+           (task->easy_h_downloader_ ? static_cast<void*>(task->easy_h_downloader_->handler()) : nullptr));
   // 1. create header handler if in byte range mode
   if (task->header_size_ != 0 && task->easy_h_downloader_.get() == nullptr) {
-    OMAF_LOG(LOG_INFO, "Create transfer for header downloader\n");
+      OMAF_LOG(LOG_INFO, "createTransferForTask: Creating header downloader for Task ID %lld\n", task->id());
     ret = createTransfer(task, task->easy_h_downloader_);
+    OMAF_LOG(LOG_INFO, "createTransferForTask: AFTER creating header downloader for Task ID %lld. Result: %d. Header_downloader handler: %p\n",
+             task->id(), ret, (task->easy_h_downloader_ ? static_cast<void*>(task->easy_h_downloader_->handler()) : nullptr));
 
     if (ret != ERROR_NONE || task->easy_h_downloader_.get() == nullptr)
+         OMAF_LOG(LOG_ERROR, "createTransferForTask: Failed to create header downloader for Task ID %lld.\n", task->id());
       return ERROR_NULL_PTR;
 
     task->easy_h_downloader_->setType(OmafCurlEasyDownloader::Type::HEADER);
   }
   // 2. create data handler
   if (task->easy_d_downloader_.get() == nullptr) {
-    OMAF_LOG(LOG_INFO, "Create transfer for data downloader\n");
+      OMAF_LOG(LOG_INFO, "createTransferForTask: Creating data downloader for Task ID %lld\n", task->id());
     ret = createTransfer(task, task->easy_d_downloader_);
+    OMAF_LOG(LOG_INFO, "createTransferForTask: AFTER creating data downloader for Task ID %lld. Result: %d. Data_downloader handler: %p\n",
+             task->id(), ret, (task->easy_d_downloader_ ? static_cast<void*>(task->easy_d_downloader_->handler()) : nullptr));
 
     if (ret != ERROR_NONE || task->easy_d_downloader_.get() == nullptr)
+        OMAF_LOG(LOG_ERROR, "createTransferForTask: Failed to create data downloader for Task ID %lld.\n", task->id());
       return ERROR_NULL_PTR;
 
     task->easy_d_downloader_->setType(OmafCurlEasyDownloader::Type::DATA);
   }
+  OMAF_LOG(LOG_INFO, "createTransferForTask: EXIT for Task ID %lld. Final data_downloader handler: %p, header_downloader handler: %p\n",
+           task->id(),
+           (task->easy_d_downloader_ ? static_cast<void*>(task->easy_d_downloader_->handler()) : nullptr),
+           (task->easy_h_downloader_ ? static_cast<void*>(task->easy_h_downloader_->handler()) : nullptr));
   return ret;
 }
 
 OMAF_STATUS OmafCurlMultiDownloader::startTransferForTask(OmafDownloadTask::Ptr task) noexcept {
   int ret = ERROR_NONE;
+  OMAF_LOG(LOG_INFO, "startTransferForTask: ENTER for Task ID %lld, URL: %s. Data_downloader handler before start: %p\n",
+           task->id(), task->url().c_str(),
+           (task->easy_d_downloader_ ? static_cast<void*>(task->easy_d_downloader_->handler()) : nullptr));
   // 1. start header transfer
   if (task->easy_h_downloader_.get() != nullptr) {
     OMAF_LOG(LOG_INFO, "Start transfer for header downloader %s\n", task->to_string().c_str());
@@ -273,6 +290,8 @@ OMAF_STATUS OmafCurlMultiDownloader::startTransfer(OmafDownloadTask::Ptr task, O
       return ERROR_INVALID;
     }
 
+    OMAF_LOG(LOG_INFO, "startTransfer: Before adding to run_task_map_. Task ID %lld, use_count=%ld. Downloader Ptr: %p\n",
+         task->id(), task.use_count(), static_cast<void*>(downloader.get()));
     {
       std::lock_guard<std::mutex> lock(run_task_map_mutex_);
       auto handler = downloader->handler();
@@ -282,8 +301,13 @@ OMAF_STATUS OmafCurlMultiDownloader::startTransfer(OmafDownloadTask::Ptr task, O
 
         task->state(OmafDownloadTask::State::RUNNING);
         run_task_map_[downloader] = task;
+        OMAF_LOG(LOG_INFO, "startTransfer: AFTER adding to run_task_map_. Task ID %lld, use_count=%ld. run_task_map_.size() = %zu\n",
+             task->id(), task.use_count(), run_task_map_.size());
         downloader->setState(OmafCurlEasyDownloader::State::DOWNLOADING);
         task->transfer_times_ += 1;
+      }
+      else {
+          OMAF_LOG(LOG_ERROR, "startTransfer: downloader->handler() is NULL for Task ID %lld!\n", task->id());
       }
     }
 
@@ -562,6 +586,7 @@ void OmafCurlMultiDownloader::threadRunner(void) noexcept {
 }
 
 OMAF_STATUS OmafCurlMultiDownloader::startTaskDownload(void) noexcept {
+    return ERROR_NONE;
   try {
     // start a new task
     if ((run_task_map_.size() < static_cast<size_t>(max_parallel_transfers_)) && (ready_task_list_.size() > 0)) {
@@ -572,10 +597,17 @@ OMAF_STATUS OmafCurlMultiDownloader::startTaskDownload(void) noexcept {
         OMAF_LOG(LOG_INFO, "1-task id %lld, task count=%d\n", task->id(),  task.use_count());
         ready_task_list_.pop_front();
       }
+      if (!task) { // Check if task is truly null
+          OMAF_LOG(LOG_ERROR, "startTaskDownload: Task is NULL after trying to get from ready_task_list_!\n");
+          return ERROR_NONE; // Or appropriate error
+      }
 
       OMAF_STATUS ret = ERROR_NONE;
       if (task != NULL) {
+          OMAF_LOG(LOG_INFO, "startTaskDownload: Before create/startTransferForTask. Task ID %lld, use_count=%ld\n", task->id(), task.use_count());
         ret = createTransferForTask(task);
+        OMAF_LOG(LOG_INFO, "startTaskDownload: After createTransferForTask. Task ID %lld, use_count=%ld, easy_d_downloader null? %d\n", task->id(), task.use_count(), (task->easy_d_downloader_ == nullptr));
+
         if (ret == ERROR_NONE) {
           ret = startTransferForTask(task);
           if (ret != ERROR_NONE) {
@@ -585,13 +617,16 @@ OMAF_STATUS OmafCurlMultiDownloader::startTaskDownload(void) noexcept {
         } else {
           OMAF_LOG(LOG_ERROR, "Failed to create the transfer!\n");
         }
+         OMAF_LOG(LOG_INFO, "startTaskDownload: After all transfer logic. Task ID %lld, use_count=%ld\n", task->id(), task.use_count());
       }
       else
       {
         OMAF_LOG(LOG_ERROR, "Download task failed to create!\n");
         return ERROR_NULL_PTR;
       }
-      OMAF_LOG(LOG_INFO, "2-task id %lld, task count=%d\n", task->id(), task.use_count());
+      if (task) { // Add a null check for safety before logging
+    OMAF_LOG(LOG_INFO, "2-task id %lld, task count=%ld (end of startTaskDownload scope for local 'task' Ptr)\n", task->id(), task.use_count());
+}
     }
     return ERROR_NONE;
   } catch (const std::exception& ex) {

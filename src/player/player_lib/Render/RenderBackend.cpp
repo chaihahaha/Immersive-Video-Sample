@@ -33,15 +33,16 @@
 
 #include "RenderBackend.h"
 #include <string.h>
+#include <iostream>
 #ifdef _LINUX_OS_
 #include <GL/glu.h>
-#include <GL/glu_mangle.h>
+//#include <GL/glu_mangle.h>
 #include <GL/gl.h>
-#include <GL/glx.h>
-#include <GL/glext.h>
-#include <GL/glcorearb.h>
+//#include <GL/glx.h>
+//#include <GL/glext.h>
+//#include <GL/glcorearb.h>
 #include <GLES3/gl3.h>
-#include <GLES3/gl3ext.h>
+//#include <GLES3/gl3ext.h>
 #include <GLES3/gl3platform.h>
 #endif
 #ifdef _ANDROID_OS_
@@ -62,7 +63,6 @@ RenderStatus RenderBackend::BindTexture(int32_t target, int32_t texture)
     glBindTexture(target, texture); //target can be set as GL_TEXTURE_2D
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"BindTexture ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -79,7 +79,6 @@ RenderStatus RenderBackend::BindVertexArray(uint32_t array)
     glBindVertexArray(array);
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"BindVertexArray ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -90,7 +89,6 @@ RenderStatus RenderBackend::BindBuffer(uint32_t target, uint32_t buffer)
     glBindBuffer(target, buffer);
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"BindBuffer ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -101,7 +99,6 @@ RenderStatus RenderBackend::DrawArrays(int32_t mode, int32_t first, int32_t coun
     glDrawArrays(mode, first, count); //mode can be set as GL_TRIANGLES
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"DrawArrays ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -115,6 +112,7 @@ RenderStatus RenderBackend::BufferData(uint32_t target, int32_t size, const void
 
 RenderStatus RenderBackend::Enable(int32_t cap)
 {
+    std::cout << "enable cap: " << cap << std::endl;
     glEnable(cap);
     return RENDER_STATUS_OK;
 }
@@ -130,7 +128,6 @@ RenderStatus RenderBackend::ActiveTexture(int32_t texture)
     glActiveTexture(texture);
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"ActiveTexture ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -141,7 +138,6 @@ RenderStatus RenderBackend::GenTextures(int32_t number, uint32_t *textures)
     glGenTextures(number, textures);
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"GenTextures ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -153,8 +149,6 @@ RenderStatus RenderBackend::GenVertexArrays(int32_t number, uint32_t *arrays)
     GLenum ret = glGetError();
     if (GL_NO_ERROR != ret)
     {
-        LOG(INFO)<<"GenVertexArrays ERROR!"<<endl;
-        LOG(INFO)<<ret<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -165,7 +159,6 @@ RenderStatus RenderBackend::GenBuffers(int32_t number, uint32_t *buffers)
     glGenBuffers(number, buffers);
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"GenBuffers ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -188,7 +181,6 @@ RenderStatus RenderBackend::TexImage2D(int32_t target, int32_t level, int32_t in
     glTexImage2D(target, level, internalformat, width, height, border, format, type, data);
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"TexImage2D ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -199,7 +191,6 @@ RenderStatus RenderBackend::VertexAttribPointer(uint32_t index, int32_t size, ui
     glVertexAttribPointer(index, size, type, normalized, stride, ptr);
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"VertexAttribPointer ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -216,7 +207,6 @@ RenderStatus RenderBackend::DrawElements(uint32_t mode, int32_t size, uint32_t t
     glDrawElements(mode, size, type, indices);
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"DrawElements ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -251,7 +241,6 @@ RenderStatus RenderBackend::BindFramebuffer(int32_t target, uint32_t frameBuffer
     glBindFramebuffer(target, frameBuffers);
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"BindFramebuffer ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;
@@ -273,7 +262,6 @@ RenderStatus RenderBackend::Viewport(int32_t x, int32_t y, int32_t width, int32_
     glViewport(x, y, width, height);
     if (GL_NO_ERROR != glGetError())
     {
-        LOG(INFO)<<"Viewport ERROR!"<<endl;
         return RENDER_ERROR;
     }
     return RENDER_STATUS_OK;

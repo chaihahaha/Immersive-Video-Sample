@@ -33,10 +33,13 @@
 
 #ifdef _LINUX_OS_
 
+#include <functional>
+#include <emscripten.h>
 #include <dirent.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <algorithm>
+#include <thread>
 #include "../../../utils/tinyxml2.h"
 #include "../../player_lib/Common/Common.h"
 #include "../../player_lib/Api/MediaPlayer_Linux.h"
@@ -50,9 +53,64 @@
 #define MAXWINDOWLEN 2000
 #define MINWINDOWLEN 500
 
-using namespace tinyxml2;
 
 VCD_USE_VRVIDEO;
+using namespace tinyxml2;
+
+std::string config_string = R"(
+<?xml version="1.0"?>
+<info>
+    <!-- windowWidth/windowHeight is for width and height of window -->
+    <windowWidth>960</windowWidth>
+    <windowHeight>960</windowHeight>
+    <!-- Resource URL, can be remote or local -->
+    <url>http://127.0.0.1:8000/Gaslamp/Test.mpd</url>
+    <!-- sourceType 0 is for DashSource -->
+    <sourceType>0</sourceType>
+    <!-- enableExtractor 0 is false and 1 is true -->
+    <enableExtractor>0</enableExtractor>
+    <!-- enableAutoView 0 is false and 1 is true in MultiView mode -->
+    <enableAutoView>0</enableAutoView>
+    <!-- debug option to dump input packets -->
+    <StreamDumpedOption>0</StreamDumpedOption>
+    <!-- viewport settings -->
+    <viewportHFOV>80</viewportHFOV>
+    <viewportVFOV>80</viewportVFOV>
+    <viewportWidth>960</viewportWidth>
+    <viewportHeight>960</viewportHeight>
+    <!-- cache path -->
+    <cachePath>/Gaslamp</cachePath>
+    <!-- log level: INFO < WARNING < ERROR < FATAL -->
+    <minLogLevel>WARNING</minLogLevel>
+    <!-- limited video decoder resolution -->
+    <maxVideoDecodeWidth>2560</maxVideoDecodeWidth>
+    <maxVideoDecodeHeight>2560</maxVideoDecodeHeight>
+    <!-- for WebRTC parameters -->
+    <resolution>8k</resolution>
+    <server_url>http://127.0.0.1</server_url>
+    <ProjectionType>ERP</ProjectionType>
+    <frameRate>30</frameRate>
+    <frameNum>100</frameNum>
+    <enableDump>false</enableDump>
+    <predict enable="0">
+     <!-- <plugin>libViewportPredict_LR.so</plugin>
+     <path>../plugins/ViewportPredict_Plugin/predict_LR/</path> -->
+    </predict>
+    <intimeviewportupdate enable="0">
+     <responseTimesInOneSeg>2</responseTimesInOneSeg>
+     <maxCatchupWidth>2560</maxCatchupWidth>
+     <maxCatchupHeight>2560</maxCatchupHeight>
+    </intimeviewportupdate>
+    <!-- <PathOf360SCVPPlugins>/usr/local/lib/libPanZoomTileSelection.so</PathOf360SCVPPlugins> -->
+</info>
+)";
+
+struct RenderConfig renderConfig;
+volatile bool configLoaded = false;
+MediaPlayer_Linux *player = new MediaPlayer_Linux();
+//RenderContext* context; // TODO: buggy it's overwritten by new
+
+
 bool parseRenderFromXml(std::string xml_file, struct RenderConfig &renderConfig) noexcept {
   try {
     XMLDocument config;
@@ -104,10 +162,7 @@ bool parseRenderFromXml(std::string xml_file, struct RenderConfig &renderConfig)
     {
       renderConfig.sourceType =
         atoi(stElem->GetText());  // FFMPEG_SOURCE=1 or DASH_SOURCE=0
-      if (renderConfig.sourceType == 1) {
-        LOG(ERROR) << "---NOT support local file for now---" << std::endl;
-        return RENDER_ERROR;
-      } else if (renderConfig.sourceType > 2 || renderConfig.sourceType < 0) {
+      if (renderConfig.sourceType > 2 || renderConfig.sourceType < 0) {
         LOG(ERROR) << "---INVALID source type input (0:remote mpd 2:webrtc support)---" << std::endl;
         return RENDER_ERROR;
       }
@@ -237,19 +292,15 @@ bool parseRenderFromXml(std::string xml_file, struct RenderConfig &renderConfig)
       std::string logLevel = logLevelElem->GetText();
       if (logLevel == "INFO")
       {
-        renderConfig.minLogLevel = google::INFO;
       }
       else if (logLevel == "WARNING")
       {
-        renderConfig.minLogLevel = google::WARNING;
       }
       else if (logLevel == "ERROR")
       {
-        renderConfig.minLogLevel = google::ERROR;
       }
       else if (logLevel == "FATAL")
       {
-        renderConfig.minLogLevel = google::FATAL;
       }
       else
       {
@@ -337,79 +388,60 @@ bool parseRenderFromXml(std::string xml_file, struct RenderConfig &renderConfig)
   }
 }
 
+
 RenderContext* InitRenderContext(struct RenderConfig config)
 {
   RenderContext *context = new GLFWRenderContext(config);
   if (context == nullptr)
   {
-    LOG(ERROR) << "Error in contex create!" << endl;
+      std::cout << "context nullptr" << std::endl;
     return nullptr;
   }
   void *window = context->InitContext();
   if (window == nullptr)
   {
-    LOG(ERROR) << "Failed to initial render context!" << endl;
+      std::cout << "widow nullptr" << std::endl;
     SAFE_DELETE(context);
     return nullptr;
   }
   return context;
 }
 
-int main(int32_t argc, char *argv[]) {
-  // 1. input from xml configuration
-  struct RenderConfig renderConfig;
-  if (RENDER_STATUS_OK != parseRenderFromXml("config.xml", renderConfig)) {
-    LOG(ERROR) << "Failed to parse the render xml config file!" << std::endl;
-    SAFE_DELETE_ARRAY(renderConfig.pathof360SCVPPlugin);
-    SAFE_DELETE_ARRAY(renderConfig.url);
-    SAFE_DELETE_ARRAY(renderConfig.cachePath);
-    if (renderConfig.enablePredictor) {
-      SAFE_DELETE_ARRAY(renderConfig.libPath);
-      SAFE_DELETE_ARRAY(renderConfig.predictPluginName);
-    }
-    return RENDER_ERROR;
-  }
-  GlogWrapper m_glogWrapper((char*)"glogRender", renderConfig.minLogLevel);
+void main_loop_play() {
+    player->Play();
+}
 
-  DIR *dir = opendir(renderConfig.cachePath);
-  if (dir) {
-    closedir(dir);
-  } else {
-    LOG(INFO) << "Failed to open the cache path: " << renderConfig.cachePath << " , create a folder with this path!" << endl;
-    int checkdir = mkdir(renderConfig.cachePath, 0777);
-    if (checkdir) {
-      SAFE_DELETE_ARRAY(renderConfig.pathof360SCVPPlugin);
-      SAFE_DELETE_ARRAY(renderConfig.url);
-      SAFE_DELETE_ARRAY(renderConfig.cachePath);
-      if (renderConfig.enablePredictor) {
-        SAFE_DELETE_ARRAY(renderConfig.libPath);
-        SAFE_DELETE_ARRAY(renderConfig.predictPluginName);
-      }
-      LOG(ERROR) << "Uable to create cache path! " << endl;
-      return RENDER_ERROR;
+EMSCRIPTEN_KEEPALIVE
+int main() {
+    FILE *config_file = fopen("config.xml", "w");
+    size_t config_file_size = config_string.size();
+    fwrite(config_string.c_str(), 1, config_file_size, config_file);
+    fclose(config_file);
+
+    if (parseRenderFromXml("config.xml", renderConfig) != RENDER_STATUS_OK) {
+      // Handle error (e.g., log to console)
+        std::cout << "load config error" << std::endl;
+      return -1;
     }
-  }
-  // 2.initial player
-  MediaPlayer_Linux *player = new MediaPlayer_Linux();
-  player->Create(renderConfig);
-  RenderContext* context = InitRenderContext(renderConfig);
-  // 3.open process
-  if (RENDER_STATUS_OK != player->Start(context)) {
-    delete player;
-    player = NULL;
-    return RENDER_ERROR;
-  }
-  // 4.play process
-  player->Play();
-  delete player;
-  player = NULL;
-  SAFE_DELETE_ARRAY(renderConfig.pathof360SCVPPlugin);
-  SAFE_DELETE_ARRAY(renderConfig.url);
-  SAFE_DELETE_ARRAY(renderConfig.cachePath);
-  if (renderConfig.enablePredictor) {
-    SAFE_DELETE_ARRAY(renderConfig.libPath);
-    SAFE_DELETE_ARRAY(renderConfig.predictPluginName);
-  }
+
+    // Proceed with initialization
+    DIR *dir = opendir(renderConfig.cachePath);
+    if (!dir) {
+      mkdir(renderConfig.cachePath, 0777);
+    }
+    std::cout << "loaded config" << std::endl;
+
+    player->Create(renderConfig);
+    RenderContext* context = InitRenderContext(renderConfig);
+    if (player->Start(context) != RENDER_STATUS_OK) {
+        std::cout << "start error" << std::endl;
+      // Handle error
+      return -1;
+    }
+    //emscripten_set_main_loop(main_loop_play, 20, 1);
+    for (int i = 0; i < 5; i++) {
+        main_loop_play();
+    }
   return 0;
 }
 #endif

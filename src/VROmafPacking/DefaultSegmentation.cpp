@@ -171,14 +171,11 @@ DefaultSegmentation::~DefaultSegmentation()
             const char *dlsymErr = dlerror();
             if (dlsymErr)
             {
-                OMAF_LOG(LOG_ERROR, "Failed to load symbol MPD writer Destroy !\n");
-                OMAF_LOG(LOG_ERROR, "And get error message %s \n", dlsymErr);
                 return;
             }
 
             if (!destroyMPDWriter)
             {
-                OMAF_LOG(LOG_ERROR, "NULL MPD writer destructor !\n");
                 return;
             }
 
@@ -274,7 +271,6 @@ int32_t DefaultSegmentation::CreateDashMPDWriter()
 {
     if (!m_mpdWriterPluginHdl)
     {
-        OMAF_LOG(LOG_ERROR, "NULL MPD writer plugin handle !\n");
         return OMAF_ERROR_NULL_PTR;
     }
 
@@ -284,13 +280,11 @@ int32_t DefaultSegmentation::CreateDashMPDWriter()
     dlsymErr2 = dlerror();
     if (dlsymErr2)
     {
-        OMAF_LOG(LOG_ERROR, "Failed to load symbol Create: %s\n", dlsymErr2);
         return OMAF_ERROR_DLSYM;
     }
 
     if (!createMPDWriter)
     {
-        OMAF_LOG(LOG_ERROR, "NULL MPD writer creator !\n");
         return OMAF_ERROR_NULL_PTR;
     }
 
@@ -305,7 +299,6 @@ int32_t DefaultSegmentation::CreateDashMPDWriter()
 
     if (!m_mpdWriter)
     {
-        OMAF_LOG(LOG_ERROR, "Failed to create MPD writer !\n");
         return OMAF_ERROR_NULL_PTR;
     }
 
@@ -331,8 +324,6 @@ int32_t DefaultSegmentation::ConstructTileTrackSegCtx()
 
     if (m_videosNum != bitRateRanking.size())
     {
-        //LOG(ERROR) << "Invalid video streams number !" << std::endl;
-        OMAF_LOG(LOG_ERROR, "Invalid video streams number !\n");
         return OMAF_ERROR_VIDEO_NUM;
     }
     m_videosBitrate = new uint64_t[m_videosNum];
@@ -369,7 +360,6 @@ int32_t DefaultSegmentation::ConstructTileTrackSegCtx()
                     break;
             }
             m_projType = (VCD::OMAF::ProjectionFormat)vs->GetProjType();
-            OMAF_LOG(LOG_INFO, "Get video source projection type %d\n", m_projType);
             m_videoSegInfo = vs->GetVideoSegInfo();
             Nalu *vpsNalu = vs->GetVPSNalu();
             if (!vpsNalu || !(vpsNalu->data) || !(vpsNalu->dataSize))
@@ -465,7 +455,6 @@ int32_t DefaultSegmentation::ConstructTileTrackSegCtx()
                     if (i == 0)
                     {
                         uint64_t subSegNumInSeg = (uint64_t)(trackSegCtxs[i].dashCfg.subsgtDuration.get().m_den / trackSegCtxs[i].dashCfg.subsgtDuration.get().m_num);
-                        OMAF_LOG(LOG_INFO, "One CMAF segment contains %ld chunks ! \n", subSegNumInSeg);
                     }
                 }
                 trackSegCtxs[i].dashCfg.needCheckIDR = true;
@@ -915,16 +904,11 @@ int32_t DefaultSegmentation::ConstructAudioTrackSegCtx()
         MediaStream *stream = it->second;
         if (stream && (stream->GetMediaType() == AUDIOTYPE))
         {
-            //OMAF_LOG(LOG_INFO, "Begin to construct audio track segmentation context !\n");
             AudioStream *as = (AudioStream*)stream;
             uint32_t frequency = as->GetSampleRate();
             uint8_t chlConfig  = as->GetChannelNum();
             uint16_t bitRate   = as->GetBitRate();
             std::vector<uint8_t> packedAudioSpecCfg = as->GetPackedSpecCfg();
-            OMAF_LOG(LOG_INFO, "Audio sample rate %d\n", frequency);
-            OMAF_LOG(LOG_INFO, "Audio channel number %d\n", chlConfig);
-            OMAF_LOG(LOG_INFO, "Audio bit rate %d\n", bitRate);
-            OMAF_LOG(LOG_INFO, "Audio specific configuration packed size %lld\n", packedAudioSpecCfg.size());
 
             VCD::MP4::MPDAdaptationSetCtx *mpdASCtx = new VCD::MP4::MPDAdaptationSetCtx;
             if (!mpdASCtx)
@@ -1046,7 +1030,6 @@ int32_t DefaultSegmentation::ConstructAudioTrackSegCtx()
     }
 
     m_audioSegCtxsConsted = true;
-    //OMAF_LOG(LOG_INFO, "Complete audio segmentation context construction !\n");
     return ERROR_NONE;
 }
 
@@ -1195,7 +1178,6 @@ int32_t DefaultSegmentation::WriteSegmentForEachAudio(MediaStream *stream, Frame
     if (!dashSegmenter)
         return OMAF_ERROR_NULL_PTR;
 
-    //OMAF_LOG(LOG_INFO, "Write audio track segment !\n");
     int32_t ret = dashSegmenter->SegmentData(trackSegCtx);
     if (ret)
         return ret;
@@ -1205,10 +1187,8 @@ int32_t DefaultSegmentation::WriteSegmentForEachAudio(MediaStream *stream, Frame
     trackSegCtx->codedMeta.presTime.m_num += 1000 / (m_frameRate.num / m_frameRate.den);
     trackSegCtx->codedMeta.presTime.m_den = 1000;
 
-    //OMAF_LOG(LOG_INFO, "EOS %d\n", trackSegCtx->isEOS);
     m_audioSegNum = dashSegmenter->GetSegmentsNum();
 
-    //OMAF_LOG(LOG_INFO, "AUDIO seg num %ld\n", m_audioSegNum);
     return ERROR_NONE;
 }
 
@@ -1274,7 +1254,6 @@ int32_t DefaultSegmentation::StartExtractorTrackSegmentation(
 
     if (ret)
     {
-        OMAF_LOG(LOG_ERROR, "Failed to create extractor track segmentation thread !\n");
         return OMAF_ERROR_CREATE_THREAD;
     }
 
@@ -1290,7 +1269,6 @@ int32_t DefaultSegmentation::StartLastExtractorTrackSegmentation(
 
     if (ret)
     {
-        OMAF_LOG(LOG_ERROR, "Failed to create extractor track segmentation thread !\n");
         return OMAF_ERROR_CREATE_THREAD;
     }
 
@@ -1323,7 +1301,6 @@ int32_t DefaultSegmentation::ExtractorTrackSegmentation()
     pthread_t threadId = pthread_self();
     if (threadId == 0)
     {
-        OMAF_LOG(LOG_ERROR, "NULL thread id for extractor track segmentation !\n");
         return OMAF_ERROR_INVALID_THREAD;
     }
 
@@ -1353,7 +1330,6 @@ int32_t DefaultSegmentation::ExtractorTrackSegmentation()
         }
         if (itExtractorTrack == extractorTracks->end())
         {
-            OMAF_LOG(LOG_ERROR, "Can't find specified Extractor Track!\n");
             return OMAF_ERROR_INVALID_DATA;
         }
         isFrameReady = ((m_currSegedFrmNum == (m_prevSegedFrmNum + 1)) && (extractorTrack->GetProcessedFrmNum() == m_currProcessedFrmNum) && (m_currSegedFrmNum == (m_currProcessedFrmNum + 1)));
@@ -1369,7 +1345,6 @@ int32_t DefaultSegmentation::ExtractorTrackSegmentation()
 
             if (itExtractorTrack == extractorTracks->end())
             {
-                OMAF_LOG(LOG_ERROR, "Can't find specified Extractor Track!\n");
                 return OMAF_ERROR_INVALID_DATA;
             }
 
@@ -1382,7 +1357,6 @@ int32_t DefaultSegmentation::ExtractorTrackSegmentation()
             itET = m_extractorSegCtx.find(extractorTrack1);
             if (itET == m_extractorSegCtx.end())
             {
-                OMAF_LOG(LOG_ERROR, "Can't find segmentation context for specified extractor track !\n");
                 return OMAF_ERROR_INVALID_DATA;
             }
             TrackSegmentCtx *trackSegCtx = itET->second;
@@ -1416,7 +1390,6 @@ int32_t DefaultSegmentation::LastExtractorTrackSegmentation()
     pthread_t threadId = pthread_self();
     if (threadId == 0)
     {
-        OMAF_LOG(LOG_ERROR, "NULL thread id for extractor track segmentation !\n");
         return OMAF_ERROR_INVALID_THREAD;
     }
 
@@ -1445,7 +1418,6 @@ int32_t DefaultSegmentation::LastExtractorTrackSegmentation()
         }
         if (itExtractorTrack == extractorTracks->end())
         {
-            OMAF_LOG(LOG_ERROR, "Can't find specified Extractor Track!\n");
             return OMAF_ERROR_INVALID_DATA;
         }
 
@@ -1462,7 +1434,6 @@ int32_t DefaultSegmentation::LastExtractorTrackSegmentation()
 
             if (itExtractorTrack == extractorTracks->end())
             {
-                OMAF_LOG(LOG_ERROR, "Can't find specified Extractor Track!\n");
                 return OMAF_ERROR_INVALID_DATA;
             }
 
@@ -1474,7 +1445,6 @@ int32_t DefaultSegmentation::LastExtractorTrackSegmentation()
             itET = m_extractorSegCtx.find(extractorTrack1);
             if (itET == m_extractorSegCtx.end())
             {
-                OMAF_LOG(LOG_ERROR, "Can't find segmentation context for specified extractor track !\n");
                 return OMAF_ERROR_INVALID_DATA;
             }
             TrackSegmentCtx *trackSegCtx = itET->second;
@@ -1561,7 +1531,6 @@ int32_t DefaultSegmentation::VideoSegmentation()
         }
         if (currWaitTime >= waitTimes)
         {
-            OMAF_LOG(LOG_ERROR, "Constructing segmentation context for audio stream takes too long time !\n");
             return OMAF_ERROR_TIMED_OUT;
         }
 
@@ -1700,9 +1669,6 @@ int32_t DefaultSegmentation::VideoSegmentation()
             m_threadNumForET = extractorTrackNum / m_segInfo->extractorTracksPerSegThread + 1;
         }
 
-        OMAF_LOG(LOG_INFO, "Lanuch %d threads for Extractor Track segmentation!\n", m_threadNumForET);
-        OMAF_LOG(LOG_INFO, "Average Extractor Track number per thread is %d\n", m_aveETPerSegThread);
-        OMAF_LOG(LOG_INFO, "The last thread involves %d Extractor Tracks !\n", m_lastETPerSegThread);
     }
 
 #ifdef _USE_TRACE_
@@ -1731,7 +1697,6 @@ int32_t DefaultSegmentation::VideoSegmentation()
                 }
                 if (currWaitTime >= waitTimes)
                 {
-                    OMAF_LOG(LOG_ERROR, "It takes too much time to generate the first audio segment !\n");
                     return OMAF_ERROR_TIMED_OUT;
                 }
             }
@@ -1876,7 +1841,6 @@ int32_t DefaultSegmentation::VideoSegmentation()
             }
             if (m_extractorThreadIds.size() != m_threadNumForET)
             {
-                 OMAF_LOG(LOG_ERROR, "Launched threads number %ld doesn't match calculated threads number %d\n", (m_extractorThreadIds.size()), m_threadNumForET);
             }
 
             usleep(2000);
@@ -1923,7 +1887,6 @@ int32_t DefaultSegmentation::VideoSegmentation()
 
             std::chrono::high_resolution_clock clock;
             uint64_t before = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
-            OMAF_LOG(LOG_INFO, "It takes %lld ms to complete seg %ld\n", (before - currentT), m_segNum);
             currentT = before;
             if (m_isCMAFEnabled && m_segInfo->isLive)
             {
@@ -1994,8 +1957,6 @@ int32_t DefaultSegmentation::VideoSegmentation()
                     }
                     if (currWaitTime >= waitTimes)
                     {
-                        OMAF_LOG(LOG_ERROR, "Audio still hasn't generated all segments !\n");
-                        OMAF_LOG(LOG_ERROR, "Video segments num %ld and audio segments num %ld\n", m_segNum, m_audioSegNum);
                         return OMAF_ERROR_TIMED_OUT;
                     }
                 }
@@ -2031,8 +1992,6 @@ int32_t DefaultSegmentation::VideoSegmentation()
                     }
                     if (currWaitTime >= waitTimes)
                     {
-                        OMAF_LOG(LOG_ERROR, "Audio still hasn't generated all segments !\n");
-                        OMAF_LOG(LOG_ERROR, "Video segments num %ld and audio segments num %ld\n", m_segNum, m_audioSegNum);
                         return OMAF_ERROR_TIMED_OUT;
                     }
                 }
@@ -2041,7 +2000,6 @@ int32_t DefaultSegmentation::VideoSegmentation()
                 if (ret)
                     return ret;
             }
-            OMAF_LOG(LOG_INFO, "Totally write %ld frames into video tracks!\n", m_framesNum);
             break;
         }
 #ifdef _USE_TRACE_
@@ -2059,12 +2017,10 @@ int32_t DefaultSegmentation::VideoSegmentation()
 
 int32_t DefaultSegmentation::AudioSegmentation()
 {
-    OMAF_LOG(LOG_INFO, "Launch audio segmentation thread !\n");
     uint64_t currentT = 0;
     int32_t ret = ConstructAudioTrackSegCtx();
     if (ret)
         return ret;
-    OMAF_LOG(LOG_INFO, "Construction for audio track segmentation context DONE !\n");
     bool onlyAudio = OnlyAudio();
     if (onlyAudio)
     {
@@ -2129,9 +2085,7 @@ int32_t DefaultSegmentation::AudioSegmentation()
         }
     }
 
-    OMAF_LOG(LOG_INFO, "Done audio initial segment !\n");
     m_audioPrevSegNum = m_audioSegNum;
-    OMAF_LOG(LOG_INFO, "Initial audio segment num %ld\n", m_audioSegNum);
 
     bool nowEOS = false;
     bool eosWritten = false;
@@ -2202,7 +2156,6 @@ int32_t DefaultSegmentation::AudioSegmentation()
 
             std::chrono::high_resolution_clock clock;
             uint64_t before = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
-            OMAF_LOG(LOG_INFO, "Complete one seg for audio in %lld ms\n", (before - currentT));
             currentT = before;
         }
 
@@ -2246,13 +2199,11 @@ int32_t DefaultSegmentation::AudioSegmentation()
                     if (ret)
                         return ret;
                 }
-                OMAF_LOG(LOG_INFO, "Total %ld frames written into segments!\n", m_framesNum);
                 break;
             }
             m_framesNum++;
         }
 
-        //OMAF_LOG(LOG_INFO, "NOW eos %d \n", nowEOS);
         if (nowEOS && eosWritten)
         {
             std::map<uint8_t, MediaStream*>::iterator itStr = m_streamMap->begin();
@@ -2270,7 +2221,6 @@ int32_t DefaultSegmentation::AudioSegmentation()
         }
     }
 
-    OMAF_LOG(LOG_INFO, "Totally write %ld frames into audio track!\n", framesWritten);
     return ERROR_NONE;
 }
 

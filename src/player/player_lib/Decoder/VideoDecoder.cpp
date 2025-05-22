@@ -71,6 +71,7 @@ VideoDecoder::~VideoDecoder()
 
 RenderStatus VideoDecoder::Initialize(int32_t id, Codec_Type codec, FrameHandler* handler, uint64_t startPts)
 {
+    std::cout << "initializing VideoDecoder::Initialize" << std::endl;
     this->mVideoId = id;
     switch(codec){
         case VideoCodec_HEVC:
@@ -86,6 +87,7 @@ RenderStatus VideoDecoder::Initialize(int32_t id, Codec_Type codec, FrameHandler
             mDecCtx->codec_id = AV_CODEC_ID_HEVC;
             break;
     }
+    std::cout << "chose VideoDecoder::Initialize " << mDecCtx->codec_id << std::endl;
 
     mHandler = handler;
     SetStartPts(startPts);
@@ -98,7 +100,7 @@ RenderStatus VideoDecoder::Initialize()
     //5. initial decoder
     // av_register_all();
     // avcodec_register_all();
-    mDecCtx->decoder = avcodec_find_decoder(mDecCtx->codec_id);
+    mDecCtx->decoder = const_cast<AVCodec*>(avcodec_find_decoder(mDecCtx->codec_id));
     if (NULL == mDecCtx->decoder)
     {
         LOG(ERROR)<<"decoder find error!"<<std::endl;

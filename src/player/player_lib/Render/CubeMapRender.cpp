@@ -57,6 +57,7 @@ CubeMapRender::~CubeMapRender()
 
 RenderStatus CubeMapRender::Render(uint32_t onScreenTexHandle, uint32_t width, uint32_t height, glm::mat4 ProjectionMatrix, glm::mat4 ViewModelMatrix)
 {
+    std::cout << "in CubeMap render" << std::endl;
     uint32_t vertexAttribOfOnScreen = m_videoShaderOfOnScreen->SetAttrib("aPos");
     uint32_t transVertexAttribOfOnScreen = m_videoShaderOfOnScreen->SetAttrib("transPos");
     m_meshOfOnScreen->Bind(vertexAttribOfOnScreen, transVertexAttribOfOnScreen);
@@ -74,6 +75,7 @@ RenderStatus CubeMapRender::Render(uint32_t onScreenTexHandle, uint32_t width, u
     uint32_t meshVertexNum = m_meshOfOnScreen->GetVertexNum();
     renderBackend->DrawArrays(GL_TRIANGLES, 0, meshVertexNum);
     renderBackend->BindVertexArray(0);
+    std::cout << "CubeMap render end" << std::endl;
     return RENDER_STATUS_OK;
 }
 

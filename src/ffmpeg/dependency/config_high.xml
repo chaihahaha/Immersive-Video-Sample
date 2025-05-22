@@ -1,8 +1,0 @@
-<?txt version="1.0" encoding="UTF-8"?>
-<sessionList>
-    <session name="Session">
-        <option encoder="svt" />
-        <option isNative="true" />
-        <option targetSocket="1" />
-    </session>
-</sessionList>

@@ -111,7 +111,6 @@ public:
     //!
     void PrintSingleSwitchTimeInLog() {
         static uint32_t cnt_log = 1;
-        LOG(INFO) << "[" << cnt_log++ << "] single switch time : " << switch_end_time_ - switch_start_time_ << " ms " << endl;
     }
     //!
     //! \brief  print single switch time in file
@@ -124,12 +123,6 @@ public:
     //! \brief  print switch performance in log
     //!
     void PrintSwitchPerformanceInLog() {
-        LOG(INFO) << "--------------------------------------------" << endl
-                  << "switch total times : " << total_switch_times_ << endl
-                  << "average switch latency : " << avg_switch_time_ << " ms" << endl
-                  << "max switch latency : " << max_switch_time_ << " ms" << endl
-                  << "min switch latency : " << min_switch_time_ << " ms" << endl
-                  << "--------------------------------------------" << endl;
     }
     //!
     //! \brief  print switch performance in file
@@ -147,7 +140,6 @@ public:
     //!
     void SetSingleE2ELatency(uint64_t time) {
         if (avg_e2elatency_time_ * total_record_latency_times_ > UINT64_MAX) {
-            LOG(WARNING) << "Too large for the latency profiling! Re-collect the latency data!" << endl;
             total_record_latency_times_ = 0;
             max_e2elatency_time_ = 0;
             min_e2elatency_time_ = __LONG_MAX__;
@@ -162,12 +154,6 @@ public:
     //! \brief  print latency performance in log
     //!
     void PrintE2ELatencyPerformanceInLog() {
-        LOG(INFO) << "-=-=-=-=-=-=-E2E latency performance-=-=-=-=-=-=-" << endl
-                  << "--------------------------------------------" << endl
-                  << "average e2e latency : " << avg_e2elatency_time_ << " ms" << endl
-                  << "max e2e latency : " << max_e2elatency_time_ << " ms" << endl
-                  << "min e2e latency : " << min_e2elatency_time_ << " ms" << endl
-                  << "--------------------------------------------" << endl;
     }
     //!
     //! \brief  print latency performance in file

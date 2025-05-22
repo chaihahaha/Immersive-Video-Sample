@@ -4,7 +4,7 @@ mkdir -p ../build/external
 cd ../build/external
 
 if [ ! -d "./openHEVC" ] ; then
-    git clone https://github.com/OpenHEVC/openHEVC.git
+    git clone https://ghfast.top/github.com/OpenHEVC/openHEVC.git
 fi
 
 cd openHEVC

@@ -36,12 +36,11 @@
 #define GLFW_EXPOSE_NATIVE_X11
 #include "EGLRenderContext.h"
 #include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
+//#include <GLFW/glfw3native.h>
+#include <emscripten.h>
 #include  <iostream>
 #include  <cstdlib>
 #include  <cstring>
-
-EGLDisplay  pEglDisplay; //to do: move it into the class
 
 VCD_NS_BEGIN
 
@@ -71,7 +70,7 @@ EGLRenderContext::~EGLRenderContext()
 
 RenderStatus EGLRenderContext::SwapBuffers(void * window, int param)
 {
-    eglSwapBuffers(m_eglDisplay,m_eglSurface);
+    glfwSwapBuffers(static_cast<GLFWwindow*>(window));
     glfwPollEvents();
     return RENDER_STATUS_OK;
 }
@@ -175,28 +174,28 @@ void* EGLRenderContext::InitContext()
     // initialize glfw
     if (!glfwInit())
     {
-        LOG(ERROR)<< "glfw failed to init" << std::endl;
         glfwTerminate();
         return NULL;
     }
     //tranverse();
     // open a window
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "VR Player", NULL, NULL); //done
     if (!m_window)
     {
-        LOG(ERROR)<< "failed to open window" << std::endl;
         glfwTerminate();
         return NULL;
     }
-    glfwSetInputMode((GLFWwindow *)m_window, GLFW_STICKY_KEYS, GL_TRUE);
-    glfwSetInputMode((GLFWwindow *)m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode((GLFWwindow *)m_window, GLFW_STICKY_KEYS, GL_TRUE);
+    //glfwSetInputMode((GLFWwindow *)m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glfwPollEvents();
     glfwSetCursorPos((GLFWwindow *)m_window, m_windowWidth / 2, m_windowHeight / 2); //done
+                                                                                // Emscripten specific setup
+    glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_window));
 
     // initialize opengl
     glEnable(GL_TEXTURE_2D);
@@ -206,51 +205,45 @@ void* EGLRenderContext::InitContext()
     glFrontFace(GL_CCW);
     glCullFace(GL_BACK);
 
-    m_win = glfwGetX11Window((GLFWwindow *)m_window);
-    m_eglDisplay = eglGetDisplay((EGLNativeDisplayType) glfwGetX11Display());
-    pEglDisplay = m_eglDisplay;
-    if (m_eglDisplay == EGL_NO_DISPLAY) {
-        LOG(ERROR)<<"EGL NO DISPLAY!"<<std::endl;
-        return NULL;
-    }
+    //m_win = glfwGetX11Window((GLFWwindow *)m_window);
+    //m_eglDisplay = eglGetDisplay((EGLNativeDisplayType) glfwGetX11Display());
+    //pEglDisplay = m_eglDisplay;
+    //if (m_eglDisplay == EGL_NO_DISPLAY) {
+    //    return NULL;
+    //}
 
-    if ( !eglInitialize( m_eglDisplay, NULL, NULL ) ) {
-        LOG(ERROR)<<"Initialize EGL failed!"<<std::endl;
-        return NULL;
-    }
+    //if ( !eglInitialize( m_eglDisplay, NULL, NULL ) ) {
+    //    return NULL;
+    //}
 
-    EGLint attr[] = {
-        EGL_BUFFER_SIZE, 16,
-        EGL_RENDERABLE_TYPE,
-        EGL_OPENGL_BIT,
-        EGL_NONE
-    };
+    //EGLint attr[] = {
+    //    EGL_BUFFER_SIZE, 16,
+    //    EGL_RENDERABLE_TYPE,
+    //    EGL_OPENGL_BIT,
+    //    EGL_NONE
+    //};
 
-    EGLConfig  eglConfig;
-    EGLint	   configNum;
-    if ( !eglChooseConfig( m_eglDisplay, attr, &eglConfig, 1, &configNum ) ) {
-        LOG(ERROR)<<"Failed to choose config----eglError: " << eglGetError() << ")" <<std::endl;
-        return NULL;
-    }
-    if ( configNum != 1 ) {
-        LOG(ERROR)<<"failed to get exactly one config, num config is" << configNum<<std::endl;
-        return NULL;
-    }
-    m_eglSurface = eglCreateWindowSurface(m_eglDisplay, eglConfig, m_win, NULL);
-    if ( m_eglSurface == EGL_NO_SURFACE ) {
-        LOG(ERROR)<<"failed to create EGL surface-----eglError: " << eglGetError() << ")"<<std::endl;
-        return NULL;
-    }
-    EGLint ctxattr[] = {
-        EGL_CONTEXT_CLIENT_VERSION, 2,
-        EGL_NONE
-    };
-    m_eglContext = eglCreateContext ( m_eglDisplay, eglConfig, EGL_NO_CONTEXT, ctxattr );
-    if ( m_eglContext == EGL_NO_CONTEXT ) {
-        LOG(ERROR)<<"failed to create EGL context-----eglError: " << eglGetError() << ")"<<std::endl;
-        return NULL;
-    }
-    eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
+    //EGLConfig  eglConfig;
+    //EGLint	   configNum;
+    //if ( !eglChooseConfig( m_eglDisplay, attr, &eglConfig, 1, &configNum ) ) {
+    //    return NULL;
+    //}
+    //if ( configNum != 1 ) {
+    //    return NULL;
+    //}
+    //m_eglSurface = eglCreateWindowSurface(m_eglDisplay, eglConfig, m_win, NULL);
+    //if ( m_eglSurface == EGL_NO_SURFACE ) {
+    //    return NULL;
+    //}
+    //EGLint ctxattr[] = {
+    //    EGL_CONTEXT_CLIENT_VERSION, 2,
+    //    EGL_NONE
+    //};
+    //m_eglContext = eglCreateContext ( m_eglDisplay, eglConfig, EGL_NO_CONTEXT, ctxattr );
+    //if ( m_eglContext == EGL_NO_CONTEXT ) {
+    //    return NULL;
+    //}
+    //eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
 
     return m_window;
 }

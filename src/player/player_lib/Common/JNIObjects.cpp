@@ -76,14 +76,12 @@ JNIEnv* JNIContext::GetJNIEnv()
     GetJVM();
     if (mJavaVM == nullptr)
     {
-        ANDROID_LOGD("Java vm is null ptr!");
     }
     int status = mJavaVM->GetEnv((void **)&mJEnv, JNI_VERSION_1_6);
     if (status < 0) {
         status = mJavaVM->AttachCurrentThread(&mJEnv, NULL);
         if (status < 0)
         {
-            ANDROID_LOGD("get env failed!");
             return nullptr;
         }
     }
@@ -155,7 +153,6 @@ Surface_ERROR SurfaceTexture::CreateSurfaceTexture()
     const jmethodID updateTexImageMethodId = mJEnv->GetMethodID(surfaceTexture_class, "updateTexImage", "()V");
     if (updateTexImageMethodId == nullptr)
     {
-        LOG(ERROR) << "Failed to get method id of updateTexImage!" << std::endl;
         return SURFACE_CREATE_ERROR;
     }
     mUpdateTexImageMethodId = updateTexImageMethodId;
@@ -163,7 +160,6 @@ Surface_ERROR SurfaceTexture::CreateSurfaceTexture()
     const jmethodID getTimestampMethodId = mJEnv->GetMethodID(surfaceTexture_class, "getTimestamp", "()J");
     if (getTimestampMethodId == nullptr)
     {
-        LOG(ERROR) << "Failed to get method id of getTimestamp!" << std::endl;
         return SURFACE_CREATE_ERROR;
     }
     mGetTimestampMethodId = getTimestampMethodId;
@@ -171,7 +167,6 @@ Surface_ERROR SurfaceTexture::CreateSurfaceTexture()
     const jmethodID getTransformMatrixMethodId = mJEnv->GetMethodID(surfaceTexture_class, "getTransformMatrix", "([F)V");
     if (getTransformMatrixMethodId == nullptr)
     {
-        LOG(ERROR) << "Failed to get method id of getTransformMatrix!" << std::endl;
         return SURFACE_CREATE_ERROR;
     }
     mGetTransformMatrixId = getTransformMatrixMethodId;
@@ -186,7 +181,6 @@ Surface_ERROR SurfaceTexture::UpdateR2T()
 {
     if (mJEnv == nullptr || mJavaObject == nullptr)
     {
-        LOG(ERROR) << "Error in initializing java env or SurfaceTexture java object!" << std::endl;
         return SURFACE_CREATE_ERROR;
     }
     mJEnv->CallVoidMethod(mJavaObject, mUpdateTexImageMethodId);
@@ -255,7 +249,6 @@ Surface_ERROR Surface::CreateSurface()
     const jmethodID surface_constructor = mEnv->GetMethodID(surface_class, "<init>", "(Landroid/graphics/SurfaceTexture;)V");//<init> - construct id
     if (surface_class == nullptr)
     {
-        LOG(INFO) << "Surface construct not found!" << std::endl;
         return SURFACE_CREATE_ERROR;
     }
     jobject surfaceTexture_object = mSurfaceTexture->GetJavaObject();

@@ -43,6 +43,7 @@
 VCD_OMAF_BEGIN
 
 OmafMediaStream::OmafMediaStream() {
+    std::cout << "OmafMediaStream::OmafMediaStream" << std::endl;
   mMainAdaptationSet = NULL;
   mExtratorAdaptationSet = NULL;
   m_pStreamInfo = NULL;
@@ -69,6 +70,7 @@ OmafMediaStream::OmafMediaStream() {
 }
 
 OmafMediaStream::~OmafMediaStream() {
+    std::cout << "OmafMediaStream::~OmafMediaStream" << std::endl;
   OMAF_LOG(LOG_INFO, "Delete omaf media stream!\n");
   SAFE_DELETE(m_pStreamInfo->codec);
   SAFE_DELETE(m_pStreamInfo->mime_type);
@@ -137,6 +139,7 @@ OmafMediaStream::~OmafMediaStream() {
 }
 
 void OmafMediaStream::SetOmafReaderMgr(std::shared_ptr<OmafReaderManager> mgr) noexcept {
+    std::cout << "OmafMediaStream::SetOmafReaderMgr" << std::endl;
   omaf_reader_mgr_ = std::move(mgr);
 
   std::lock_guard<std::mutex> lock(mMutex);
@@ -155,6 +158,7 @@ void OmafMediaStream::SetOmafReaderMgr(std::shared_ptr<OmafReaderManager> mgr) n
 }
 
 void OmafMediaStream::Close() {
+    std::cout << "OmafMediaStream::Close" << std::endl;
   if (m_status != STATUS_STOPPED) {
     m_status = STATUS_STOPPED;
     m_catchup_status = STATUS_STOPPED;
@@ -170,6 +174,7 @@ void OmafMediaStream::Close() {
 }
 
 int OmafMediaStream::AddExtractor(OmafExtractor* pAS) {
+    std::cout << "OmafMediaStream::AddExtractor" << std::endl;
   std::lock_guard<std::mutex> lock(mExtractorsMutex);
   if (NULL != pAS) mExtractors[pAS->GetID()] = pAS;
 
@@ -177,6 +182,7 @@ int OmafMediaStream::AddExtractor(OmafExtractor* pAS) {
 }
 
 int OmafMediaStream::AddAdaptationSet(OmafAdaptationSet* pAS) {
+    std::cout << "OmafMediaStream::AddAdaptationSet" << std::endl;
   if (NULL != pAS) {
     std::lock_guard<std::mutex> lock(mMutex);
     mMediaAdaptationSet[pAS->GetID()] = pAS;
@@ -185,6 +191,7 @@ int OmafMediaStream::AddAdaptationSet(OmafAdaptationSet* pAS) {
 }
 
 int OmafMediaStream::InitStream(std::string type) {
+    std::cout << "OmafMediaStream::InitStream" << std::endl;
   if (NULL == m_pStreamInfo) m_pStreamInfo = (DashStreamInfo*)malloc(sizeof(DashStreamInfo));
 
   if (NULL == m_pStreamInfo) {
@@ -229,6 +236,7 @@ int OmafMediaStream::InitStream(std::string type) {
 }
 
 OMAF_STATUS OmafMediaStream::UpdateStreamInfo() {
+    std::cout << "OmafMediaStream::UpdateStreamInfo" << std::endl;
   if (!mMediaAdaptationSet.size()) return OMAF_ERROR_INVALID_DATA;
 
   if (mode_ == OmafDashMode::EXTRACTOR) {
@@ -490,6 +498,7 @@ OMAF_STATUS OmafMediaStream::UpdateStreamInfo() {
 }
 
 void OmafMediaStream::SetupExtratorDependency() {
+    std::cout << "OmafMediaStream::SetupExtratorDependency" << std::endl;
   std::lock_guard<std::mutex> lock(mExtractorsMutex);
   for (auto extrator_it = mExtractors.begin(); extrator_it != mExtractors.end(); extrator_it++) {
     OmafExtractor* extractor = (OmafExtractor*)(extrator_it->second);
@@ -502,6 +511,7 @@ void OmafMediaStream::SetupExtratorDependency() {
 }
 
 int OmafMediaStream::SetupSegmentSyncer(const OmafDashParams& params) {
+    std::cout << "OmafMediaStream::SetupSegmentSyncer" << std::endl;
   OmafDashRangeSync::Ptr syncer;
   OMAF_LOG(LOG_INFO, "Setup segment window syncer!\n");
   auto as = mMediaAdaptationSet.begin();
@@ -535,6 +545,7 @@ int OmafMediaStream::SetupSegmentSyncer(const OmafDashParams& params) {
 }
 
 int OmafMediaStream::UpdateStartNumber(uint64_t nAvailableStartTime) {
+    std::cout << "OmafMediaStream::UpdateStartNumber" << std::endl;
   int ret = ERROR_NONE;
 
   std::lock_guard<std::mutex> lock(mMutex);
@@ -551,6 +562,7 @@ int OmafMediaStream::UpdateStartNumber(uint64_t nAvailableStartTime) {
 }
 
 int OmafMediaStream::DownloadInitSegment() {
+  std::cout << "inside OmafMediaStream::DownloadInitSegment"<< std::endl;
   std::lock_guard<std::mutex> lock(mMutex);
   for (auto it = mMediaAdaptationSet.begin(); it != mMediaAdaptationSet.end(); it++) {
     OmafAdaptationSet* pAS = (OmafAdaptationSet*)(it->second);
@@ -570,6 +582,7 @@ int OmafMediaStream::DownloadInitSegment() {
 
 void OmafMediaStream::GetChunkInfoType() {
   // parse chunk info type from the first segment
+  std::cout << "GetChunkInfoType"  << std::endl;
   string try_segment_url;
   auto iter = mMediaAdaptationSet.begin();
   if (iter == mMediaAdaptationSet.end()) return;
@@ -585,6 +598,7 @@ void OmafMediaStream::GetChunkInfoType() {
 }
 
 ChunkInfoType OmafMediaStream::ParseChunkInfoType(string url) {
+  std::cout << "ParseChunkInfoType init downloader for : " << url << std::endl;
   OmafCurlEasyDownloader downloader(OmafCurlEasyDownloader::CurlWorkMode::EASY_MODE);
   CurlParams curl_params;
   curl_params.http_params_ = omaf_dash_params_.http_params_;
@@ -664,9 +678,11 @@ ChunkInfoType OmafMediaStream::ParseChunkInfoType(string url) {
 }
 
 int OmafMediaStream::DownloadSegments(bool enableCMAF) {
+    std::cout << "OmafMediaStream::DownloadSegments" << std::endl;
   int ret = ERROR_NONE;
   // std::lock_guard<std::mutex> lock(mMutex);
   for (auto it = mMediaAdaptationSet.begin(); it != mMediaAdaptationSet.end(); it++) {
+      std::cout << "loop adaptation set download segment" << std::endl;
     OmafAdaptationSet* pAS = (OmafAdaptationSet*)(it->second);
     pAS->SetChunkInfoType(m_chunkInfoType);
     pAS->DownloadSegment(enableCMAF);
@@ -687,6 +703,7 @@ int OmafMediaStream::DownloadSegments(bool enableCMAF) {
 
 int OmafMediaStream::DownloadAssignedSegments(std::map<uint32_t, TracksMap> additional_tracks, uint64_t currentTimeLine, bool enableCMAF)
 {
+    std::cout << "OmafMediaStream::DownloadAssignedSegment" << std::endl;
   int ret = ERROR_NONE;
   // std::lock_guard<std::mutex> lock(mMutex);
   for (auto it = mMediaAdaptationSet.begin(); it != mMediaAdaptationSet.end(); it++)
@@ -706,6 +723,7 @@ int OmafMediaStream::DownloadAssignedSegments(std::map<uint32_t, TracksMap> addi
 }
 
 int OmafMediaStream::SeekTo(int seg_num) {
+    std::cout << "OmafMediaStream::SeekTo" << std::endl;
   int ret = ERROR_NONE;
   std::lock_guard<std::mutex> lock(mMutex);
   for (auto it = mMediaAdaptationSet.begin(); it != mMediaAdaptationSet.end(); it++) {
@@ -721,6 +739,7 @@ int OmafMediaStream::SeekTo(int seg_num) {
 }
 
 int OmafMediaStream::UpdateEnabledExtractors(std::list<OmafExtractor*> extractors) {
+    std::cout << "OmafMediaStream::UpdateEnabledExtractors" << std::endl;
   if (extractors.empty()) return ERROR_INVALID;
 
   int ret = ERROR_NONE;
@@ -771,6 +790,7 @@ int OmafMediaStream::EnableAllAudioTracks() {
   return ret;
 }
 int OmafMediaStream::UpdateEnabledTileTracks(std::map<int, OmafAdaptationSet*> selectedTiles) {
+    std::cout << "OmafMediaStream::UpdateEnabledTileTracks" << std::endl;
   if (selectedTiles.empty()) return ERROR_INVALID;
 
   int ret = ERROR_NONE;
@@ -826,6 +846,7 @@ int OmafMediaStream::GetTrackCount() {
 }
 
 int32_t OmafMediaStream::StartTilesStitching() {
+    std::cout << "OmafMediaStream::StartTilesStitching" << std::endl;
   int32_t ret = pthread_create(&m_stitchThread, NULL, TilesStitchingThread, this);
   if (ret) {
     OMAF_LOG(LOG_ERROR, "Failed to create tiles stitching thread !\n");
@@ -836,6 +857,7 @@ int32_t OmafMediaStream::StartTilesStitching() {
 }
 
 void* OmafMediaStream::TilesStitchingThread(void* pThis) {
+    std::cout << "OmafMediaStream::TilesStitchingThread" << std::endl;
   OmafMediaStream* pStream = (OmafMediaStream*)pThis;
 
   pStream->TilesStitching();
@@ -873,6 +895,7 @@ static bool IsSelectionChanged(TracksMap selection1, TracksMap selection2) {
 
 int32_t OmafMediaStream::GetSelectedPacketsWithPTS(uint64_t targetPTS, pair<uint64_t, TracksMap> targetedTracks, map<uint32_t, MediaPacket*> &selectedPackets)
 {
+    std::cout << "OmafMediaStream::GetSelectedPacketsWithPTS" << std::endl;
   int ret = ERROR_NONE;
   TracksMap tkMap = targetedTracks.second;
   if (tkMap.size() == 0)
@@ -925,6 +948,7 @@ int32_t OmafMediaStream::GetSelectedPacketsWithPTS(uint64_t targetPTS, pair<uint
 
 int32_t OmafMediaStream::GetCatchupMergedPackets(map<uint32_t, MediaPacket*> selectedPackets, std::list<MediaPacket*> &catchupMergedPacket, OmafTilesStitch *stitch, bool bFirst)
 {
+    std::cout << "OmafMediaStream::GetCatchupMergedPackets" << std::endl;
   if (!bFirst) {
     int ret = stitch->UpdateSelectedTiles(selectedPackets, m_needParams);
     if (ret != ERROR_NONE)
@@ -950,6 +974,8 @@ int32_t OmafMediaStream::GetCatchupMergedPackets(map<uint32_t, MediaPacket*> sel
 }
 
 int32_t OmafMediaStream::TaskRun(OmafTilesStitch *stitch, std::pair<uint64_t, std::map<int, OmafAdaptationSet*>> task, uint32_t video_id, uint64_t triggerPTS) {
+    // FIXME: TaskRun not running m_catchupMergedPackets not updated
+    std::cout << "OmafMediaStream::TaskRun" << std::endl;
 
     int ret = ERROR_NONE;
     //1. get catch up targeted tile tracks and start pts to stitch
@@ -961,7 +987,7 @@ int32_t OmafMediaStream::TaskRun(OmafTilesStitch *stitch, std::pair<uint64_t, st
 
     uint64_t optStartPTS = startPTSofCurrSeg;
     //1.1 choose opt pts
-    // LOG(INFO) <<"Trigger PTS " << triggerPTS << "Start PTS " << startPTSofCurrSeg << endl;
+    LOG(INFO) <<"Trigger PTS " << triggerPTS << "Start PTS " << startPTSofCurrSeg << endl;
 #ifndef _ANDROID_NDK_OPTION_
     if (m_gopSize > 0 && triggerPTS > startPTSofCurrSeg) {
       uint32_t offset_num = triggerPTS / m_gopSize;
@@ -977,11 +1003,12 @@ int32_t OmafMediaStream::TaskRun(OmafTilesStitch *stitch, std::pair<uint64_t, st
       uint32_t normalsamplesNumPerSeg = GetSegmentDuration() * round(float(m_pStreamInfo->framerate_num) / m_pStreamInfo->framerate_den);
       if (normalsamplesNumPerSeg != 0) {
         samplesNumPerSeg = omaf_reader_mgr_->GetSamplesNumPerSegmentForTimeLine(startPTSofCurrSeg / normalsamplesNumPerSeg + 1);
-        // LOG(INFO) << "samplesNumPerSeg for seg " << startPTSofCurrSeg / normalsamplesNumPerSeg + 1 << " is " << samplesNumPerSeg << endl;
+        LOG(INFO) << "samplesNumPerSeg for seg " << startPTSofCurrSeg / normalsamplesNumPerSeg + 1 << " is " << samplesNumPerSeg << endl;
       }
     }
     for (uint64_t currPTS = optStartPTS; currPTS < startPTSofCurrSeg + samplesNumPerSeg; currPTS++)
     {
+        std::cout << "inside adding m_catchupMergedPackets loop" << std::endl;
       std::map<uint32_t, MediaPacket*> selectedPackets;
       //2. get selected packets with corresponding PTS
       ret = GetSelectedPacketsWithPTS(currPTS, targetedTracks, selectedPackets);
@@ -1027,7 +1054,7 @@ int32_t OmafMediaStream::TaskRun(OmafTilesStitch *stitch, std::pair<uint64_t, st
         for (auto pkt = catchupMergedPacket.begin(); pkt != catchupMergedPacket.end(); pkt++) {
           MediaPacket *mpkt = *pkt;
           mpkt->SetEOS(true);
-          // LOG(INFO) << "Set pts " << currPTS << " eos!" << endl;
+          LOG(INFO) << "Set pts " << currPTS << " eos!" << endl;
         }
       }
       //4. push to m_catchupMergedpacket list<pair<uint64_t, MediaPacket*>>
@@ -1043,6 +1070,7 @@ int32_t OmafMediaStream::TaskRun(OmafTilesStitch *stitch, std::pair<uint64_t, st
 }
 
 int32_t OmafMediaStream::TilesStitching() {
+    std::cout << "OmafMediaStream::TilesStitching" << std::endl;
   if (!m_stitch) {
     OMAF_LOG(LOG_ERROR, "Tiles stitching handle hasn't been created !\n");
     return OMAF_ERROR_NULL_PTR;
@@ -1568,6 +1596,8 @@ int32_t OmafMediaStream::TilesStitching() {
 }
 
 std::list<MediaPacket*> OmafMediaStream::GetOutTilesMergedPackets() {
+    std::cout << "OmafMediaStream::GetOutTilesMergedPackets" << std::endl;
+    // FIXME: m_catchupMergedPackets is size 0
   std::list<MediaPacket*> outPackets;
   {
   std::lock_guard<std::mutex> lock(m_packetsMutex);
@@ -1595,7 +1625,7 @@ std::list<MediaPacket*> OmafMediaStream::GetOutTilesMergedPackets() {
       {
         MediaPacket* pkt = *iter;
         pkt->SetVideoID(catchup_packet->first);
-        // LOG(INFO) << "Set pkt video id " << catchup_packet->first << endl;
+        LOG(INFO) << "Set pkt video id " << catchup_packet->first << endl;
       }
       outPackets.splice(outPackets.end(), catchup_packet->second.front());
       catchup_packet->second.pop_front();
@@ -1615,6 +1645,7 @@ std::list<MediaPacket*> OmafMediaStream::GetOutTilesMergedPackets() {
 
 int OmafMediaStream::CreateCatchupThreadPool()
 {
+    std::cout << "OmafMediaStream::CreateCatchupThreadPool" << std::endl;
   m_catchupThreadsList.resize(m_catchupThreadNum);
   for (size_t i = 0; i < m_catchupThreadsList.size(); i++)
   {
@@ -1650,6 +1681,7 @@ void* OmafMediaStream::CatchupThreadFuncWrapper(void* input)
 
 int OmafMediaStream::CatchupThreadFunc(void* thread)
 {
+    //std::cout << "OmafMediaStream::CatchupThreadFunc..." << std::endl;
   StitchThread *pThread = static_cast<StitchThread*>(thread);
   if (pThread == nullptr)
   {

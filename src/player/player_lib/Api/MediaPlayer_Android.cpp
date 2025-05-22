@@ -33,7 +33,7 @@
 
 #ifdef _ANDROID_OS_
 #include "MediaPlayer_Android.h"
-#include "../Common/Common.h"
+#include "Common/Common.h"
 #include "../MediaSource/DashMediaSource.h"
 #include <stdlib.h>
 #include <unistd.h>
@@ -75,7 +75,6 @@ RenderStatus MediaPlayer_Android::Create(struct RenderConfig config)
     RenderStatus loadMediaStatus = m_mediaSource->Initialize(m_renderConfig, m_rsFactory);
     if (loadMediaStatus != RENDER_STATUS_OK)
     {
-        ANDROID_LOGD("failed to load media status");
         return RENDER_ERROR;
     }
     this->m_mediaInfo = m_mediaSource->GetMediaInfo();
@@ -91,7 +90,6 @@ RenderStatus MediaPlayer_Android::Start()
         return RENDER_ERROR;
     }
     if (!m_renderConfig.url) {
-        LOG(ERROR) << "Wrong url" << std::endl;
         return RENDER_ERROR;
     }
     if (RENDER_STATUS_OK != m_renderManager->Initialize(m_mediaSource, m_rsFactory, nullptr)) {

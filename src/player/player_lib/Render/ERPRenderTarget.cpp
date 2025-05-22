@@ -35,13 +35,8 @@
 #include "RenderContext.h"
 
 #include <GL/glu.h>
-#include <GL/glu_mangle.h>
 #include <GL/gl.h>
-#include <GL/glx.h>
-#include <GL/glext.h>
-#include <GL/glcorearb.h>
 #include <GLES3/gl3.h>
-#include <GLES3/gl3ext.h>
 #include <GLES3/gl3platform.h>
 #include <algorithm>
 #include <iostream>
@@ -144,7 +139,6 @@ RenderStatus ERPRenderTarget::Update( HeadPose* pose, float hFOV, float vFOV, ui
     static uint64_t start = 0;
     static uint64_t totalChangedTime = 0;
     static uint32_t changedCount = 0;
-    DataLog *data_log = DATALOG::GetInstance();
     for (uint32_t i = 0; i < TilesInViewport.size(); i++)
     {
         std::vector<TileInformation> listBest = mQualityRankingInfo.mapQualitySelection[mQualityRankingInfo.mainQualityRanking];
@@ -154,10 +148,6 @@ RenderStatus ERPRenderTarget::Update( HeadPose* pose, float hFOV, float vFOV, ui
             if (m_isAllHighQualityInView) // firt time to be blur
             {
                 start = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
-                if (data_log != nullptr) {
-                    data_log->SetSwitchStartTime(start);
-                }
-                LOG(INFO)<<"[FrameSequences][Low]: low resolution part occurs! pts is " << pts <<std::endl;
 #ifdef _USE_TRACE_
                 //trace
                 tracepoint(mthq_tp_provider, T0_change_to_lowQ, changedCount+1, pts);
@@ -169,10 +159,6 @@ RenderStatus ERPRenderTarget::Update( HeadPose* pose, float hFOV, float vFOV, ui
     if (isAllHighFlag && !m_isAllHighQualityInView) // first time to be clear
     {
         uint64_t end = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
-        if (data_log != nullptr) {
-            data_log->SetSwitchEndTime(end);
-        }
-        LOG(INFO)<<"[FrameSequences][High]: T9' All high resolution part! pts is " << pts <<" cost time : "<<(end-start)<<"ms"<<std::endl;
 #ifdef _USE_TRACE_
         //trace
         tracepoint(mthq_tp_provider, T12_change_to_highQ, changedCount+1, pts);
@@ -180,7 +166,6 @@ RenderStatus ERPRenderTarget::Update( HeadPose* pose, float hFOV, float vFOV, ui
         totalChangedTime += end - start;
         changedCount++;
         m_avgChangedTime = (float)totalChangedTime / changedCount;
-        LOG(INFO) << "total change time " << changedCount << std::endl;
     }
     m_isAllHighQualityInView = isAllHighFlag;
 
@@ -273,11 +258,9 @@ RenderStatus ERPRenderTarget::CalcQualityRanking()
         if (regionInfo == NULL || regionInfo->GetRegionWisePacking() == NULL \
              || regionInfo->GetSourceInfo() == NULL || regionInfo->GetSourceInRegion() > 2)
         {
-            LOG(INFO)<<"region information is invalid!"<<endl;
             errorCnt++;
             continue;
         }
-        // LOG(INFO)<<"regionInfo ptr:"<<regionInfo->GetSourceInRegion()<<" rwpk:"<<regionInfo->GetRegionWisePacking()->rectRegionPacking<<" source:"<<regionInfo->GetSourceInfo()->width<<endl;
         for(int32_t i=0; i<regionInfo->GetSourceInRegion(); i++)
             listQuality.push_back(regionInfo->GetSourceInfo()[i].qualityRanking);
     }
@@ -440,7 +423,6 @@ RenderStatus ERPRenderTarget::GetTilesInViewport(float yaw, float pitch, float h
 {
     if (hFOV <= 0 || vFOV <= 0)
     {
-        LOG(ERROR)<<"FOV input invalid!"<<std::endl;
         return RENDER_ERROR;
     }
     struct SphereRegion region;

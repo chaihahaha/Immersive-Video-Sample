@@ -76,4 +76,8 @@ std::unique_ptr<T> make_unique_vcd(Args &&... args) {
 #define INOUT
 #endif  // !INOUT
 
+#ifndef LOG
+#define LOG(a) std::cout
+#endif
+
 #endif  // !VCD_UTILS_COMMON_H

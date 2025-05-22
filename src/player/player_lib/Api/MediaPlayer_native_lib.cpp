@@ -50,7 +50,6 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
     {
-        ANDROID_LOGD("Get env failed!");
         return -1;
     }
 
@@ -281,7 +280,6 @@ Java_com_vcd_immersive_omafplayer_MediaPlayer_NativeMediaPlayer_SetDecodeSurface
                                                                                   jint tex_id,
                                                                                   jint video_id) {
     VCD::VRVideo::MediaPlayer_Android* pPlayer = (VCD::VRVideo::MediaPlayer_Android* )hdl;
-    // ANDROID_LOGD("set decode surface %p and tex id %d", (env)->NewGlobalRef(decode_surface), tex_id);
     pPlayer->SetDecodeSurface((env)->NewGlobalRef(decode_surface), tex_id, video_id);
 }
 
@@ -292,7 +290,6 @@ Java_com_vcd_immersive_omafplayer_MediaPlayer_NativeMediaPlayer_SetDisplaySurfac
                                                                                   jlong hdl,
                                                                                   jint tex_id) {
     VCD::VRVideo::MediaPlayer_Android* pPlayer = (VCD::VRVideo::MediaPlayer_Android* )hdl;
-    // ANDROID_LOGD("set display tex id %d", tex_id);
     pPlayer->SetDisplaySurface(tex_id);
 }
 

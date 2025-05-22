@@ -61,7 +61,6 @@ int32_t DashInitSegmenter::GenerateInitSegment(
     map<VCD::MP4::TrackId, TrackSegmentCtx*> tileTrackSegCtxs)
 {
     VCD::MP4::TrackId trackId = trackSegCtx->trackIdx;
-    OMAF_LOG(LOG_INFO, "Generate initial segment for track %d!\n", trackId.GetIndex());
     bool hadFirstFramesRemaining = m_firstFrameRemaining.size();
     bool endOfStream = trackSegCtx->codedMeta.isEOS;
     VCD::MP4::DataItem<VCD::MP4::CodedMeta> codedMeta;
@@ -77,7 +76,6 @@ int32_t DashInitSegmenter::GenerateInitSegment(
         packingType = VCD::MP4::VideoFramePackingType::OMNI_SIDEBYSIDE;
     }
 
-    //OMAF_LOG(LOG_INFO, "Is audio %d\n", trackSegCtx->isAudio);
     if (!(trackSegCtx->isExtractorTrack))
     {
         if (!endOfStream && m_firstFrameRemaining.count(trackId))
@@ -94,7 +92,6 @@ int32_t DashInitSegmenter::GenerateInitSegment(
                 m_segWriter->AddH265VideoTrack(trackId, isOMAF, isPackedSubPic, packingType, m_config.tracks.at(trackId).meta, *codedMeta);
                 break;
             case VCD::MP4::CodedFormat::AAC:
-                //OMAF_LOG(LOG_INFO, "To add AAC track !\n");
                 m_segWriter->AddAACTrack(trackId, m_config.tracks.at(trackId).meta, isOMAF, *codedMeta);
                 break;
             case VCD::MP4::CodedFormat::TimedMetadata:
@@ -106,7 +103,6 @@ int32_t DashInitSegmenter::GenerateInitSegment(
                 map<TrackId, TrackConfig>::const_iterator iter = m_config.tracks.find(trackId);
                 if (iter == m_config.tracks.end())
                 {
-                    OMAF_LOG(LOG_ERROR, "Can't find specified track index !\n");
                     return OMAF_ERROR_INVALID_REF_TRACK;
                 }
                 TrackConfig trackCfg = iter->second;
@@ -155,7 +151,6 @@ int32_t DashInitSegmenter::GenerateInitSegment(
                         map<TrackId, TrackConfig>::const_iterator iter = m_config.tracks.find(normalTrack.first);
                         if (iter == m_config.tracks.end())
                         {
-                            OMAF_LOG(LOG_ERROR, "Can't find specified track index !\n");
                             return OMAF_ERROR_INVALID_REF_TRACK;
                         }
                         TrackConfig trackCfg = iter->second;
@@ -198,7 +193,6 @@ int32_t DashInitSegmenter::GenerateInitSegment(
                         map<TrackId, TrackConfig>::const_iterator iter = m_config.tracks.find(trackId);
                         if (iter == m_config.tracks.end())
                         {
-                            OMAF_LOG(LOG_ERROR, "Can't find specified track index !\n");
                             return OMAF_ERROR_INVALID_REF_TRACK;
                         }
                         TrackConfig trackCfg = iter->second;
@@ -230,7 +224,6 @@ int32_t DashInitSegmenter::GenerateInitSegment(
                 m_fp = fopen(trackSegCtx->dashInitCfg.initSegName, "wb+");
                 if (!m_fp)
                 {
-                    OMAF_LOG(LOG_ERROR, "Failed to open %s\n", trackSegCtx->dashInitCfg.initSegName);
                     return OMAF_ERROR_NULL_PTR;
                 }
 

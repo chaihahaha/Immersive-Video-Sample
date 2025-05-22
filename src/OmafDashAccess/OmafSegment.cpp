@@ -188,6 +188,7 @@ int OmafSegment::CacheToFile() noexcept {
                                     ds_params_.dash_url_.length() - ds_params_.dash_url_.find_last_of('/') - 1);
     cache_file_ = DOWNLOADMANAGER::GetInstance()->GetCacheFolder() + "/" +
                   DOWNLOADMANAGER::GetInstance()->AssignCacheFileName() + fileName;
+    std::cout << "cachetofile dash url: " << cache_file_ << std::endl;
     if (!dash_stream_.cacheToFile(cache_file_)) {
       OMAF_LOG(LOG_ERROR, "Failed to cache the dash to file: %s\n", cache_file_.c_str());
       return OMAF_ERROR_FILE_WRITE;

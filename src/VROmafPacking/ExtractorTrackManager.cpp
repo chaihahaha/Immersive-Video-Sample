@@ -97,12 +97,10 @@ int32_t ExtractorTrackManager::Initialize(std::map<uint8_t, MediaStream*> *media
 
     if (m_initInfo->packingPluginName)
     {
-        OMAF_LOG(LOG_INFO, "Appoint plugin %s for extractor track generation !\n", (m_initInfo->packingPluginName));
 
         m_extractorTrackGen = new ExtractorTrackGenerator(m_initInfo, m_streams);
         if (!m_extractorTrackGen)
         {
-            OMAF_LOG(LOG_ERROR, "Failed to create extractor track generator !\n");
             return OMAF_ERROR_NULL_PTR;
         }
 
@@ -116,7 +114,6 @@ int32_t ExtractorTrackManager::Initialize(std::map<uint8_t, MediaStream*> *media
     }
     else
     {
-        OMAF_LOG(LOG_INFO, "No plugin appointed, so extractor track will not be generated !\n");
     }
 
     return ERROR_NONE;

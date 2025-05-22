@@ -57,7 +57,6 @@ public:
         // initialize glfw
         if (!glfwInit())
         {
-            LOG(ERROR)<< "glfw failed to init" << std::endl;
             glfwTerminate();
             return;
         }
@@ -71,7 +70,6 @@ public:
         window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "VR Player", NULL, NULL); //done
         if (!window)
         {
-            LOG(ERROR)<< "failed to open window" << std::endl;
             glfwTerminate();
             return;
         }

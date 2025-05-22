@@ -35,11 +35,11 @@
 #include "RenderContext.h"
 #ifdef _LINUX_OS_
 #include <GL/glu.h>
-#include <GL/glu_mangle.h>
+//#include <GL/glu_mangle.h>
 #include <GL/gl.h>
-#include <GL/glx.h>
-#include <GL/glext.h>
-#include <GL/glcorearb.h>
+//#include <GL/glx.h>
+//#include <GL/glext.h>
+//#include <GL/glcorearb.h>
 #endif
 #ifdef _ANDROID_OS_
 #include <GLES3/gl3.h>
@@ -153,7 +153,6 @@ RenderStatus CubeMapRenderTarget::Update( HeadPose* pose, float hFOV, float vFOV
     static uint64_t start = 0;
     static uint64_t totalChangedTime = 0;
     static uint32_t changedCount = 0;
-    DataLog *data_log = DATALOG::GetInstance();
     for (uint32_t i = 0; i < TilesInViewport.size(); i++)
     {
         std::vector<TileInformation> listBest = mQualityRankingInfo.mapQualitySelection[mQualityRankingInfo.mainQualityRanking];
@@ -163,10 +162,6 @@ RenderStatus CubeMapRenderTarget::Update( HeadPose* pose, float hFOV, float vFOV
             if (m_isAllHighQualityInView) // firt time to be blur
             {
                 start = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
-                if (data_log != nullptr) {
-                    data_log->SetSwitchStartTime(start);
-                }
-                LOG(INFO)<<"[FrameSequences][Low]: low resolution part occurs! pts is " << pts <<std::endl;
 #ifndef _ANDROID_OS_
 #ifdef _USE_TRACE_
                 //trace
@@ -180,10 +175,6 @@ RenderStatus CubeMapRenderTarget::Update( HeadPose* pose, float hFOV, float vFOV
     if (isAllHighFlag && !m_isAllHighQualityInView) // first time to be clear
     {
         uint64_t end = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
-        if (data_log != nullptr) {
-            data_log->SetSwitchEndTime(end);
-        }
-        LOG(INFO)<<"[FrameSequences][High]: T9' All high resolution part! pts is " << pts <<"cost time : "<<(end-start)<<"ms"<<std::endl;
 #ifndef _ANDROID_OS_
 #ifdef _USE_TRACE_
         //trace
@@ -275,7 +266,6 @@ RenderStatus CubeMapRenderTarget::CalcQualityRanking()
         if (regionInfo == NULL || regionInfo->GetRegionWisePacking() == NULL \
              || regionInfo->GetSourceInfo() == NULL || regionInfo->GetSourceInRegion() > 2)
         {
-            LOG(INFO)<<"region information is invalid!"<<endl;
             errorCnt++;
             continue;
         }
@@ -375,14 +365,12 @@ int32_t CubeMapRenderTarget::findQuality(RegionData *regionInfo, RectangularRegi
             {
                 if (m_transformType[tile_info.face_id] != tile_info.transformType) // exist and changed
                 {
-                    LOG(INFO) << "face id " << tile_info.face_id << " has changed its transformtype from " << m_transformType[tile_info.face_id] <<" to " << tile_info.transformType << endl;
                     m_transformType.erase(tile_info.face_id);
                     m_transformType.insert(make_pair(tile_info.face_id, tile_info.transformType));
                 }
             }
             else if (m_transformType.find(tile_info.face_id) == m_transformType.end()) // not existed
             {
-                LOG(INFO) << "add transform type " << static_cast<uint32_t>(tile_info.transformType) <<" to face id " << tile_info.face_id << endl;
                 m_transformType.insert(make_pair(tile_info.face_id, tile_info.transformType));
             }
         }
@@ -468,7 +456,6 @@ RenderStatus CubeMapRenderTarget::GetTilesInViewport(float yaw, float pitch, flo
 {
     if (hFOV <= 0 || vFOV <= 0)
     {
-        LOG(ERROR)<<"FOV input invalid!"<<std::endl;
         return RENDER_ERROR;
     }
     struct SphereRegion region;

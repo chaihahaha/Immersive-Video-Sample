@@ -155,6 +155,7 @@ class OmafCurlEasyDownloader : public VCD::NonCopyable {
   OMAF_STATUS close() noexcept;
   HttpHeader header() noexcept;
   double speed() noexcept;
+  std::string getUrlForLogging() const { return url_; }
 
  public:
   static size_t curlBodyCallback(char *ptr, size_t size, size_t nmemb, void *userdata) noexcept;

@@ -60,7 +60,8 @@ MediaPlayer_Linux::MediaPlayer_Linux()
     m_renderManager = NULL;
     m_rsFactory     = NULL;
     memset_s(&m_renderConfig, sizeof(m_renderConfig), 0);
-    memset_s(&m_mediaInfo, sizeof(m_mediaInfo), 0);
+    //memset_s(&m_mediaInfo, sizeof(m_mediaInfo), 0);
+    //m_mediaInfo = nullptr;
 }
 
 MediaPlayer_Linux::~MediaPlayer_Linux()
@@ -100,16 +101,9 @@ RenderStatus MediaPlayer_Linux::Start(void *render_context)
     //initial MediaSource
     switch (m_renderConfig.sourceType)
     {
-#ifdef _ENABLE_DASH_SOURCE_
         case DASH_SOURCE:
             m_mediaSource = new DashMediaSource();
             break;
-#endif
-#ifdef _ENABLE_WEBRTC_SOURCE_
-        case WEBRTC_SOURCE:
-            m_mediaSource = new WebRTCMediaSource();
-            break;
-#endif
         default:
             m_mediaSource = NULL;
             LOG(ERROR)<<"initial media source error!"<<std::endl;
@@ -122,10 +116,14 @@ RenderStatus MediaPlayer_Linux::Start(void *render_context)
     {
         return RENDER_ERROR;
     }
+    std::cout << "mediasource initialized" << std::endl;
 
     this->m_mediaInfo = m_mediaSource->GetMediaInfo();
+    std::cout << "got media info" << std::endl;
     m_mediaSource->SetActiveStream(0, 0);
+    std::cout << "set stream" << std::endl;
     RenderStatus startStatus = m_mediaSource->Start();
+    std::cout << "media source started" << std::endl;
     if (startStatus != RENDER_STATUS_OK)
     {
         return RENDER_ERROR;
@@ -139,7 +137,9 @@ RenderStatus MediaPlayer_Linux::Start(void *render_context)
     }
     m_status = PLAY;
 
+    std::cout << "set resolution" << std::endl;
     m_renderContext->SetFullResolution(m_mediaInfo.mVideoInfo[0].width, m_mediaInfo.mVideoInfo[0].height);
+    std::cout << "set resolution success" << std::endl;
 
     return RENDER_STATUS_OK;
 }
@@ -156,8 +156,8 @@ RenderStatus MediaPlayer_Linux::Play()
     bool quitFlag = false;
     uint64_t needDropFrames = 0;
     int64_t accumTimeDelay = 0;
-    do
-    {
+    //do
+    //{
         HeadPose *pose = new HeadPose;
         memset_s(pose, sizeof(HeadPose), 0);
         m_renderManager->GetStatusAndPose(pose, &m_status);
@@ -175,7 +175,7 @@ RenderStatus MediaPlayer_Linux::Play()
             uint32_t renderInterval = m_renderManager->GetRenderConfig().renderInterval;
             if(interval < renderInterval)
             {
-                usleep((renderInterval - interval) * 1000);
+                //usleep((renderInterval - interval) * 1000);
                 needDropFrames = 0;
                 LOG(INFO)<<"==========wait_time============== :"<<(renderInterval - interval)<<std::endl;
             }
@@ -224,21 +224,21 @@ RenderStatus MediaPlayer_Linux::Play()
             quitFlag = true;
         }
         SAFE_DELETE(pose);
-    } while (!quitFlag);
-    uint64_t end = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
-    LOG(INFO)<<"-----------------------------"<<std::endl;
-    LOG(INFO)<<"----[render duration]:------ "<<float(end - start)/1000<<"s"<<std::endl;
-    LOG(INFO)<<"----[render frame count]:--- "<<renderCount<<std::endl;
-    LOG(INFO)<<"----[actual render fps]:---- "<<renderCount / (float(end - start)/1000)<<std::endl;
-    LOG(INFO)<<"-----------------------------"<<std::endl;
-    DataLog *data_log = DATALOG::GetInstance();
-    if (data_log != nullptr) {
-        data_log->PrintSwitchPerformanceInLog();
-        data_log->PrintSwitchPerformanceInFile();
-        data_log->PrintE2ELatencyPerformanceInLog();
-        data_log->PrintE2ELatencyPerformanceInFile();
+    //} while (!quitFlag);
+    //uint64_t end = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
+    //LOG(INFO)<<"-----------------------------"<<std::endl;
+    //LOG(INFO)<<"----[render duration]:------ "<<float(end - start)/1000<<"s"<<std::endl;
+    //LOG(INFO)<<"----[render frame count]:--- "<<renderCount<<std::endl;
+    //LOG(INFO)<<"----[actual render fps]:---- "<<renderCount / (float(end - start)/1000)<<std::endl;
+    //LOG(INFO)<<"-----------------------------"<<std::endl;
+    //DataLog *data_log = DATALOG::GetInstance();
+    //if (data_log != nullptr) {
+    //    data_log->PrintSwitchPerformanceInLog();
+    //    data_log->PrintSwitchPerformanceInFile();
+    //    data_log->PrintE2ELatencyPerformanceInLog();
+    //    data_log->PrintE2ELatencyPerformanceInFile();
 
-    }
+    //}
     return RENDER_STATUS_OK;
 }
 

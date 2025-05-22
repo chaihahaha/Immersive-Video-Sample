@@ -135,7 +135,6 @@ RenderStatus CubeMapMesh::Bind(uint32_t vertexAttrib, uint32_t transVertexAttrib
             uint8_t transformType = it->second;
             if (transformType != NO_TRANSFORM) // NEED TO FIX! rotate 90/180/270
             {
-                LOG(INFO)<< "transform type changed!" << endl;
                 for (uint32_t i = face_id * VERTEX_NUM; i < (face_id + 1) * VERTEX_NUM; i++)
                 {
                     if (i % 6 == 3) // transformed position x

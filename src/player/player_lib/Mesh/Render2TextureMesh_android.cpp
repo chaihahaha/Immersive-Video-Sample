@@ -78,10 +78,8 @@ RenderStatus Render2TextureMesh_android::Create()
 
 RenderStatus Render2TextureMesh_android::Bind(uint32_t vertexAttrib, uint32_t texCoordAttrib)
 {
-    // ANDROID_LOGD("Render2TextureMesh_android::84 vertexAttrib IS %d texCoordAttrib is %d", vertexAttrib, texCoordAttrib);
     // glGenVertexArrays(1, &m_VAOHandle);
     // glBindVertexArray(m_VAOHandle);
-    // ANDROID_LOGD("Render2TextureMesh_android::86 m_VAOHandle IS %d", m_VAOHandle);
     glVertexAttribPointer(vertexAttrib, 2, GL_FLOAT, GL_FALSE, 0, m_vertices);
     glEnableVertexAttribArray(vertexAttrib);
     glVertexAttribPointer(texCoordAttrib, 2, GL_FLOAT, GL_FALSE, 0, m_texCoords);
@@ -107,7 +105,6 @@ RenderStatus Render2TextureMesh_android::BufferUpdate(void *tile_info)
     m_vertices[5] = (float(tileInfo->projRegTop + tileInfo->projRegHeight) / tileInfo->picHeight) * 2.0 - 1.0;
     m_vertices[6] = (float(tileInfo->projRegLeft + tileInfo->projRegWidth) / tileInfo->picWidth) * 2.0 - 1.0;
     m_vertices[7] = (float(tileInfo->projRegTop) / tileInfo->picHeight) * 2.0 - 1.0;
-    // ANDROID_LOGD("proj l:%d, t:%d, w:%d, h:%d picW:%d, picH:%d",
     // tileInfo->projRegLeft, tileInfo->projRegTop, tileInfo->projRegWidth, tileInfo->projRegHeight, tileInfo->picWidth, tileInfo->picHeight);
 
     // packed texture
@@ -119,7 +116,6 @@ RenderStatus Render2TextureMesh_android::BufferUpdate(void *tile_info)
     m_texCoords[5] = (float(tileInfo->packedRegTop + tileInfo->packedRegHeight) / tileInfo->packedPicHeight);
     m_texCoords[6] = (float(tileInfo->packedRegLeft + tileInfo->packedRegWidth) / tileInfo->packedPicWidth);
     m_texCoords[7] = (float(tileInfo->packedRegTop) / tileInfo->packedPicHeight);
-    // ANDROID_LOGD("pack l:%d, t:%d, w:%d, h:%d, picW:%d, picH:%d", tileInfo->packedRegLeft, tileInfo->packedRegTop, tileInfo->packedRegWidth, tileInfo->packedRegHeight, tileInfo->packedPicWidth, tileInfo->packedPicHeight);
     return RENDER_STATUS_OK;
 }
 

@@ -62,6 +62,7 @@ PlanarRender::~PlanarRender()
 
 RenderStatus PlanarRender::Render(uint32_t onScreenTexHandle, uint32_t width, uint32_t height, glm::mat4 ProjectionMatrix, glm::mat4 ViewModelMatrix)
 {
+    std::cout << "in planar render" << std::endl;
     RenderBackend* renderBackend = RENDERBACKEND::GetInstance();
     renderBackend->BindFramebuffer(GL_FRAMEBUFFER, 0);
     renderBackend->Clear(GL_COLOR_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -77,6 +78,7 @@ RenderStatus PlanarRender::Render(uint32_t onScreenTexHandle, uint32_t width, ui
     uint32_t meshVertexNum = m_meshOfOnScreen->GetVertexNum();
     renderBackend->DrawArrays(GL_TRIANGLES, 0, meshVertexNum);
     renderBackend->BindVertexArray(0);
+    std::cout << "planar render end" << std::endl;
     return RENDER_STATUS_OK;
 }
 

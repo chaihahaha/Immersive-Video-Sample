@@ -173,7 +173,11 @@ void OmafCurlEasyHelper::curlTime(CURL *easy_curl, CurlTimes &curl_time) noexcep
   curl_time.redirect_ = redirectTime(easy_curl);
 }
 
-OmafCurlEasyDownloader::~OmafCurlEasyDownloader() { close(); }
+OmafCurlEasyDownloader::~OmafCurlEasyDownloader() {
+  OMAF_LOG(LOG_INFO, "OmafCurlEasyDownloader DESTRUCTOR: url=%s, curl_handler_ptr=%p, this_ptr=%p\n",
+           url_.c_str(), static_cast<void*>(easy_curl_), static_cast<void*>(this));
+  close(); // close() already logs
+}
 
 OMAF_STATUS OmafCurlEasyDownloader::init(const CurlParams &params) noexcept {
   try {
@@ -231,6 +235,7 @@ OMAF_STATUS OmafCurlEasyDownloader::open(const std::string &url) noexcept {
 }
 
 OMAF_STATUS OmafCurlEasyDownloader::start(int64_t offset, int64_t size, onData dcb, onChunkData cdcb, onState scb) noexcept {
+    return ERROR_NONE;
   try {
     std::lock_guard<std::mutex> lock(easy_curl_mutex_);
     if (offset > 0 || size > 0) {
@@ -292,13 +297,17 @@ OMAF_STATUS OmafCurlEasyDownloader::stop() noexcept {
 }
 
 OMAF_STATUS OmafCurlEasyDownloader::close() noexcept {
+ OMAF_LOG(LOG_INFO, "OmafCurlEasyDownloader::close(): url=%s, handler=%p, this_ptr=%p\n",
+             url_.c_str(), static_cast<void*>(easy_curl_), static_cast<void*>(this));
   try {
     stop();
 
     std::lock_guard<std::mutex> lock(easy_curl_mutex_);
 
     if (easy_curl_) {
-      curl_easy_cleanup(easy_curl_);
+        OMAF_LOG(LOG_INFO, "OmafCurlEasyDownloader::close(): Calling curl_easy_cleanup on handler %p for url %s\n",
+               static_cast<void*>(easy_curl_), url_.c_str());
+      curl_easy_cleanup(easy_curl_); // This will trigger ~CurlEasyHandleState
       easy_curl_ = nullptr;
     }
 
@@ -353,6 +362,7 @@ void OmafCurlEasyDownloader::receiveSB(std::unique_ptr<StreamBlock> sb) noexcept
 
 size_t OmafCurlEasyDownloader::curlBodyCallback(char *ptr, size_t size, size_t nmemb, void *userdata) noexcept {
   size_t bsize = size * nmemb;
+  return bsize;
 
   try {
     //OMAF_LOG(LOG_INFO, "Receive bytes size= %lld\n", bsize);
@@ -404,6 +414,9 @@ OmafCurlEasyDownloader::Ptr OmafCurlEasyDownloaderPool::pop() noexcept {
         OmafCurlEasyDownloader::Ptr downloader = std::move(easy_downloader_pool_.front());
         downloader->params(curl_params_);
         easy_downloader_pool_.pop();
+         OMAF_LOG(LOG_INFO, "DownloaderPool: Popped existing downloader. Handler: %p. Extracted URL (if available): %s\n",
+                 static_cast<void*>(downloader->handler()),
+                 downloader->getUrlForLogging().c_str());
         return std::move(downloader);
       }
       if (downloader_count_ >= max_downloader_) {
@@ -411,10 +424,16 @@ OmafCurlEasyDownloader::Ptr OmafCurlEasyDownloaderPool::pop() noexcept {
       }
     }
     // 2. create a new downloader
+    OMAF_LOG(LOG_INFO, "DownloaderPool: Creating new downloader.\n");
     OmafCurlEasyDownloader::Ptr downloader = std::make_shared<OmafCurlEasyDownloader>();
+    OMAF_LOG(LOG_INFO, "DownloaderPool: New downloader created. Calling init(). Current handler: %p\n", static_cast<void*>(downloader->handler()));
     if (ERROR_NONE == downloader->init(curl_params_)) {
+        OMAF_LOG(LOG_INFO, "DownloaderPool: New downloader init() OK. Handler after init: %p. URL after init (likely empty): %s\n",
+               static_cast<void*>(downloader->handler()),
+               downloader->getUrlForLogging().c_str());
       return std::move(downloader);
     }
+    OMAF_LOG(LOG_ERROR, "DownloaderPool: New downloader init() FAILED.\n");
     return nullptr;
   } catch (const std::exception &ex) {
     OMAF_LOG(LOG_ERROR, "Exception when request one easy downloader! ex=%s\n", ex.what());

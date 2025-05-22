@@ -45,8 +45,21 @@ VCD_NS_BEGIN
 
 class MediaPlayer_Linux
 {
+private:
+    // Add these member variables to preserve state between frames
+    uint64_t m_lastTime;
+    uint64_t m_prevLastTime;
+    uint64_t m_deltaTime;
+    uint64_t m_renderCount;
+    int64_t m_correctCount;
+    int64_t m_accumTimeDelay;
+    uint64_t m_needDropFrames;
+    bool m_quitFlag;
+
 public:
     MediaPlayer_Linux();
+
+    bool RenderFrame();  // Returns true when done
 
     RenderStatus Create(struct RenderConfig config);
 

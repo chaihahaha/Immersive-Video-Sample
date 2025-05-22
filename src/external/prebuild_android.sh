@@ -11,7 +11,7 @@ NDK_r18b_PATH=${PWD}
 cd ../
 #safestring
 if [ ! -d "./safestringlib" ] ; then
-    git clone https://github.com/intel/safestringlib.git
+    git clone https://ghfast.top/github.com/intel/safestringlib.git
 fi
 
 cd safestringlib
@@ -27,7 +27,7 @@ sudo cp ../include/* /usr/local/include/safestringlib/
 cd ../..
 #glog
 if [ ! -d "./glog" ];then
-    git clone https://github.com/google/glog.git
+    git clone https://ghfast.top/github.com/google/glog.git
 fi
 cd glog
 git reset --hard 0a2e5931bd5ff22fd3bf8999eb8ce776f159cda6

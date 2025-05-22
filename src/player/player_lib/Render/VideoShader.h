@@ -35,14 +35,14 @@
 #define _VIDEOSHADER_H_
 
 #ifdef _LINUX_OS_
-#include <GL/glu.h>
-#include <GL/glu_mangle.h>
+//#include <GL/glu.h>
+//#include <GL/glu_mangle.h>
 #include <GL/gl.h>
-#include <GL/glx.h>
+//#include <GL/glx.h>
 #include <GL/glext.h>
-#include <GL/glcorearb.h>
+//#include <GL/glcorearb.h>
 #include <GLES3/gl3.h>
-#include <GLES3/gl3ext.h>
+//#include <GLES3/gl3ext.h>
 #include <GLES3/gl3platform.h>
 
 #include <glm/glm.hpp>

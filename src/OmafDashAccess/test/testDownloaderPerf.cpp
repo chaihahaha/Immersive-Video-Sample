@@ -40,7 +40,6 @@ namespace {
 class DownloaderPerfTest : public testing::Test {
  public:
   virtual void SetUp() {
-    OMAF_LOG(LOG_INFO, "Calling setup\n");
 
     valid_url = "http://10.67.115.92:8080/testOMAFlive/Test.mpd";
 
@@ -61,7 +60,6 @@ class DownloaderPerfTest : public testing::Test {
   }
 
   virtual void TearDown() {
-    OMAF_LOG(LOG_INFO, "Calling TearDown\n");
 
     OMAF_STATUS ret = dash_client_->stop();
     EXPECT_TRUE(ret == ERROR_NONE);
@@ -93,7 +91,6 @@ TEST_F(DownloaderPerfTest, perf_success) {
       },
       nullptr,
       [&sync_num](OmafDashSegmentClient::State state) {
-        OMAF_LOG(LOG_INFO, "Receive the state: %d\n", static_cast<int>(state));
         EXPECT_TRUE(state == OmafDashSegmentClient::State::SUCCESS);
         sync_num++;
       });
@@ -123,7 +120,6 @@ TEST_F(DownloaderPerfTest, perf_timeout) {
       },
       nullptr,
       [&sync_num](OmafDashSegmentClient::State state) {
-        OMAF_LOG(LOG_INFO, "Receive the state:%d\n", static_cast<int>(state));
         EXPECT_TRUE(state == OmafDashSegmentClient::State::TIMEOUT);
         sync_num++;
       });
@@ -154,7 +150,6 @@ TEST_F(DownloaderPerfTest, perf_success_100) {
         },
         nullptr,
         [&sync_num](OmafDashSegmentClient::State state) {
-          OMAF_LOG(LOG_INFO, "Receive the state:%d\n", static_cast<int>(state));
           EXPECT_TRUE(state == OmafDashSegmentClient::State::SUCCESS);
           sync_num++;
         });

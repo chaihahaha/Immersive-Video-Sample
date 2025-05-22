@@ -90,7 +90,6 @@ int32_t MultiViewSegmentation::CreateDashMPDWriter()
 {
     if (!m_mpdWriterPluginHdl)
     {
-        OMAF_LOG(LOG_ERROR, "NULL MPD writer plugin handle !\n");
         return OMAF_ERROR_NULL_PTR;
     }
 
@@ -100,13 +99,11 @@ int32_t MultiViewSegmentation::CreateDashMPDWriter()
     dlsymErr2 = dlerror();
     if (dlsymErr2)
     {
-        OMAF_LOG(LOG_ERROR, "Failed to load symbol Create: %s\n", dlsymErr2);
         return OMAF_ERROR_DLSYM;
     }
 
     if (!createMPDWriter)
     {
-        OMAF_LOG(LOG_ERROR, "NULL MPD writer creator !\n");
         return OMAF_ERROR_NULL_PTR;
     }
 
@@ -121,7 +118,6 @@ int32_t MultiViewSegmentation::CreateDashMPDWriter()
 
     if (!m_mpdWriter)
     {
-        OMAF_LOG(LOG_ERROR, "Failed to create MPD writer !\n");
         return OMAF_ERROR_NULL_PTR;
     }
 
@@ -154,7 +150,6 @@ int32_t MultiViewSegmentation::ConstructVideoTrackSegCtx()
             uint64_t bitRate = vs->GetBitRate();
             uint8_t qualityLevel = 1;
             m_projType = (VCD::OMAF::ProjectionFormat)vs->GetProjType();
-            OMAF_LOG(LOG_INFO, "Get video source projection type %d\n", m_projType);
             m_videoSegInfo = vs->GetVideoSegInfo();
             Nalu *vpsNalu = vs->GetVPSNalu();
             if (!vpsNalu || !(vpsNalu->data) || !(vpsNalu->dataSize))
@@ -230,7 +225,6 @@ int32_t MultiViewSegmentation::ConstructVideoTrackSegCtx()
                 if (i == 0)
                 {
                     uint64_t subSegNumInSeg = (uint64_t)(trackSegCtx->dashCfg.subsgtDuration.get().m_den / trackSegCtx->dashCfg.subsgtDuration.get().m_num);
-                    OMAF_LOG(LOG_INFO, "One CMAF segment contains %ld chunks ! \n", subSegNumInSeg);
                 }
             }
             trackSegCtx->dashCfg.needCheckIDR = true;
@@ -338,16 +332,11 @@ int32_t MultiViewSegmentation::ConstructAudioTrackSegCtx()
         MediaStream *stream = it->second;
         if (stream && (stream->GetMediaType() == AUDIOTYPE))
         {
-            //OMAF_LOG(LOG_INFO, "Begin to construct audio track segmentation context !\n");
             AudioStream *as = (AudioStream*)stream;
             uint32_t frequency = as->GetSampleRate();
             uint8_t chlConfig  = as->GetChannelNum();
             uint16_t bitRate   = as->GetBitRate();
             std::vector<uint8_t> packedAudioSpecCfg = as->GetPackedSpecCfg();
-            OMAF_LOG(LOG_INFO, "Audio sample rate %d\n", frequency);
-            OMAF_LOG(LOG_INFO, "Audio channel number %d\n", chlConfig);
-            OMAF_LOG(LOG_INFO, "Audio bit rate %d\n", bitRate);
-            OMAF_LOG(LOG_INFO, "Audio specific configuration packed size %lld\n", packedAudioSpecCfg.size());
 
             VCD::MP4::MPDAdaptationSetCtx *mpdASCtx = new VCD::MP4::MPDAdaptationSetCtx;
             if (!mpdASCtx)
@@ -470,7 +459,6 @@ int32_t MultiViewSegmentation::ConstructAudioTrackSegCtx()
     }
 
     m_audioSegCtxsConsted = true;
-    //OMAF_LOG(LOG_INFO, "Complete audio segmentation context construction !\n");
     return ERROR_NONE;
 }
 
@@ -558,7 +546,6 @@ int32_t MultiViewSegmentation::WriteSegmentForEachVideo(MediaStream *stream, Fra
     {
         if (!isEOS)
         {
-            OMAF_LOG(LOG_ERROR, "NULL video data !\n");
             return OMAF_ERROR_INVALID_DATA;
         }
         else
@@ -622,7 +609,6 @@ int32_t MultiViewSegmentation::WriteSegmentForEachAudio(MediaStream *stream, Fra
     if (!dashSegmenter)
         return OMAF_ERROR_NULL_PTR;
 
-    //OMAF_LOG(LOG_INFO, "Write audio track segment !\n");
     int32_t ret = dashSegmenter->SegmentData(trackSegCtx);
     if (ret)
         return ret;
@@ -632,10 +618,8 @@ int32_t MultiViewSegmentation::WriteSegmentForEachAudio(MediaStream *stream, Fra
     trackSegCtx->codedMeta.presTime.m_num += 1000 / (m_frameRate.num / m_frameRate.den);
     trackSegCtx->codedMeta.presTime.m_den = 1000;
 
-    //OMAF_LOG(LOG_INFO, "EOS %d\n", trackSegCtx->isEOS);
     m_audioSegNum = dashSegmenter->GetSegmentsNum();
 
-    //OMAF_LOG(LOG_INFO, "AUDIO seg num %ld\n", m_audioSegNum);
     return ERROR_NONE;
 }
 
@@ -695,7 +679,6 @@ int32_t MultiViewSegmentation::VideoSegmentation()
         }
         if (currWaitTime >= waitTimes)
         {
-            OMAF_LOG(LOG_ERROR, "Constructing segmentation context for audio stream takes too long time !\n");
             return OMAF_ERROR_TIMED_OUT;
         }
 
@@ -798,7 +781,6 @@ int32_t MultiViewSegmentation::VideoSegmentation()
                 }
                 if (currWaitTime >= waitTimes)
                 {
-                    OMAF_LOG(LOG_ERROR, "It takes too much time to generate the first audio segment !\n");
                     return OMAF_ERROR_TIMED_OUT;
                 }
             }
@@ -895,7 +877,6 @@ int32_t MultiViewSegmentation::VideoSegmentation()
 
             std::chrono::high_resolution_clock clock;
             uint64_t before = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
-            OMAF_LOG(LOG_INFO, "Complete one seg for video in %lld ms\n", (before - currentT));
             currentT = before;
             if (m_isCMAFEnabled && m_segInfo->isLive)
             {
@@ -957,8 +938,6 @@ int32_t MultiViewSegmentation::VideoSegmentation()
                     }
                     if (currWaitTime >= waitTimes)
                     {
-                        OMAF_LOG(LOG_ERROR, "Audio still hasn't generated all segments !\n");
-                        OMAF_LOG(LOG_ERROR, "Video segments num %ld and audio segments num %ld\n", m_segNum, m_audioSegNum);
                         return OMAF_ERROR_TIMED_OUT;
                     }
                 }
@@ -984,8 +963,6 @@ int32_t MultiViewSegmentation::VideoSegmentation()
                     }
                     if (currWaitTime >= waitTimes)
                     {
-                        OMAF_LOG(LOG_ERROR, "Audio still hasn't generated all segments !\n");
-                        OMAF_LOG(LOG_ERROR, "Video segments num %ld and audio segments num %ld\n", m_segNum, m_audioSegNum);
                         return OMAF_ERROR_TIMED_OUT;
                     }
                 }
@@ -994,7 +971,6 @@ int32_t MultiViewSegmentation::VideoSegmentation()
                 if (ret)
                     return ret;
             }
-            OMAF_LOG(LOG_INFO, "Totally write %ld frames into video tracks!\n", m_framesNum);
             break;
         }
 #ifdef _USE_TRACE_
@@ -1012,13 +988,11 @@ int32_t MultiViewSegmentation::VideoSegmentation()
 
 int32_t MultiViewSegmentation::AudioSegmentation()
 {
-    OMAF_LOG(LOG_INFO, "Launch audio segmentation thread !\n");
     uint64_t currentT = 0;
     int32_t ret = ConstructAudioTrackSegCtx();
     if (ret)
         return ret;
 
-    OMAF_LOG(LOG_INFO, "Construction for audio track segmentation context DONE !\n");
     bool onlyAudio = OnlyAudio();
     if (onlyAudio)
     {
@@ -1082,9 +1056,7 @@ int32_t MultiViewSegmentation::AudioSegmentation()
         }
     }
 
-    OMAF_LOG(LOG_INFO, "Done audio initial segment !\n");
     m_audioPrevSegNum = m_audioSegNum;
-    OMAF_LOG(LOG_INFO, "Initial audio segment num %ld\n", m_audioSegNum);
 
     bool nowEOS = false;
     bool eosWritten = false;
@@ -1155,7 +1127,6 @@ int32_t MultiViewSegmentation::AudioSegmentation()
 
             std::chrono::high_resolution_clock clock;
             uint64_t before = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
-            OMAF_LOG(LOG_INFO, "Complete one seg for audio in %lld ms\n", (before - currentT));
             currentT = before;
         }
 
@@ -1199,13 +1170,11 @@ int32_t MultiViewSegmentation::AudioSegmentation()
                     if (ret)
                         return ret;
                 }
-                OMAF_LOG(LOG_INFO, "Total %ld frames written into segments!\n", m_framesNum);
                 break;
             }
             m_framesNum++;
         }
 
-        //OMAF_LOG(LOG_INFO, "NOW eos %d \n", nowEOS);
         if (nowEOS && eosWritten)
         {
             std::map<uint8_t, MediaStream*>::iterator itStr = m_streamMap->begin();
@@ -1223,7 +1192,6 @@ int32_t MultiViewSegmentation::AudioSegmentation()
         }
     }
 
-    OMAF_LOG(LOG_INFO, "Totally write %ld frames into audio track!\n", framesWritten);
     return ERROR_NONE;
 }
 

@@ -112,13 +112,11 @@ OmafPackage::~OmafPackage()
             itHdl = m_streamPlugins.find(codec);
             if (itHdl == m_streamPlugins.end())
             {
-                OMAF_LOG(LOG_ERROR, "Can't find corresponding stream plugin for codec %d\n", codec);
                 return;
             }
             void *pluginHdl = itHdl->second;
             if (!pluginHdl)
             {
-                OMAF_LOG(LOG_ERROR, "The stream process plugin handle is NULL !\n");
                 return;
             }
             if (stream->GetMediaType() == VIDEOTYPE)
@@ -128,12 +126,10 @@ OmafPackage::~OmafPackage()
                 const char *dlsymErr = dlerror();
                 if (dlsymErr)
                 {
-                    OMAF_LOG(LOG_ERROR, "Failed to load symbol Destroy for codec %d\n", codec);
                     return;
                 }
                 if (!destroyVS)
                 {
-                    OMAF_LOG(LOG_ERROR, "NULL video stream destroyer !\n");
                     return;
                 }
                 destroyVS((VideoStream*)(stream));
@@ -145,12 +141,10 @@ OmafPackage::~OmafPackage()
                 const char *dlsymErr = dlerror();
                 if (dlsymErr)
                 {
-                    OMAF_LOG(LOG_ERROR, "Failed to load symbol Destroy for codec %d\n", codec);
                     return;
                 }
                 if (!destroyAS)
                 {
-                    OMAF_LOG(LOG_ERROR, "NULL audio stream destroyer !\n");
                     return;
                 }
                 destroyAS((AudioStream*)(stream));
@@ -202,16 +196,13 @@ int32_t OmafPackage::AddMediaStream(uint8_t streamIdx, BSBuffer *bs)
                 {
                     snprintf(hevcPluginName, 1024, "%s/lib%s.so", m_initInfo->videoProcessPluginPath, m_initInfo->videoProcessPluginName);
                 }
-                OMAF_LOG(LOG_INFO, "Used video stream process plugin is %s\n", hevcPluginName);
 
                 pluginHdl = dlopen(hevcPluginName, RTLD_LAZY);
                 const char *dlsymErr = dlerror();
                 if (!pluginHdl)
                 {
-                    OMAF_LOG(LOG_ERROR, "Failed to open HEVC video stream plugin %s\n", hevcPluginName);
                     if (dlsymErr)
                     {
-                        OMAF_LOG(LOG_ERROR, "Get error msg %s\n", dlsymErr);
                     }
                     return OMAF_ERROR_DLOPEN;
                 }
@@ -222,7 +213,6 @@ int32_t OmafPackage::AddMediaStream(uint8_t streamIdx, BSBuffer *bs)
                 pluginHdl = it->second;
                 if (!pluginHdl)
                 {
-                    OMAF_LOG(LOG_ERROR, "NULL HEVC video stream plugin !\n");
                     return OMAF_ERROR_NULL_PTR;
                 }
             }
@@ -232,20 +222,17 @@ int32_t OmafPackage::AddMediaStream(uint8_t streamIdx, BSBuffer *bs)
             const char* dlsymErr1 = dlerror();
             if (dlsymErr1)
             {
-                OMAF_LOG(LOG_ERROR, "Failed to load symbol Create: %s\n", dlsymErr1);
                 return OMAF_ERROR_DLSYM;
             }
 
             if (!createVS)
             {
-                OMAF_LOG(LOG_ERROR, "NULL video stream creator !\n");
                 return OMAF_ERROR_NULL_PTR;
             }
 
             VideoStream *vs = createVS();
             if (!vs)
             {
-                OMAF_LOG(LOG_ERROR, "Failed to create HEVC video stream !\n");
                 return OMAF_ERROR_NULL_PTR;
             }
 
@@ -256,7 +243,6 @@ int32_t OmafPackage::AddMediaStream(uint8_t streamIdx, BSBuffer *bs)
             int32_t ret = vs->Initialize(streamIdx, bs, m_initInfo);
             if (ret)
             {
-                OMAF_LOG(LOG_ERROR, "Failed to initialize HEVC video stream !\n");
                 return ret;
             }
 
@@ -269,8 +255,6 @@ int32_t OmafPackage::AddMediaStream(uint8_t streamIdx, BSBuffer *bs)
             {
                 if (m_initInfo->segmentationInfo->splitTile)
                 {
-                    OMAF_LOG(LOG_INFO, "There is no tile in input video stream !\n");
-                    OMAF_LOG(LOG_INFO, "But splitting tile is set to true, now change it to false !\n");
                     m_initInfo->segmentationInfo->splitTile = 0;
                 }
             }
@@ -278,7 +262,6 @@ int32_t OmafPackage::AddMediaStream(uint8_t streamIdx, BSBuffer *bs)
         }
         else
         {
-            OMAF_LOG(LOG_ERROR, "Not supported video codec %d\n", bs->codecId);
             return OMAF_ERROR_INVALID_CODEC;
         }
     } else if (bs->mediaType == AUDIOTYPE) {
@@ -300,16 +283,13 @@ int32_t OmafPackage::AddMediaStream(uint8_t streamIdx, BSBuffer *bs)
                 {
                     snprintf(aacPluginName, 1024, "%s/lib%s.so", m_initInfo->audioProcessPluginPath, m_initInfo->audioProcessPluginName);
                 }
-                OMAF_LOG(LOG_INFO, "Used audio stream process plugin is %s\n", aacPluginName);
 
                 pluginHdl = dlopen(aacPluginName, RTLD_LAZY);
                 const char *dlsymErr = dlerror();
                 if (!pluginHdl)
                 {
-                    OMAF_LOG(LOG_ERROR, "Failed to open AAC audio stream plugin %s\n", aacPluginName);
                     if (dlsymErr)
                     {
-                        OMAF_LOG(LOG_ERROR, "Get error msg %s\n", dlsymErr);
                     }
                     return OMAF_ERROR_DLOPEN;
                 }
@@ -320,7 +300,6 @@ int32_t OmafPackage::AddMediaStream(uint8_t streamIdx, BSBuffer *bs)
                 pluginHdl = it->second;
                 if (!pluginHdl)
                 {
-                    OMAF_LOG(LOG_ERROR, "NULL AAC audio stream plugin !\n");
                     return OMAF_ERROR_NULL_PTR;
                 }
             }
@@ -330,20 +309,17 @@ int32_t OmafPackage::AddMediaStream(uint8_t streamIdx, BSBuffer *bs)
             const char* dlsymErr1 = dlerror();
             if (dlsymErr1)
             {
-                OMAF_LOG(LOG_ERROR, "Failed to load symbol Create: %s\n", dlsymErr1);
                 return OMAF_ERROR_DLSYM;
             }
 
             if (!createAS)
             {
-                OMAF_LOG(LOG_ERROR, "NULL audio stream creator !\n");
                 return OMAF_ERROR_NULL_PTR;
             }
 
             AudioStream *as = createAS();
             if (!as)
             {
-                OMAF_LOG(LOG_ERROR, "Failed to create AAC audio stream !\n");
                 return OMAF_ERROR_NULL_PTR;
             }
 
@@ -354,15 +330,12 @@ int32_t OmafPackage::AddMediaStream(uint8_t streamIdx, BSBuffer *bs)
             int32_t ret = as->Initialize(streamIdx, bs, m_initInfo);
             if (ret)
             {
-                OMAF_LOG(LOG_ERROR, "Failed to initialize AAC audio stream !\n");
                 return ret;
             }
-            OMAF_LOG(LOG_INFO, "Successfully add one audio stream !\n");
             as = NULL;
         }
         else
         {
-            OMAF_LOG(LOG_ERROR, "Not supported audio codec %d\n", bs->codecId);
             return OMAF_ERROR_INVALID_CODEC;
         }
     }
@@ -437,7 +410,6 @@ int32_t OmafPackage::InitOmafPackage(InitialInfo *initInfo)
 
     if ((m_initInfo->projType == E_SVIDEO_PLANAR) && m_hasViewSEI)
     {
-        OMAF_LOG(LOG_INFO, "This is multi-view video packing now !\n");
         m_sourceMode = MULTIVIEW_VIDEO_PACKING;
     }
 
@@ -453,12 +425,10 @@ int32_t OmafPackage::InitOmafPackage(InitialInfo *initInfo)
         if (m_initInfo->segmentationInfo->isLive)
         {
             m_initInfo->segmentationInfo->chunkInfoType = E_ChunkInfoType::E_CHUNKINFO_CLOC_ONLY;
-            OMAF_LOG(LOG_INFO, "No chunk info type set, and now set it to CLOC_ONLY for live mode !\n");
         }
         else
         {
             m_initInfo->segmentationInfo->chunkInfoType = E_ChunkInfoType::E_CHUNKINFO_SIDX_ONLY;
-            OMAF_LOG(LOG_INFO, "No chunk info type set, and now set it to SIDX_ONLY for static mode !\n");
         }
     }
 
@@ -494,7 +464,6 @@ int32_t OmafPackage::SetFrameInfo(uint8_t streamIdx, FrameBSInfo *frameInfo)
     }
     else if (stream->GetMediaType() == AUDIOTYPE)
     {
-        //OMAF_LOG(LOG_INFO, "To add one audio frame with pts %d\n", frameInfo->pts);
         ret = ((AudioStream*)stream)->AddFrameInfo(frameInfo);
     }
 
@@ -507,7 +476,6 @@ int32_t OmafPackage::SetFrameInfo(uint8_t streamIdx, FrameBSInfo *frameInfo)
         Rational vsFrameRate = ((VideoStream*)stream)->GetFrameRate();
         if ((vsFrameRate.num == 0) || (vsFrameRate.den == 0))
         {
-            OMAF_LOG(LOG_ERROR, "Invalid frame rate ! \n");
             return OMAF_ERROR_BAD_PARAM;
         }
         uint32_t frameRate = (uint32_t)(ceil((float)(vsFrameRate.num) / (float)(vsFrameRate.den)));
@@ -515,23 +483,18 @@ int32_t OmafPackage::SetFrameInfo(uint8_t streamIdx, FrameBSInfo *frameInfo)
         vsGopSize = ((VideoStream*)stream)->GetGopSize();
         if (vsGopSize)
         {
-            OMAF_LOG(LOG_INFO, "vsGopSize %d \n", vsGopSize);
-            OMAF_LOG(LOG_INFO, "frameRate %d \n", frameRate);
         }
 
         if (vsGopSize)
         {
             int64_t gopIntervalTime = (int64_t)((1000 * vsGopSize) / frameRate);
-            OMAF_LOG(LOG_INFO, "gopIntervalTime %ld \n", gopIntervalTime);
             if (gopIntervalTime == m_initInfo->segmentationInfo->chunkDuration)
             {
                 //no change
-                OMAF_LOG(LOG_INFO, "There is no change in CMAF chunk duration !\n");
             }
             else if (gopIntervalTime > m_initInfo->segmentationInfo->chunkDuration)
             {
                 m_initInfo->segmentationInfo->chunkDuration = gopIntervalTime;
-                OMAF_LOG(LOG_INFO, "CMAF chunk duration is %ld ms !\n", m_initInfo->segmentationInfo->chunkDuration);
             }
             else
             {
@@ -541,10 +504,8 @@ int32_t OmafPackage::SetFrameInfo(uint8_t streamIdx, FrameBSInfo *frameInfo)
                     times++;
                 }
                 m_initInfo->segmentationInfo->chunkDuration = gopIntervalTime * times;
-                OMAF_LOG(LOG_INFO, "CMAF chunk duration is %ld ms !\n", m_initInfo->segmentationInfo->chunkDuration);
             }
             m_hasChunkDurCorrected = true;
-            OMAF_LOG(LOG_INFO, "The actual CMAF chunk duration is %ld ms !\n", m_initInfo->segmentationInfo->chunkDuration);
         }
     }
 

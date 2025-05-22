@@ -73,7 +73,6 @@ class OmafReaderTest : public testing::Test {
 
       OMAF_STATUS ret = reader->getTrackInformations(track_infos);
       if (ERROR_NONE != ret) {
-        OMAF_LOG(LOG_ERROR, "Failed to get the trackinformation list from reader, code=%d\n", ret);
         return nullptr;
       }
 
@@ -94,7 +93,6 @@ class OmafReaderTest : public testing::Test {
 
       return std::move(track_info);
     } catch (const std::exception &ex) {
-      OMAF_LOG(LOG_ERROR, "Exception when find the track information! ex: %s\n", ex.what() );
       return nullptr;
     }
   }
@@ -117,7 +115,6 @@ class OmafReaderTest : public testing::Test {
       }
       return found;
     } catch (const std::exception &ex) {
-      OMAF_LOG(LOG_ERROR, "Exception when find the start index! ex: %s\n", ex.what() );
       return false;
     }
   }
@@ -200,7 +197,6 @@ TEST_F(OmafReaderTest, ParseInitialSegment) {
     // 2. go through the track information
     for (auto track : trackInfos) {
       if (track == nullptr) {
-        OMAF_LOG(LOG_ERROR, "Meet empty track!\n");
         continue;
       }
 
@@ -217,7 +213,6 @@ TEST_F(OmafReaderTest, ParseInitialSegment) {
             pAS->SetTrackNumber(static_cast<int>(dash_track_id));
             pAS->GetInitSegment()->SetTrackId(dash_track_id);
 
-            OMAF_LOG(LOG_INFO, "Initse id=%u, trackid=%u\n", track->initSegmentId, dash_track_id );
             break;
           }
         }  // end for adaptation set loop
@@ -232,7 +227,6 @@ TEST_F(OmafReaderTest, ParseInitialSegment) {
             pExAS->SetTrackNumber(static_cast<int>(dash_track_id));
             pExAS->GetInitSegment()->SetTrackId(dash_track_id);
 
-            OMAF_LOG(LOG_INFO, "Initse id=%u, trackid=%u\n", track->initSegmentId, dash_track_id);
             break;
           }
         }  // end for extractors loop
@@ -240,7 +234,6 @@ TEST_F(OmafReaderTest, ParseInitialSegment) {
     }      // end for track loop
 
   } catch (const std::exception &ex) {
-    OMAF_LOG(LOG_ERROR, "Failed to parse the init segment, ex: %s\n", ex.what());
   }
 
   /*
@@ -359,9 +352,6 @@ TEST_F(OmafReaderTest, ParseInitialSegment) {
       std::string repId = pAS->GetRepresentationId();
       snprintf(storedFileName, 1024, "./segs_for_readertest/%s.1.mp4", repId.c_str());
       cacheFileName = storedFileName;
-      OMAF_LOG(LOG_INFO, "segment file=%s\n", cacheFileName.c_str());
-      OMAF_LOG(LOG_INFO, "init seg=%u\n", newSeg->GetInitSegID());
-      OMAF_LOG(LOG_INFO, "segid=%d\n", newSeg->GetSegID());
       newSeg->SetSegmentCacheFile(cacheFileName);
       newSeg->SetSegStored();
 
@@ -390,9 +380,6 @@ TEST_F(OmafReaderTest, ParseInitialSegment) {
       snprintf(storedFileName, 1024, "./segs_for_readertest/%s.1.mp4", repId.c_str());
 
       cacheFileName = storedFileName;
-      OMAF_LOG(LOG_INFO, "segment file=%s\n", cacheFileName.c_str());
-      OMAF_LOG(LOG_INFO, "init seg=%u\n", newSeg->GetInitSegID());
-      OMAF_LOG(LOG_INFO, "segid=%d\n", newSeg->GetSegID());
       newSeg->SetSegmentCacheFile(cacheFileName);
       newSeg->SetSegStored();
 
@@ -429,9 +416,6 @@ TEST_F(OmafReaderTest, ParseInitialSegment) {
       auto trackId = extractor->GetTrackNumber();
       auto initsegid = extractor->GetInitSegment()->GetInitSegID();
       auto trackIdx = buildReaderTrackId(trackId, initsegid);
-      OMAF_LOG(LOG_INFO, "The trackid=%d\n", trackId);
-      OMAF_LOG(LOG_INFO, "init segid=%d\n",initsegid);
-      OMAF_LOG(LOG_INFO, "reader trackid=%d\n", trackIdx);
 
       snprintf(fileName, 256, "Viewport%d.h265", initsegid - 999);
       fp = fopen(fileName, "wb+");
@@ -443,7 +427,6 @@ TEST_F(OmafReaderTest, ParseInitialSegment) {
       size_t end = 0;
       auto segId = 1;
       if (findSampleIndexRange(trackInf, segId, begin, end)) {
-        OMAF_LOG(LOG_INFO, "The begin index=%lld, end=%lld\n", begin, end);
       }
 
       uint32_t sampleIdx = begin;
@@ -461,7 +444,6 @@ TEST_F(OmafReaderTest, ParseInitialSegment) {
         }
 
         ret = m_reader->getExtractorTrackSampleData(trackIdx, sampleIdx, (char *)(packet->Payload()), packetSize);
-        OMAF_LOG(LOG_INFO, "Extractor track sample data, ret=%d\n", ret);
         EXPECT_TRUE(ret == ERROR_NONE);
 
         if (sampleIdx == 0) {

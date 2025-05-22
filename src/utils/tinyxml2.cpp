@@ -22,6 +22,7 @@ distribution.
 */
 
 #include "tinyxml2.h"
+#include <iostream>
 
 #include <new>		// yes, this one new style header, is in the Android SDK.
 #if defined(ANDROID_NDK) || defined(__BORLANDC__) || defined(__QNXNTO__)
@@ -2175,6 +2176,7 @@ XMLError XMLDocument::LoadFile( const char* filename )
     Clear();
     FILE* fp = callfopen( filename, "rb" );
     if ( !fp ) {
+        std::cout << "error file not found" << std::endl;
         SetError( XML_ERROR_FILE_NOT_FOUND, 0, "filename=%s", filename );
         return _errorID;
     }
@@ -2213,6 +2215,7 @@ XMLError XMLDocument::LoadFile( FILE* fp )
     fseek( fp, 0, SEEK_SET );
     if ( fgetc( fp ) == EOF && ferror( fp ) != 0 ) {
         SetError( XML_ERROR_FILE_READ_ERROR, 0, 0 );
+        std::cout << "error file read error" << std::endl;
         return _errorID;
     }
 
@@ -2220,6 +2223,7 @@ XMLError XMLDocument::LoadFile( FILE* fp )
     const long filelength = ftell( fp );
     fseek( fp, 0, SEEK_SET );
     if ( filelength == -1L ) {
+        std::cout << "file len -1" << std::endl;
         SetError( XML_ERROR_FILE_READ_ERROR, 0, 0 );
         return _errorID;
     }
@@ -2227,11 +2231,13 @@ XMLError XMLDocument::LoadFile( FILE* fp )
 
     if ( !LongFitsIntoSizeTMinusOne<>::Fits( filelength ) ) {
         // Cannot handle files which won't fit in buffer together with null terminator
+        std::cout << "Cannot handle files which won't fit in buffer together with null terminator" << std::endl;
         SetError( XML_ERROR_FILE_READ_ERROR, 0, 0 );
         return _errorID;
     }
 
     if ( filelength == 0 ) {
+        std::cout << "empty doc" << std::endl;
         SetError( XML_ERROR_EMPTY_DOCUMENT, 0, 0 );
         return _errorID;
     }
@@ -2241,6 +2247,7 @@ XMLError XMLDocument::LoadFile( FILE* fp )
     _charBuffer = new char[size+1];
     const size_t read = fread( _charBuffer, 1, size, fp );
     if ( read != size ) {
+        std::cout << "file read size error" << std::endl;
         SetError( XML_ERROR_FILE_READ_ERROR, 0, 0 );
         return _errorID;
     }

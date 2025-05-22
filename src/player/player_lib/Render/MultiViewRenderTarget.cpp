@@ -35,13 +35,8 @@
 #include "RenderContext.h"
 
 #include <GL/glu.h>
-#include <GL/glu_mangle.h>
 #include <GL/gl.h>
-#include <GL/glx.h>
-#include <GL/glext.h>
-#include <GL/glcorearb.h>
 #include <GLES3/gl3.h>
-#include <GLES3/gl3ext.h>
 #include <GLES3/gl3platform.h>
 #include <algorithm>
 #include <iostream>
@@ -133,10 +128,8 @@ RenderStatus MultiViewRenderTarget::Update( HeadPose* pose, float hFOV, float vF
     }
     // 2. screen texture assignment
     if (targetRS == nullptr) {
-        LOG(ERROR) << "Target render source is not available" << endl;
         return RENDER_ERROR;
     }
-    LOG(INFO) << "Target render view id " << targetRS->GetViewID().first << endl;
     m_textureOfR2S[m_activeTextureId] = targetRS->GetTextureOfR2T();
 
     return RENDER_STATUS_OK;

@@ -37,6 +37,7 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
+#include <iostream>
 #include <sys/time.h>
 #include "../../../utils/ns_def.h"
 #include "RenderType.h"
@@ -44,6 +45,7 @@
 #include "../../../utils/safe_mem.h"
 #include "../../../utils/OmafStructure.h"
 #include "../../../utils/GlogWrapper.h"
+#define LOG(a) std::cout
 
 #ifdef _ANDROID_OS_
 #include <android/log.h>

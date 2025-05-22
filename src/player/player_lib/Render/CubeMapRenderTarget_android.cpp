@@ -45,7 +45,7 @@
 #include "../../../trace/MtHQ_tp.h"
 #endif
 #endif
-#include "../Common/RegionData.h"
+#include "Common/RegionData.h"
 #include "ShaderString.h"
 #include "../Mesh/Render2TextureMesh_android.h"
 
@@ -135,7 +135,6 @@ RenderStatus CubeMapRenderTarget_android::UpdateDisplayTex()
                 TileInformation ti = *itq;
                 RenderSource* rs = mapRenderSources[ti.video_id];
                 glBindFramebuffer(GL_FRAMEBUFFER, m_fboOnScreenHandle);
-                // ANDROID_LOGD("m_fboOnScreenHandle : %d", m_fboOnScreenHandle);
                 m_videoShaderOfR2T.Bind();
                 uint32_t vertexAttribOfOnScreen = m_videoShaderOfR2T.SetAttrib("anPosition");
                 uint32_t texCoordAttribOfOnScreen = m_videoShaderOfR2T.SetAttrib("anTexCoords");
@@ -145,7 +144,6 @@ RenderStatus CubeMapRenderTarget_android::UpdateDisplayTex()
                 glBindTexture(GL_TEXTURE_EXTERNAL_OES, rs->GetTextureOfR2T());
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + ti.face_id, m_textureOfR2S[0], 0);
                 glViewport(0, 0, ti.picWidth, ti.picHeight);
-                // ANDROID_LOGD("glviewport width %d, height %d\n", ti.picWidth, ti.picHeight);
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
             }
@@ -157,7 +155,6 @@ RenderStatus CubeMapRenderTarget_android::UpdateDisplayTex()
         TileInformation ti = *itm;
         RenderSource* rs = mapRenderSources[ti.video_id];
         glBindFramebuffer(GL_FRAMEBUFFER, m_fboOnScreenHandle);
-        // ANDROID_LOGD("m_fboOnScreenHandle : %d", m_fboOnScreenHandle);
         m_videoShaderOfR2T.Bind();
         uint32_t vertexAttribOfOnScreen = m_videoShaderOfR2T.SetAttrib("anPosition");
         uint32_t texCoordAttribOfOnScreen = m_videoShaderOfR2T.SetAttrib("anTexCoords");
@@ -167,7 +164,6 @@ RenderStatus CubeMapRenderTarget_android::UpdateDisplayTex()
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_EXTERNAL_OES, rs->GetTextureOfR2T());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + ti.face_id, m_textureOfR2S[0], 0);
-        // ANDROID_LOGD("viewport width %d, height %d", ti.picWidth, ti.picHeight);
         glViewport(0, 0, ti.picWidth, ti.picHeight);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -200,7 +196,6 @@ RenderStatus CubeMapRenderTarget_android::CalcQualityRanking()
         if (regionInfo == NULL || regionInfo->GetRegionWisePacking() == NULL \
              || regionInfo->GetSourceInfo() == NULL || regionInfo->GetSourceInRegion() > 2)
         {
-            LOG(INFO)<<"region information is invalid!"<<endl;
             errorCnt++;
             continue;
         }
@@ -302,14 +297,12 @@ int32_t CubeMapRenderTarget_android::findQuality(RegionData *regionInfo, Rectang
             {
                 if (m_transformType[tile_info.face_id] != tile_info.transformType) // exist and changed
                 {
-                    LOG(INFO) << "face id " << tile_info.face_id << " has changed its transformtype from " << m_transformType[tile_info.face_id] <<" to " << tile_info.transformType << endl;
                     m_transformType.erase(tile_info.face_id);
                     m_transformType.insert(make_pair(tile_info.face_id, tile_info.transformType));
                 }
             }
             else if (m_transformType.find(tile_info.face_id) == m_transformType.end()) // not existed
             {
-                LOG(INFO) << "add transform type " << static_cast<uint32_t>(tile_info.transformType) <<" to face id " << tile_info.face_id << endl;
                 m_transformType.insert(make_pair(tile_info.face_id, tile_info.transformType));
             }
         }
@@ -395,7 +388,6 @@ RenderStatus CubeMapRenderTarget_android::GetTilesInViewport(float yaw, float pi
 {
     if (hFOV <= 0 || vFOV <= 0)
     {
-        LOG(ERROR)<<"FOV input invalid!"<<std::endl;
         return RENDER_ERROR;
     }
     struct SphereRegion region;

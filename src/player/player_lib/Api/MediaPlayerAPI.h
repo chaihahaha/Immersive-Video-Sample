@@ -33,7 +33,7 @@
 #ifndef _MEDIAPLAYERAPI_H_
 #define _MEDIAPLAYERAPI_H_
 
-#include "../Common/RenderType.h"
+#include "Common/RenderType.h"
 
 class MediaPlayer
 {

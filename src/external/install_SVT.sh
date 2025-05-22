@@ -6,7 +6,7 @@ mkdir -p ../build/external
 cd ../build/external
 
 if [ ! -d "./SVT-HEVC" ] ; then
-    git clone https://github.com/OpenVisualCloud/SVT-HEVC.git
+    git clone https://ghfast.top/github.com/OpenVisualCloud/SVT-HEVC.git
 fi
 
 cd SVT-HEVC

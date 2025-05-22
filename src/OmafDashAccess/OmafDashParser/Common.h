@@ -177,4 +177,6 @@ using namespace std;
   void Set##MemberName(Type v) { Member = v; }            \
   Type Get##MemberName() { return Member; }
 
+#define OMAF_LOG(level, log, args...) printf(log, ##args);
+
 #endif /* COMMON_H */

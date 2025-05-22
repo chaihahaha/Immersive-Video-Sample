@@ -389,6 +389,7 @@ OmafSegment::Ptr OmafAdaptationSet::LoadAssignedSegment(std::string assignedSegm
 /////Download relative methods
 
 int OmafAdaptationSet::DownloadInitializeSegment() {
+    std::cout << "inside OmafAdaptationSet::DownloadInitializeSegment" << std::endl;
   int ret = ERROR_NONE;
 
   if (omaf_reader_mgr_ == nullptr) {
@@ -440,6 +441,7 @@ int OmafAdaptationSet::DownloadInitializeSegment() {
 }
 
 int OmafAdaptationSet::DownloadSegment(bool enableCMAF) {
+    std::cout << "inside OmafAdaptationSet::DownloadSegment" << std::endl;
   int ret = ERROR_NONE;
 
   if (!mEnable) {
@@ -475,6 +477,7 @@ int OmafAdaptationSet::DownloadSegment(bool enableCMAF) {
   DashSegmentSourceParams params;
 
   params.dash_url_ = seg->GenerateCompleteURL(mBaseURL, repID, mActiveSegNum);
+  std::cout << "dash complete url: " << params.dash_url_ << std::endl;
   params.priority_ = TaskPriority::NORMAL;
   params.timeline_point_ = static_cast<int64_t>(mSegNum);
   params.start_chunk_id_ = (mSegNum == 1) ? mStartChunkId : 0; // start chunk from 0

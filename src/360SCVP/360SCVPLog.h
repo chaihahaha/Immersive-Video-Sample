@@ -36,6 +36,7 @@
 
 #include "../utils/Log.h"
 #include "../utils/error.h"
+#include "stdio.h"
 
 //global logging callback function
 extern LogFunction logCallBack;
@@ -45,7 +46,10 @@ extern LogFunction logCallBack;
 #define PRINT_LOG(logLevel, source, line, fmt, args...)   \
     logCallBack(logLevel, source, line, fmt, ##args);    \
 
+//#define SCVP_LOG(logLevel, fmt, args...)                             \
+//    PRINT_LOG(logLevel, FILE_NAME(__FILE__), __LINE__, fmt, ##args)  \
+
 #define SCVP_LOG(logLevel, fmt, args...)                             \
-    PRINT_LOG(logLevel, FILE_NAME(__FILE__), __LINE__, fmt, ##args)  \
+    printf(fmt, ##args);  \
 
 #endif /* _PACKINGLOG_H_ */

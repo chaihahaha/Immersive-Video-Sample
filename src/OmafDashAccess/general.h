@@ -47,7 +47,6 @@
 #include "../utils/Threadable.h"
 #include "../utils/Singleton.h"
 #include "OmafDashAccessLog.h"
-#include "glog/logging.h"
 #include "OmafStructure.h"
 
 #ifdef _ANDROID_NDK_OPTION_
@@ -71,6 +70,11 @@
     free((x));       \
     (x) = NULL;      \
   };
+
+#ifndef OMAF_LOG
+#define OMAF_LOG(level, log, args...) std::cout<<(log)<<std::endl;
+#endif
+
 
 VCD_OMAF_BEGIN
 

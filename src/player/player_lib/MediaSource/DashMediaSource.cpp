@@ -104,12 +104,16 @@ DashMediaSource::~DashMediaSource() {
 }
 
 RenderStatus DashMediaSource::Initialize(struct RenderConfig renderConfig, RenderSourceFactory *rsFactory) {
+      std::cout << "in DashMediaSource::Initialize running" << std::endl;
   if (nullptr == renderConfig.url) {
+      std::cout << "nullptr renderConfig.url" << std::endl;
     return RENDER_ERROR;
   }
   // 1.initial DashStreaming
+      std::cout << "1.initial DashStreaming" << std::endl;
   DashStreamingClient *pCtxDashStreaming = (DashStreamingClient *)malloc(sizeof(DashStreamingClient));
   if (NULL == pCtxDashStreaming) {
+      std::cout << "NULL pCtxDashStreaming" << std::endl;
     return RENDER_ERROR;
   }
   pCtxDashStreaming->media_url = renderConfig.url;
@@ -121,6 +125,7 @@ RenderStatus DashMediaSource::Initialize(struct RenderConfig renderConfig, Rende
   pCtxDashStreaming->bSync_time = true;
 
   // init the omaf params
+      std::cout << "init the omaf params" << std::endl;
   memset(&pCtxDashStreaming->omaf_params, 0, sizeof(pCtxDashStreaming->omaf_params));
   pCtxDashStreaming->omaf_params.http_params.ssl_verify_host = 0;
   pCtxDashStreaming->omaf_params.http_params.ssl_verify_peer = 0;
@@ -148,15 +153,18 @@ RenderStatus DashMediaSource::Initialize(struct RenderConfig renderConfig, Rende
   pCtxDashStreaming->plugin_def = def;
   m_handler = OmafAccess_Init(pCtxDashStreaming);
   if (NULL == m_handler) {
+      std::cout << "NULL m_handler" << std::endl;
     LOG(ERROR) << "handler init failed!" << std::endl;
     free(pCtxDashStreaming);
     pCtxDashStreaming = NULL;
     return RENDER_ERROR;
   }
   // 2. initial viewport.
+      std::cout << "initial viewport." << std::endl;
   HeadSetInfo clientInfo;
   clientInfo.pose = (HeadPose *)malloc(sizeof(HeadPose));
   if (NULL == clientInfo.pose) {
+      std::cout << "NULL clientInfo.pose" << std::endl;
     LOG(ERROR) << "client info malloc failed!" << std::endl;
     free(pCtxDashStreaming);
     pCtxDashStreaming = NULL;
@@ -179,6 +187,7 @@ RenderStatus DashMediaSource::Initialize(struct RenderConfig renderConfig, Rende
   clientInfo.viewPort_Height = renderConfig.viewportHeight;
   OmafAccess_SetupHeadSetInfo(m_handler, &clientInfo);
   // 3.load media source
+  std::cout << "3.load media source" << std::endl;
   if (ERROR_NONE != OmafAccess_OpenMedia(m_handler, pCtxDashStreaming, renderConfig.enablePredictor,
                                          (char *)renderConfig.predictPluginName,
                                          (char *)renderConfig.libPath)) {
@@ -187,9 +196,11 @@ RenderStatus DashMediaSource::Initialize(struct RenderConfig renderConfig, Rende
     pCtxDashStreaming = NULL;
     free(clientInfo.pose);
     clientInfo.pose = NULL;
+      std::cout << "open media failed!!!" << std::endl;
     return RENDER_ERROR;
   }
   // 4. add extra information in mediaInfo for render.
+  std::cout << "4. add extra information in mediaInfo for render." << std::endl;
   DashMediaInfo mediaInfo;
   OmafAccess_GetMediaInfo(m_handler, &mediaInfo);
 
@@ -218,6 +229,7 @@ RenderStatus DashMediaSource::Initialize(struct RenderConfig renderConfig, Rende
   m_DecoderManager->SetDecodeInfo(decode_info);
   RenderStatus ret = m_DecoderManager->Initialize(m_rsFactory);
   if (RENDER_STATUS_OK != ret) {
+      std::cout << "decodermanager initiliaze failed" << std::endl;
     LOG(INFO) << "m_DecoderManager::Initialize failed" << std::endl;
   }
 
@@ -230,11 +242,13 @@ RenderStatus DashMediaSource::Initialize(struct RenderConfig renderConfig, Rende
   clientInfo.pose = NULL;
   SAFE_DELETE_ARRAY(mediaInfo.stream_info[vi.streamID].codec);
   SAFE_DELETE_ARRAY(mediaInfo.stream_info[vi.streamID].mime_type);
+      std::cout << "RENDER_STATUS_OK RENDER_STATUS_OK RENDER_STATUS_OK" << std::endl;
   return RENDER_STATUS_OK;
 }
 
 RenderStatus DashMediaSource::Start()
 {
+    std::cout << "inside DashMediaSource::Start" << std::endl;
   if (OmafAccess_StartStreaming(m_handler) != ERROR_NONE)
   {
     return RENDER_ERROR;
@@ -382,7 +396,7 @@ void DashMediaSource::ProcessVideoPacket() {
   int ret =
       OmafAccess_GetPacket(m_handler, vi.streamID, &(dashPkt[0]), &dashPktNum, (uint64_t *)&pts, needHeaders, false);
   if (ERROR_NONE != ret) {
-    // LOG(INFO) << "Get packet failed: stream_id:" << vi.streamID << ", ret:" << ret << std::endl;
+    LOG(INFO) << "Get packet failed: stream_id:" << vi.streamID << ", ret:" << ret << std::endl;
     currentWaitTime++;
     if (currentWaitTime > maxWaitTimeout) // wait but get packet failed
     {
@@ -435,6 +449,7 @@ void DashMediaSource::ProcessVideoPacket() {
     }
     m_DecoderManager->SetAvailViewIds(seg_id, viewId);
     // send video packets
+    std::cout << "should manager send video packets" << std::endl;
     RenderStatus ret = m_DecoderManager->SendVideoPackets(&(dashPkt[0]), dashPktNum);
     // needHeaders = false;
     if (RENDER_STATUS_OK != ret) {
@@ -478,6 +493,7 @@ void DashMediaSource::ProcessAudioPacket() {
 }
 
 void DashMediaSource::Run() {
+    std::cout << "inside DashMediaSource::Run" << std::endl;
   if (NULL == m_handler) {
     return;
   }
@@ -485,15 +501,18 @@ void DashMediaSource::Run() {
   m_status = STATUS_PLAYING;
   while (m_status != STATUS_STOPPED && m_status != STATUS_TIMEOUT) {
     {
+    std::cout << "inside DashMediaSource::Run while process packet" << std::endl;
       ScopeLock lock(m_Lock);
       ProcessVideoPacket();
       ProcessAudioPacket();
+    std::cout << "inside DashMediaSource::Run processd packet" << std::endl;
     }
     usleep(1000);
   }
 }
 
 RenderStatus DashMediaSource::UpdateFrames(uint64_t pts, int64_t *corr_pts, HeadPose* pose) {
+    std::cout << "inside DashMediaSource::UpdateFrames" << std::endl;
   if (NULL == m_DecoderManager) return RENDER_NO_MATCHED_DECODER;
 
   RenderStatus ret = m_DecoderManager->UpdateVideoFrames(pts, corr_pts, pose);

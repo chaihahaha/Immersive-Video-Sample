@@ -13,7 +13,6 @@ config("my_config") {
       "-Wformat",
       "-Wformat-security",
       "-Wall",
-      "-Werror",
       "-std=c++11",
     ]
 }

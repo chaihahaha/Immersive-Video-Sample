@@ -316,8 +316,8 @@ ParameterSetMap GenDecoderParameterSetMap(const AvcDecoderConfigurationRecord& a
     avcRrd.GetOneParameterSet(avcPPS, AvcNalDefs::PPS);
 
     ParameterSetMap paramsMap;
-    paramsMap.insert(pair<MediaCodecInfoType, DataVector>(MediaCodecInfoType::AVC_SPS, move(avcSPS)));
-    paramsMap.insert(pair<MediaCodecInfoType, DataVector>(MediaCodecInfoType::AVC_PPS, move(avcPPS)));
+    paramsMap.insert(pair<MediaCodecInfoType, DataVector>(MediaCodecInfoType::AVC_SPS, std::move(avcSPS)));
+    paramsMap.insert(pair<MediaCodecInfoType, DataVector>(MediaCodecInfoType::AVC_PPS, std::move(avcPPS)));
 
     return paramsMap;
 }
@@ -332,9 +332,9 @@ ParameterSetMap GenDecoderParameterSetMap(const HevcDecoderConfigurationRecord& 
     hevcRrd.GetOneParameterSet(hevcVPS, HevcNalDefs::VPS);
 
     ParameterSetMap paramsMap;
-    paramsMap.insert(pair<MediaCodecInfoType, DataVector>(MediaCodecInfoType::HEVC_SPS, move(hevcSPS)));
-    paramsMap.insert(pair<MediaCodecInfoType, DataVector>(MediaCodecInfoType::HEVC_PPS, move(hevcPPS)));
-    paramsMap.insert(pair<MediaCodecInfoType, DataVector>(MediaCodecInfoType::HEVC_VPS, move(hevcVPS)));
+    paramsMap.insert(pair<MediaCodecInfoType, DataVector>(MediaCodecInfoType::HEVC_SPS, std::move(hevcSPS)));
+    paramsMap.insert(pair<MediaCodecInfoType, DataVector>(MediaCodecInfoType::HEVC_PPS, std::move(hevcPPS)));
+    paramsMap.insert(pair<MediaCodecInfoType, DataVector>(MediaCodecInfoType::HEVC_VPS, std::move(hevcVPS)));
 
     return paramsMap;
 }
@@ -346,7 +346,7 @@ ParameterSetMap GenDecoderParameterSetMap(const ElementaryStreamDescriptorAtom& 
     if (eleDesRrd.GetOneParameterSet(vcodecSpecInfo))
     {
         paramsMap.insert(pair<MediaCodecInfoType, DataVector>(MediaCodecInfoType::AudioSpecificConfig,
-                                                                      move(vcodecSpecInfo)));
+                                                                      std::move(vcodecSpecInfo)));
     }
     return paramsMap;
 }

@@ -137,7 +137,6 @@ int32_t Segmentation::CreateSegWriterPluginHdl()
 {
     if (!m_segWriterPluginPath || !m_segWriterPluginName)
     {
-        OMAF_LOG(LOG_ERROR, "Segment generation plugin is not assigned ! \n");
         return OMAF_ERROR_NULL_PTR;
     }
 
@@ -145,7 +144,6 @@ int32_t Segmentation::CreateSegWriterPluginHdl()
     {
         if (0 == strcmp(m_segWriterPluginName, "SegmentWriter"))
         {
-            OMAF_LOG(LOG_ERROR, "Plugin SegmentWriter can't generate CMAF segments !\n");
             return OMAF_ERROR_BAD_PARAM;
         }
     }
@@ -163,16 +161,13 @@ int32_t Segmentation::CreateSegWriterPluginHdl()
         snprintf(pluginLibName, 1024, "%s/lib%s.so", m_segWriterPluginPath, m_segWriterPluginName);
     }
 
-    OMAF_LOG(LOG_INFO, "Segment generation plugin is %s\n", pluginLibName);
 
     m_segWriterPluginHdl = dlopen(pluginLibName, RTLD_LAZY);
     const char *dlsymErr1 = dlerror();
     if (!(m_segWriterPluginHdl))
     {
-        OMAF_LOG(LOG_ERROR, "Failed to open segment writer plugin %s !\n", pluginLibName);
         if (dlsymErr1)
         {
-            OMAF_LOG(LOG_ERROR, "Get error msg %s \n", dlsymErr1);
         }
         return OMAF_ERROR_DLOPEN;
     }
@@ -184,7 +179,6 @@ int32_t Segmentation::CreateMPDWriterPluginHdl()
 {
     if (!m_mpdWriterPluginPath || !m_mpdWriterPluginName)
     {
-        OMAF_LOG(LOG_ERROR, "DASH MPD writer plugin is not assigned ! \n");
         return OMAF_ERROR_NULL_PTR;
     }
 
@@ -192,7 +186,6 @@ int32_t Segmentation::CreateMPDWriterPluginHdl()
     {
         if (0 == strcmp(m_mpdWriterPluginName, "MPDWriter"))
         {
-            OMAF_LOG(LOG_ERROR, "Plugin MPDWriter can't generate MPD file for multi-view DASH packing !\n");
             return OMAF_ERROR_BAD_PARAM;
         }
     }
@@ -210,16 +203,13 @@ int32_t Segmentation::CreateMPDWriterPluginHdl()
         snprintf(pluginLibName, 1024, "%s/lib%s.so", m_mpdWriterPluginPath, m_mpdWriterPluginName);
     }
 
-    OMAF_LOG(LOG_INFO, "MPD generation plugin is %s\n", pluginLibName);
 
     m_mpdWriterPluginHdl = dlopen(pluginLibName, RTLD_LAZY);
     const char *dlsymErr1 = dlerror();
     if (!(m_mpdWriterPluginHdl))
     {
-        OMAF_LOG(LOG_ERROR, "Failed to open MPD writer plugin %s !\n", pluginLibName);
         if (dlsymErr1)
         {
-            OMAF_LOG(LOG_ERROR, "Get error msg %s \n", dlsymErr1);
         }
         return OMAF_ERROR_DLOPEN;
     }

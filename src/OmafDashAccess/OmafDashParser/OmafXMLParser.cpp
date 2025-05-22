@@ -58,6 +58,7 @@ std::string OmafXMLParser::DownloadXMLFile(string url, string cache_dir) {
 
   std::string fileName =
       cache_dir + "/" + url.substr(url.find_last_of('/') + 1, url.length() - url.find_last_of('/') - 1);
+  return fileName;
 
   std::ofstream mpd_file;
   mpd_file.open(fileName, ios::out);

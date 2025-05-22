@@ -41,10 +41,5 @@ extern LogFunction logCallBack;
 
 #define FILE_NAME(x) (strrchr(x, '/') ? strrchr(x, '/')+1:x)
 
-#define PRINT_LOG(logLevel, source, line, fmt, args...)   \
-    logCallBack(logLevel, source, line, fmt, ##args);    \
-
-#define OMAF_LOG(logLevel, fmt, args...)                             \
-    PRINT_LOG(logLevel, FILE_NAME(__FILE__), __LINE__, fmt, ##args)  \
 
 #endif /* _DASHACCESSLOG_H_ */

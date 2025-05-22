@@ -55,13 +55,11 @@ RegionWisePackingGenerator::~RegionWisePackingGenerator()
             const char *dlsym_error = dlerror();
             if (dlsym_error)
             {
-                OMAF_LOG(LOG_ERROR, "Failed to load symbol Destroy !\n");
                 return;
             }
 
             if (!destroyRWPKGen)
             {
-                OMAF_LOG(LOG_ERROR, "NULL RWPK destructor !\n");
                 return;
             }
             destroyRWPKGen(m_rwpkGen);
@@ -86,7 +84,6 @@ int32_t RegionWisePackingGenerator::Initialize(
 
     if (!rwpkGenPluginName)
     {
-        OMAF_LOG(LOG_ERROR, "NULL OMAF DASH Packing plugin name !\n");
         return OMAF_INVALID_PLUGIN_PARAM;
     }
 
@@ -108,16 +105,13 @@ int32_t RegionWisePackingGenerator::Initialize(
         snprintf(pluginLibName, 1024, "%s/lib%s.so", rwpkGenPluginPath, rwpkGenPluginName);
     }
 
-    OMAF_LOG(LOG_INFO, "The plugin is %s\n", pluginLibName);
 
     m_pluginHdl = dlopen(pluginLibName, RTLD_LAZY);
     const char* dlsymErr1 = dlerror();
     if (!m_pluginHdl)
     {
-        OMAF_LOG(LOG_ERROR, "Failed to open plugin lib %s\n", pluginLibName);
         if (dlsymErr1)
         {
-            OMAF_LOG(LOG_ERROR, "Get error msg  %s\n", dlsymErr1);
         }
         return OMAF_ERROR_DLOPEN;
     }
@@ -127,19 +121,16 @@ int32_t RegionWisePackingGenerator::Initialize(
     const char* dlsymErr2 = dlerror();
     if (dlsymErr2)
     {
-        OMAF_LOG(LOG_ERROR, "Failed to load symbol Create: %s\n", dlsymErr2);
         return OMAF_ERROR_DLSYM;
     }
 
     if (!createRWPKGen)
     {
-        OMAF_LOG(LOG_ERROR, "NULL RWPK generator !\n");
         return OMAF_ERROR_NULL_PTR;
     }
     m_rwpkGen = createRWPKGen();
     if (!m_rwpkGen)
     {
-        OMAF_LOG(LOG_ERROR, "Failed to create RWPK generator !\n");
         return OMAF_ERROR_NULL_PTR;
     }
 
@@ -178,7 +169,6 @@ int32_t RegionWisePackingGenerator::Initialize(
         tilesNumInViewport, maxSelectedTilesNum, (void*)logging);
     if (ret)
     {
-        OMAF_LOG(LOG_ERROR, "Failed to initialize RWPK generator !\n");
     }
 
     std::map<uint8_t, VideoStreamInfo*>::iterator itInfo1;
@@ -203,12 +193,10 @@ int32_t RegionWisePackingGenerator::GenerateDstRwpk(
         ret = m_rwpkGen->GenerateDstRwpk(tilesInViewport, dstRwpk);
         if (ret)
         {
-            OMAF_LOG(LOG_ERROR, "Failed to generate destinate RWPK !\n");
         }
     }
     else
     {
-        OMAF_LOG(LOG_ERROR, "There is no RWPK generator !\n");
         ret = OMAF_ERROR_NULL_PTR;
     }
     return ret;
@@ -224,12 +212,10 @@ int32_t RegionWisePackingGenerator::GenerateTilesMergeDirection(
         ret = m_rwpkGen->GenerateTilesMergeDirection(tilesInViewport, tilesMergeDir);
         if (ret)
         {
-            OMAF_LOG(LOG_ERROR, "Failed to generate tiles merge direction !\n");
         }
     }
     else
     {
-        OMAF_LOG(LOG_ERROR, "There is no RWPK generator !\n");
         ret = OMAF_ERROR_NULL_PTR;
     }
     return ret;
@@ -244,7 +230,6 @@ uint32_t RegionWisePackingGenerator::GetTotalTilesNumInPackedPic()
     }
     else
     {
-        OMAF_LOG(LOG_ERROR, "There is no RWPK generator !\n");
     }
 
     return num;
@@ -259,7 +244,6 @@ uint32_t RegionWisePackingGenerator::GetPackedPicWidth()
     }
     else
     {
-        OMAF_LOG(LOG_ERROR, "There is no RWPK generator !\n");
     }
 
     return width;
@@ -274,7 +258,6 @@ uint32_t RegionWisePackingGenerator::GetPackedPicHeight()
     }
     else
     {
-        OMAF_LOG(LOG_ERROR, "There is no RWPK generator !\n");
     }
 
     return height;
@@ -289,7 +272,6 @@ TileArrangement* RegionWisePackingGenerator::GetMergedTilesArrange()
     }
     else
     {
-        OMAF_LOG(LOG_ERROR, "There is no RWPK generator !\n");
     }
 
     return tilesArr;
@@ -306,12 +288,10 @@ int32_t RegionWisePackingGenerator::GenerateMergedTilesArrange(TileDef *tilesInV
         ret = m_rwpkGen->GenerateMergedTilesArrange(tilesInViewport);
         if (ret)
         {
-            OMAF_LOG(LOG_ERROR, "Failed to generate merged tiles arrangement !\n");
         }
     }
     else
     {
-        OMAF_LOG(LOG_ERROR, "There is no RWPK generator !\n");
         ret = OMAF_ERROR_NULL_PTR;
     }
     return ret;

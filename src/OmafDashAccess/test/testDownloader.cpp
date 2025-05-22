@@ -39,10 +39,9 @@ namespace {
 class DownloaderTest : public testing::Test {
  public:
   virtual void SetUp() {
-    OMAF_LOG(LOG_INFO, "Calling setup\n");
 
     outsite_url = "https://www.baidu.com";
-    valid_url = "http://10.67.115.92:8080/testOMAFlive/Test.mpd";
+    valid_url = "http://127.0.0.1:8000/gaslamp/Gaslamp/Test.mpd";
 
     invalid_url = invalid_url + "invalid";
 
@@ -67,7 +66,6 @@ class DownloaderTest : public testing::Test {
   }
 
   virtual void TearDown() {
-    OMAF_LOG(LOG_INFO, "Calling TearDown\n");
 
     OMAF_STATUS ret = dash_client_->stop();
     EXPECT_TRUE(ret == ERROR_NONE);
@@ -110,7 +108,6 @@ TEST_F(DownloaderTest, downloadSuccess) {
       },
       nullptr,
       [&isState](OmafDashSegmentClient::State state) {
-        OMAF_LOG(LOG_INFO, "Receive the state: %d\n", static_cast<int>(state));
         EXPECT_TRUE(state == OmafDashSegmentClient::State::SUCCESS);
         isState = true;
       });
@@ -153,7 +150,6 @@ TEST_F(DownloaderTest, downloadCMAFSuccess) {
         index_range = indexRange;
       },
       [&isState](OmafDashSegmentClient::State state) {
-        OMAF_LOG(LOG_INFO, "Receive the state: %d\n", static_cast<int>(state));
         isState = state;
       }
       );
@@ -201,7 +197,6 @@ TEST_F(DownloaderTest, downloadCMAFSuccess_withCloc) {
         index_range = indexRange;
       },
       [&isState](OmafDashSegmentClient::State state) {
-        OMAF_LOG(LOG_INFO, "Receive the state: %d\n", static_cast<int>(state));
         isState = state;
       }
       );
@@ -225,7 +220,6 @@ TEST_F(DownloaderTest, downloadFailure) {
       },
       nullptr,
       [&isState](OmafDashSegmentClient::State state) {
-        OMAF_LOG(LOG_INFO, "Receive the state: %d\n", static_cast<int>(state));
         EXPECT_TRUE(state == OmafDashSegmentClient::State::TIMEOUT);
         isState = true;
       });
@@ -256,7 +250,6 @@ TEST_F(DownloaderTest, downloadCMAFFailure) {
         index_range = indexRange;
       },
       [&isState](OmafDashSegmentClient::State state) {
-        OMAF_LOG(LOG_INFO, "Receive the state: %d\n", static_cast<int>(state));
         EXPECT_TRUE(state == OmafDashSegmentClient::State::TIMEOUT);
         isState = true;
       });
@@ -288,7 +281,6 @@ TEST_F(DownloaderTest, proxy_success) {
       },
       nullptr,
       [&isState](OmafDashSegmentClient::State state) {
-        OMAF_LOG(LOG_INFO, "Receive the state: %d\n", static_cast<int>(state));
         EXPECT_TRUE(state == OmafDashSegmentClient::State::SUCCESS);
         isState = true;
       });
@@ -319,7 +311,6 @@ TEST_F(DownloaderTest, invalid_proxy) {
       },
       nullptr,
       [&isState](OmafDashSegmentClient::State state) {
-        OMAF_LOG(LOG_INFO, "Receive the state: %d\n", static_cast<int>(state));
         EXPECT_TRUE(state == OmafDashSegmentClient::State::TIMEOUT);
         isState = true;
       });
@@ -348,7 +339,6 @@ TEST_F(DownloaderTest, no_proxy_success) {
       },
       nullptr,
       [&isState](OmafDashSegmentClient::State state) {
-        OMAF_LOG(LOG_INFO, "Receive the state: %d\n", static_cast<int>(state));
         EXPECT_TRUE(state == OmafDashSegmentClient::State::SUCCESS);
         isState = true;
       });

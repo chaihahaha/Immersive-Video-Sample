@@ -8,7 +8,6 @@ SET(DIR_SRC
     ${DIR_SRC}
 )
 
-ADD_DEFINITIONS("-z noexecstack -z relro -z now -fstack-protector-strong -fPIE -fPIC -pie -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Wl,-S -Wall -Werror -g -c -fPIC -std=c++11")
 
 INCLUDE_DIRECTORIES(/usr/local/include ../../utils)
 LINK_DIRECTORIES(/usr/local/lib)

@@ -1,0 +1,121 @@
+#include <emscripten/emscripten.h>
+#include <emscripten/html5.h>
+#include <GLES2/gl2.h>
+#include <EGL/egl.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <cmath>
+#include <iostream>
+
+#define RENDER_PI 3.14159265359f
+#define PLAY 1
+#define PAUSE 0
+
+struct HeadPose {
+    float yaw;
+    float pitch;
+};
+
+class EGLRenderContext {
+public:
+    EGLRenderContext(int width, int height);
+    ~EGLRenderContext() = default;
+    bool isRunning();
+    void mainLoop();
+    void* InitContext();
+    void updatePose();
+    void render();
+    static void loopCallback();
+
+private:
+    float m_horizontalAngle = 0.0f;
+    float m_verticalAngle = 0.0f;
+    float m_speed = 0.005f;
+    float m_mouseSpeed = 0.002f;
+    int m_windowWidth, m_windowHeight;
+    HeadPose m_pose;
+    EGLDisplay m_eglDisplay = EGL_NO_DISPLAY;
+    EGLContext m_eglContext = EGL_NO_CONTEXT;
+    EGLSurface m_eglSurface = EGL_NO_SURFACE;
+    glm::mat4 m_projectionMatrix;
+    glm::mat4 m_viewModelMatrix;
+    static EGLRenderContext* instance;
+};
+
+EGLRenderContext* EGLRenderContext::instance = nullptr;
+
+EGLRenderContext::EGLRenderContext(int width, int height)
+    : m_windowWidth(width), m_windowHeight(height) {
+    instance = this;
+    InitContext();
+    emscripten_set_main_loop(loopCallback, 0, 1);
+}
+
+bool EGLRenderContext::isRunning() {
+    return true;  // Browsers don't need a manual close condition
+}
+
+void* EGLRenderContext::InitContext() {
+    EmscriptenWebGLContextAttributes attr;
+    emscripten_webgl_init_context_attributes(&attr);
+    attr.alpha = false;
+    attr.depth = true;
+    attr.stencil = false;
+    attr.antialias = true;
+    attr.majorVersion = 2;
+
+    EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx = emscripten_webgl_create_context("#canvas", &attr);
+    emscripten_webgl_make_context_current(ctx);
+
+    m_eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    eglInitialize(m_eglDisplay, nullptr, nullptr);
+
+    EGLint configAttribs[] = {
+        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        EGL_NONE
+    };
+    EGLConfig config;
+    EGLint numConfigs;
+    eglChooseConfig(m_eglDisplay, configAttribs, &config, 1, &numConfigs);
+
+    m_eglSurface = eglCreateWindowSurface(m_eglDisplay, config, 0, nullptr);
+    EGLint contextAttribs[] = {
+        EGL_CONTEXT_CLIENT_VERSION, 2,
+        EGL_NONE
+    };
+    m_eglContext = eglCreateContext(m_eglDisplay, config, EGL_NO_CONTEXT, contextAttribs);
+    eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    return nullptr;
+}
+
+void EGLRenderContext::render() {
+    glClearColor(0.2f, 0.4f, 0.8f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    eglSwapBuffers(m_eglDisplay, m_eglSurface);
+}
+
+void EGLRenderContext::updatePose() {
+    // Stub: Replace this with actual mouse/key input callbacks
+    // For example, update `m_horizontalAngle`, `m_verticalAngle`, and compute m_pose.
+}
+
+void EGLRenderContext::mainLoop() {
+    updatePose();
+    render();
+}
+
+void EGLRenderContext::loopCallback() {
+    if (instance) {
+        instance->mainLoop();
+    }
+}
+
+int main() {
+    static EGLRenderContext renderCtx(800, 600);
+    return 0;
+}

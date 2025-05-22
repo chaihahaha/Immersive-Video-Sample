@@ -64,6 +64,7 @@ ERPRender::~ERPRender()
 
 RenderStatus ERPRender::Render(uint32_t onScreenTexHandle, uint32_t width, uint32_t height, glm::mat4 ProjectionMatrix, glm::mat4 ViewModelMatrix)
 {
+    std::cout << "in ERP render" << std::endl;
     RenderBackend* renderBackend = RENDERBACKEND::GetInstance();
     renderBackend->BindFramebuffer(GL_FRAMEBUFFER, 0);
     renderBackend->Clear(GL_COLOR_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -78,6 +79,7 @@ RenderStatus ERPRender::Render(uint32_t onScreenTexHandle, uint32_t width, uint3
     renderBackend->BindTexture(GL_TEXTURE_2D, onScreenTexHandle);
     uint32_t meshIndexNum = m_meshOfOnScreen->GetIndexNum();
     renderBackend->DrawElements(GL_TRIANGLE_STRIP, meshIndexNum, GL_UNSIGNED_INT, 0);
+    std::cout << "ERP render end" << std::endl;
     return RENDER_STATUS_OK;
 }
 

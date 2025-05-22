@@ -1,0 +1,3816 @@
+==> Auto-updating Homebrew...
+Adjust how often this is run with HOMEBREW_AUTO_UPDATE_SECS or disable with
+HOMEBREW_NO_AUTO_UPDATE. Hide these hints with HOMEBREW_NO_ENV_HINTS (see `man brew`).
+==> Fetching dependencies for homebrew-ffmpeg/ffmpeg/ffmpeg: dav1d, frei0r, lame, libunibreak, libass, libogg, libvorbis, libvpx, opus, sdl2, snappy, theora, x264 and libsamplerate
+==> Fetching dav1d
+==> Downloading https://ghcr.io/v2/homebrew/core/dav1d/manifests/1.5.1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/76ce8a8dffcdb3883423d0fa5ff3dbd810a979e8ef55ee544728d3cf5625c656--dav1d-1.5.1.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/dav1d/blobs/sha256:2cfb486c742fb8c46159b99a193f3c1ae221e7d460df6a01a0daf1bb33de0bb8
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/57626e0d9380e8e7a6b65af80fff91b0db126998bcc33c038b7c865ba27b322d--dav1d--1.5.1.arm64_sequoia.bottle.tar.gz
+==> Verifying checksum for '57626e0d9380e8e7a6b65af80fff91b0db126998bcc33c038b7c865ba27b322d--dav1d--1.5.1.arm64_sequoia.bottle.tar.gz'
+==> Fetching frei0r
+==> Downloading https://ghcr.io/v2/homebrew/core/frei0r/manifests/2.3.3
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/f9266f5e6cb521cdce245d9ea3bf63ef75e12bea0ab3a45f107cbe0d01f58c60--frei0r-2.3.3.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/frei0r/blobs/sha256:064f58d291191e9d7264db2992ee79213b3b88927fb953d3cb70dc09eb458d6b
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/36245c05a5a54c24a2c728ac6d70a522f9139ae91f284848a2088dfe6c781331--frei0r--2.3.3.arm64_sequoia.bottle.tar.gz
+==> Verifying checksum for '36245c05a5a54c24a2c728ac6d70a522f9139ae91f284848a2088dfe6c781331--frei0r--2.3.3.arm64_sequoia.bottle.tar.gz'
+==> Fetching lame
+==> Downloading https://ghcr.io/v2/homebrew/core/lame/manifests/3.100
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/31e57f3a54d6908e2c153f5eb435715208f3bd9db71e16470b553d72e051b269--lame-3.100.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/lame/blobs/sha256:0ae0dcb09c908b80ffbdb1bb168674e5190d6b9ae006d5282b7ab4f06eac9f36
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/31d9ab6adc42cdcbfe4efe3c85bb60f935ef165652c1f99ab1be6bc6fb6d02d8--lame--3.100.arm64_sequoia.bottle.tar.gz
+==> Verifying checksum for '31d9ab6adc42cdcbfe4efe3c85bb60f935ef165652c1f99ab1be6bc6fb6d02d8--lame--3.100.arm64_sequoia.bottle.tar.gz'
+==> Fetching libunibreak
+==> Downloading https://ghcr.io/v2/homebrew/core/libunibreak/manifests/6.1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/0ce1b2ced7836a56fa520c73ee31abcb81d0433729fe597e94ef03dd9d8a89f8--libunibreak-6.1.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/libunibreak/blobs/sha256:0bed33fbc272073291fa047e1f72422aff56e83276de789d02a0f3f82f117b45
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/19e3660ad0c0e463c506b271e8c1da2c4ecdd346ec8d61d87dbbfe97876ccaaa--libunibreak--6.1.arm64_sequoia.bottle.tar.gz
+==> Verifying checksum for '19e3660ad0c0e463c506b271e8c1da2c4ecdd346ec8d61d87dbbfe97876ccaaa--libunibreak--6.1.arm64_sequoia.bottle.tar.gz'
+==> Fetching libass
+==> Downloading https://ghcr.io/v2/homebrew/core/libass/manifests/0.17.3
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/84606583aa38b5ab3bcd159983c1468927012bf37cf5d21cc8e3a9eb334b252d--libass-0.17.3.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/libass/blobs/sha256:2c948ddd9b7a94dd267cdc24cd684903b292d26d6ce92e6d2d7c68136b071e4d
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/e333ed3c58203ccfa373d0c068323865bb5a4d6ec0ec7602bafe2a2d463ced3c--libass--0.17.3.arm64_sequoia.bottle.tar.gz
+==> Verifying checksum for 'e333ed3c58203ccfa373d0c068323865bb5a4d6ec0ec7602bafe2a2d463ced3c--libass--0.17.3.arm64_sequoia.bottle.tar.gz'
+==> Fetching libogg
+==> Downloading https://ghcr.io/v2/homebrew/core/libogg/manifests/1.3.5-2
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/1c13722950e996f50a0ef7aa1e181de6b2a8a754ebb8f695c4efc56e0d592ad6--libogg-1.3.5-2.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/libogg/blobs/sha256:13592df33977148bd6ca571b333892b42b1d988289a47f4efd3979fd48964b3e
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/687ce55f7c4a1d62212288e0485a37122ea144eda3fcf2bf0a6ad58116637a80--libogg--1.3.5.arm64_sequoia.bottle.2.tar.gz
+==> Verifying checksum for '687ce55f7c4a1d62212288e0485a37122ea144eda3fcf2bf0a6ad58116637a80--libogg--1.3.5.arm64_sequoia.bottle.2.tar.gz'
+==> Fetching libvorbis
+==> Downloading https://ghcr.io/v2/homebrew/core/libvorbis/manifests/1.3.7-1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/68d211b8805a2fab148645c2ac8e43495e576876d6f50f0c4af5ea890730b7ea--libvorbis-1.3.7-1.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/libvorbis/blobs/sha256:c28d1e0b461a4cf6f5aee72e664ac6f5f6f3efaab44f15b91924f08474cfafe1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/cfbf090a1100c38fd007bfef754ea9f8a536856d42eefb78fb82c6cc8317b708--libvorbis--1.3.7.arm64_sequoia.bottle.1.tar.gz
+==> Verifying checksum for 'cfbf090a1100c38fd007bfef754ea9f8a536856d42eefb78fb82c6cc8317b708--libvorbis--1.3.7.arm64_sequoia.bottle.1.tar.gz'
+==> Fetching libvpx
+==> Downloading https://ghcr.io/v2/homebrew/core/libvpx/manifests/1.15.1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/867634cbe0e9b126fc489d210fd7541eaa030b9c8725937cecb11853850f08b2--libvpx-1.15.1.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/libvpx/blobs/sha256:bb811f6f020d8bc6925bbc2c7fd83b1c0af249771c569ffaff2b7615d3401b45
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/a084d7eb55cd8cdc68cda30bf08e4e39f223e88b91277ca36f26be5bcb6e8dc6--libvpx--1.15.1.arm64_sequoia.bottle.tar.gz
+==> Verifying checksum for 'a084d7eb55cd8cdc68cda30bf08e4e39f223e88b91277ca36f26be5bcb6e8dc6--libvpx--1.15.1.arm64_sequoia.bottle.tar.gz'
+==> Fetching opus
+==> Downloading https://ghcr.io/v2/homebrew/core/opus/manifests/1.5.2
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/ab70a7e8383f42047a27c0638675dbd9c3229997a01eed45d76f174664a4b607--opus-1.5.2.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/opus/blobs/sha256:564c0c7f19ac41ed22baabf7c1bf2e172f81bad60ec211d03bda8eeb42ce2f1a
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/2ddeeab70dc88748d2f10719e973ed1e8961804bd2de7977c246f6cfc6e85ddf--opus--1.5.2.arm64_sequoia.bottle.tar.gz
+==> Verifying checksum for '2ddeeab70dc88748d2f10719e973ed1e8961804bd2de7977c246f6cfc6e85ddf--opus--1.5.2.arm64_sequoia.bottle.tar.gz'
+==> Fetching sdl2
+==> Downloading https://ghcr.io/v2/homebrew/core/sdl2/manifests/2.32.4-1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/19a61f83e224c628352e0a006f92fe25aff996b6f871d76e131b71ae4001e67b--sdl2-2.32.4-1.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/sdl2/blobs/sha256:7aa4224b56ceddc46eedc4cf805ac236fe2d5a5b5b33a93a69b5471dfa43d691
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/53292f583ebefa1e20f8432cbf3936d4a514511c6de3ac98d67b758bc49e2675--sdl2--2.32.4.arm64_sequoia.bottle.1.tar.gz
+==> Verifying checksum for '53292f583ebefa1e20f8432cbf3936d4a514511c6de3ac98d67b758bc49e2675--sdl2--2.32.4.arm64_sequoia.bottle.1.tar.gz'
+==> Fetching snappy
+==> Downloading https://ghcr.io/v2/homebrew/core/snappy/manifests/1.2.1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/b2e6bfcdbddf1d451a8dbbb6fc3c44a267b753ac1a889dbb0b9159bf31dacdd5--snappy-1.2.1.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/snappy/blobs/sha256:45275e26a466be03a8a2b81ef27afc862038b220cdf7d8cd63f6ff9f47f18e56
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/632130602400d84aa97296620b9fd418c8ff5cd5e147735a707216b9598b51c8--snappy--1.2.1.arm64_sequoia.bottle.tar.gz
+==> Verifying checksum for '632130602400d84aa97296620b9fd418c8ff5cd5e147735a707216b9598b51c8--snappy--1.2.1.arm64_sequoia.bottle.tar.gz'
+==> Fetching theora
+==> Downloading https://ghcr.io/v2/homebrew/core/theora/manifests/1.1.1-4
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/dbefdb4ba8626ac7d284e0da23aaeb705c37e0bfbe0c3c22f05fe5fbcadf10e4--theora-1.1.1-4.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/theora/blobs/sha256:19801e6ceb5c12db4621afff8746a3ef77581226559ec728c6c07a49659b23d3
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/7dcd2039b5cfc6d396f2cfb58cc7df088b9bfa5dbe51673aa5ebc10353115003--theora--1.1.1.arm64_sequoia.bottle.4.tar.gz
+==> Verifying checksum for '7dcd2039b5cfc6d396f2cfb58cc7df088b9bfa5dbe51673aa5ebc10353115003--theora--1.1.1.arm64_sequoia.bottle.4.tar.gz'
+==> Fetching x264
+==> Downloading https://ghcr.io/v2/homebrew/core/x264/manifests/r3108
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/8bf7841097db8a60b1789ab16ac7f9395fc5e484932ab958334695a83e804e68--x264-r3108.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/x264/blobs/sha256:599b5307d2eed20dd72830c722dd30faeca5fa7f87b9a36c122ed575311d84fc
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/820f38983d9c093e5881ddf8a26b2b52da7ed1e51f749d55f36aa3a665344e4b--x264--r3108.arm64_sequoia.bottle.tar.gz
+==> Verifying checksum for '820f38983d9c093e5881ddf8a26b2b52da7ed1e51f749d55f36aa3a665344e4b--x264--r3108.arm64_sequoia.bottle.tar.gz'
+==> Fetching libsamplerate
+==> Downloading https://ghcr.io/v2/homebrew/core/libsamplerate/manifests/0.2.2-1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/6be12485f3237a33a9c98a4799bc5e05f5f6520175c5e08fb3545d0f7f45f9cc--libsamplerate-0.2.2-1.bottle_manifest.json
+==> Downloading https://ghcr.io/v2/homebrew/core/libsamplerate/blobs/sha256:d51907988e3ab62f6e49ddd1253a723fd5964b78a0361453e8d9b75a2106b4e7
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/763bfdabeca178a5c63920f96c378a83aa3cadfe60aa364b77eb6934588ed1cf--libsamplerate--0.2.2.arm64_sequoia.bottle.1.tar.gz
+==> Verifying checksum for '763bfdabeca178a5c63920f96c378a83aa3cadfe60aa364b77eb6934588ed1cf--libsamplerate--0.2.2.arm64_sequoia.bottle.1.tar.gz'
+==> Fetching homebrew-ffmpeg/ffmpeg/ffmpeg
+/usr/bin/env /opt/homebrew/Library/Homebrew/shims/shared/curl --disable --cookie /dev/null --globoff --show-error --user-agent Homebrew/4.4.32\ \(Macintosh\;\ arm64\ Mac\ OS\ X\ 15.4.1\)\ curl/8.7.1 --header Accept-Language:\ en --fail --silent --retry 3 --remote-time --output /Users/hasee/Library/Caches/Homebrew/downloads/46e60fa1a0344fdf9e338ff1d9905d190ec121b2f1d4b348cc65a68c98867599--d1ed5c06e3edc5f2b5f3664c80121fa55b0baa95.patch.incomplete --location https://github.com/FFmpeg/FFmpeg/commit/d1ed5c06e3edc5f2b5f3664c80121fa55b0baa95.patch\?full_index=1
+==> Downloading https://github.com/FFmpeg/FFmpeg/commit/d1ed5c06e3edc5f2b5f3664c80121fa55b0baa95.patch?full_index=1
+==> Verifying checksum for '46e60fa1a0344fdf9e338ff1d9905d190ec121b2f1d4b348cc65a68c98867599--d1ed5c06e3edc5f2b5f3664c80121fa55b0baa95.patch'
+/usr/bin/env /opt/homebrew/Library/Homebrew/shims/shared/curl --disable --cookie /dev/null --globoff --show-error --user-agent Homebrew/4.4.32\ \(Macintosh\;\ arm64\ Mac\ OS\ X\ 15.4.1\)\ curl/8.7.1 --header Accept-Language:\ en --fail --silent --retry 3 --remote-time --output /Users/hasee/Library/Caches/Homebrew/downloads/89c5a789bbb2e059f601e58af1ca10f4db2a1939f591f896a0240cb1cfb2b8bb--add-av_stream_get_first_dts-for-chromium.patch.incomplete --location https://gitlab.archlinux.org/archlinux/packaging/packages/ffmpeg/-/raw/5670ccd86d3b816f49ebc18cab878125eca2f81f/add-av_stream_get_first_dts-for-chromium.patch
+==> Downloading https://gitlab.archlinux.org/archlinux/packaging/packages/ffmpeg/-/raw/5670ccd86d3b816f49ebc18cab878125eca2f81f/add-av_stream_get_first_dts-for-chromium.patch
+==> Verifying checksum for '89c5a789bbb2e059f601e58af1ca10f4db2a1939f591f896a0240cb1cfb2b8bb--add-av_stream_get_first_dts-for-chromium.patch'
+/usr/bin/env /opt/homebrew/Library/Homebrew/shims/shared/curl --disable --cookie /dev/null --globoff --show-error --user-agent Homebrew/4.4.32\ \(Macintosh\;\ arm64\ Mac\ OS\ X\ 15.4.1\)\ curl/8.7.1 --header Accept-Language:\ en --fail --silent --retry 3 --remote-time --output /Users/hasee/Library/Caches/Homebrew/downloads/18add3019332df92f86686a4368dc890b71f13ae9d96e7f8d4213de2b713f35e--ffmpeg-7.1.1.tar.xz.incomplete --location https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz
+==> Downloading https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz
+==> Verifying checksum for '18add3019332df92f86686a4368dc890b71f13ae9d96e7f8d4213de2b713f35e--ffmpeg-7.1.1.tar.xz'
+==> Installing ffmpeg from homebrew-ffmpeg/ffmpeg
+==> Installing dependencies for homebrew-ffmpeg/ffmpeg/ffmpeg: dav1d, frei0r, lame, libunibreak, libass, libogg, libvorbis, libvpx, opus, sdl2, snappy, theora, x264 and libsamplerate
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: dav1d
+==> Downloading https://ghcr.io/v2/homebrew/core/dav1d/manifests/1.5.1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/76ce8a8dffcdb3883423d0fa5ff3dbd810a979e8ef55ee544728d3cf5625c656--dav1d-1.5.1.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/57626e0d9380e8e7a6b65af80fff91b0db126998bcc33c038b7c865ba27b322d--dav1d--1.5.1.arm64_sequoia.bottle.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-rwe5qr
+==> Pouring dav1d--1.5.1.arm64_sequoia.bottle.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-rwe5qr/dav1d /opt/homebrew/Cellar/dav1d
+==> Finishing up
+ln -s ../Cellar/dav1d/1.5.1/bin/dav1d dav1d
+ln -s ../Cellar/dav1d/1.5.1/include/dav1d dav1d
+ln -s ../Cellar/dav1d/1.5.1/lib/libdav1d.7.dylib libdav1d.7.dylib
+ln -s ../Cellar/dav1d/1.5.1/lib/libdav1d.dylib libdav1d.dylib
+ln -s ../../Cellar/dav1d/1.5.1/lib/pkgconfig/dav1d.pc dav1d.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/dav1d/1.5.1: 16 files, 921.6KB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: frei0r
+==> Downloading https://ghcr.io/v2/homebrew/core/frei0r/manifests/2.3.3
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/f9266f5e6cb521cdce245d9ea3bf63ef75e12bea0ab3a45f107cbe0d01f58c60--frei0r-2.3.3.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/36245c05a5a54c24a2c728ac6d70a522f9139ae91f284848a2088dfe6c781331--frei0r--2.3.3.arm64_sequoia.bottle.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-lmsk7t
+==> Pouring frei0r--2.3.3.arm64_sequoia.bottle.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-lmsk7t/frei0r /opt/homebrew/Cellar/frei0r
+==> Finishing up
+ln -s ../Cellar/frei0r/2.3.3/include/frei0r.h frei0r.h
+ln -s ../Cellar/frei0r/2.3.3/lib/frei0r-1 frei0r-1
+ln -s ../../Cellar/frei0r/2.3.3/lib/pkgconfig/frei0r.pc frei0r.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/frei0r/2.3.3: 157 files, 5.5MB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: lame
+==> Downloading https://ghcr.io/v2/homebrew/core/lame/manifests/3.100
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/31e57f3a54d6908e2c153f5eb435715208f3bd9db71e16470b553d72e051b269--lame-3.100.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/31d9ab6adc42cdcbfe4efe3c85bb60f935ef165652c1f99ab1be6bc6fb6d02d8--lame--3.100.arm64_sequoia.bottle.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-6j36l6
+==> Pouring lame--3.100.arm64_sequoia.bottle.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-6j36l6/lame /opt/homebrew/Cellar/lame
+==> Finishing up
+ln -s ../Cellar/lame/3.100/bin/lame lame
+ln -s ../Cellar/lame/3.100/include/lame lame
+ln -s ../../Cellar/lame/3.100/share/doc/lame lame
+ln -s ../../../Cellar/lame/3.100/share/man/man1/lame.1 lame.1
+ln -s ../Cellar/lame/3.100/lib/libmp3lame.0.dylib libmp3lame.0.dylib
+ln -s ../Cellar/lame/3.100/lib/libmp3lame.a libmp3lame.a
+ln -s ../Cellar/lame/3.100/lib/libmp3lame.dylib libmp3lame.dylib
+==> Summary
+🍺  /opt/homebrew/Cellar/lame/3.100: 28 files, 2.2MB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: libunibreak
+==> Downloading https://ghcr.io/v2/homebrew/core/libunibreak/manifests/6.1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/0ce1b2ced7836a56fa520c73ee31abcb81d0433729fe597e94ef03dd9d8a89f8--libunibreak-6.1.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/19e3660ad0c0e463c506b271e8c1da2c4ecdd346ec8d61d87dbbfe97876ccaaa--libunibreak--6.1.arm64_sequoia.bottle.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-qg0hhc
+==> Pouring libunibreak--6.1.arm64_sequoia.bottle.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-qg0hhc/libunibreak /opt/homebrew/Cellar/libunibreak
+==> Finishing up
+ln -s ../Cellar/libunibreak/6.1/include/eastasianwidthdef.h eastasianwidthdef.h
+ln -s ../Cellar/libunibreak/6.1/include/graphemebreak.h graphemebreak.h
+ln -s ../Cellar/libunibreak/6.1/include/linebreak.h linebreak.h
+ln -s ../Cellar/libunibreak/6.1/include/linebreakdef.h linebreakdef.h
+ln -s ../Cellar/libunibreak/6.1/include/unibreakbase.h unibreakbase.h
+ln -s ../Cellar/libunibreak/6.1/include/unibreakdef.h unibreakdef.h
+ln -s ../Cellar/libunibreak/6.1/include/wordbreak.h wordbreak.h
+ln -s ../Cellar/libunibreak/6.1/lib/liblinebreak.a liblinebreak.a
+ln -s ../Cellar/libunibreak/6.1/lib/libunibreak.6.dylib libunibreak.6.dylib
+ln -s ../Cellar/libunibreak/6.1/lib/libunibreak.a libunibreak.a
+ln -s ../Cellar/libunibreak/6.1/lib/libunibreak.dylib libunibreak.dylib
+ln -s ../../Cellar/libunibreak/6.1/lib/pkgconfig/libunibreak.pc libunibreak.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/libunibreak/6.1: 19 files, 336.8KB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: libass
+==> Downloading https://ghcr.io/v2/homebrew/core/libass/manifests/0.17.3
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/84606583aa38b5ab3bcd159983c1468927012bf37cf5d21cc8e3a9eb334b252d--libass-0.17.3.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/e333ed3c58203ccfa373d0c068323865bb5a4d6ec0ec7602bafe2a2d463ced3c--libass--0.17.3.arm64_sequoia.bottle.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-fuoqza
+==> Pouring libass--0.17.3.arm64_sequoia.bottle.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-fuoqza/libass /opt/homebrew/Cellar/libass
+==> Finishing up
+ln -s ../Cellar/libass/0.17.3/include/ass ass
+ln -s ../Cellar/libass/0.17.3/lib/libass.9.dylib libass.9.dylib
+ln -s ../Cellar/libass/0.17.3/lib/libass.a libass.a
+ln -s ../Cellar/libass/0.17.3/lib/libass.dylib libass.dylib
+ln -s ../../Cellar/libass/0.17.3/lib/pkgconfig/libass.pc libass.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/libass/0.17.3: 12 files, 1007.0KB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: libogg
+==> Downloading https://ghcr.io/v2/homebrew/core/libogg/manifests/1.3.5-2
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/1c13722950e996f50a0ef7aa1e181de6b2a8a754ebb8f695c4efc56e0d592ad6--libogg-1.3.5-2.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/687ce55f7c4a1d62212288e0485a37122ea144eda3fcf2bf0a6ad58116637a80--libogg--1.3.5.arm64_sequoia.bottle.2.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-94j532
+==> Pouring libogg--1.3.5.arm64_sequoia.bottle.2.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-94j532/libogg /opt/homebrew/Cellar/libogg
+==> Finishing up
+ln -s ../Cellar/libogg/1.3.5/include/ogg ogg
+ln -s ../../Cellar/libogg/1.3.5/share/doc/libogg libogg
+ln -s ../../Cellar/libogg/1.3.5/lib/cmake/Ogg Ogg
+ln -s ../Cellar/libogg/1.3.5/lib/libogg.0.8.5.dylib libogg.0.8.5.dylib
+ln -s ../Cellar/libogg/1.3.5/lib/libogg.0.dylib libogg.0.dylib
+ln -s ../Cellar/libogg/1.3.5/lib/libogg.a libogg.a
+ln -s ../Cellar/libogg/1.3.5/lib/libogg.dylib libogg.dylib
+ln -s ../../Cellar/libogg/1.3.5/lib/pkgconfig/ogg.pc ogg.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/libogg/1.3.5: 104 files, 539.4KB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: libvorbis
+==> Downloading https://ghcr.io/v2/homebrew/core/libvorbis/manifests/1.3.7-1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/68d211b8805a2fab148645c2ac8e43495e576876d6f50f0c4af5ea890730b7ea--libvorbis-1.3.7-1.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/cfbf090a1100c38fd007bfef754ea9f8a536856d42eefb78fb82c6cc8317b708--libvorbis--1.3.7.arm64_sequoia.bottle.1.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-c65hz4
+==> Pouring libvorbis--1.3.7.arm64_sequoia.bottle.1.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-c65hz4/libvorbis /opt/homebrew/Cellar/libvorbis
+==> Finishing up
+ln -s ../Cellar/libvorbis/1.3.7/include/vorbis vorbis
+ln -s ../../Cellar/libvorbis/1.3.7/share/aclocal/vorbis.m4 vorbis.m4
+ln -s ../../Cellar/libvorbis/1.3.7/share/doc/libvorbis-1.3.7 libvorbis-1.3.7
+ln -s ../Cellar/libvorbis/1.3.7/lib/libvorbis.0.dylib libvorbis.0.dylib
+ln -s ../Cellar/libvorbis/1.3.7/lib/libvorbis.a libvorbis.a
+ln -s ../Cellar/libvorbis/1.3.7/lib/libvorbis.dylib libvorbis.dylib
+ln -s ../Cellar/libvorbis/1.3.7/lib/libvorbisenc.2.dylib libvorbisenc.2.dylib
+ln -s ../Cellar/libvorbis/1.3.7/lib/libvorbisenc.a libvorbisenc.a
+ln -s ../Cellar/libvorbis/1.3.7/lib/libvorbisenc.dylib libvorbisenc.dylib
+ln -s ../Cellar/libvorbis/1.3.7/lib/libvorbisfile.3.dylib libvorbisfile.3.dylib
+ln -s ../Cellar/libvorbis/1.3.7/lib/libvorbisfile.a libvorbisfile.a
+ln -s ../Cellar/libvorbis/1.3.7/lib/libvorbisfile.dylib libvorbisfile.dylib
+ln -s ../../Cellar/libvorbis/1.3.7/lib/pkgconfig/vorbis.pc vorbis.pc
+ln -s ../../Cellar/libvorbis/1.3.7/lib/pkgconfig/vorbisenc.pc vorbisenc.pc
+ln -s ../../Cellar/libvorbis/1.3.7/lib/pkgconfig/vorbisfile.pc vorbisfile.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/libvorbis/1.3.7: 158 files, 2.4MB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: libvpx
+==> Downloading https://ghcr.io/v2/homebrew/core/libvpx/manifests/1.15.1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/867634cbe0e9b126fc489d210fd7541eaa030b9c8725937cecb11853850f08b2--libvpx-1.15.1.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/a084d7eb55cd8cdc68cda30bf08e4e39f223e88b91277ca36f26be5bcb6e8dc6--libvpx--1.15.1.arm64_sequoia.bottle.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-5jkk2r
+==> Pouring libvpx--1.15.1.arm64_sequoia.bottle.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-5jkk2r/libvpx /opt/homebrew/Cellar/libvpx
+==> Finishing up
+ln -s ../Cellar/libvpx/1.15.1/include/vpx vpx
+ln -s ../Cellar/libvpx/1.15.1/lib/libvpx.11.dylib libvpx.11.dylib
+ln -s ../Cellar/libvpx/1.15.1/lib/libvpx.a libvpx.a
+ln -s ../Cellar/libvpx/1.15.1/lib/libvpx.dylib libvpx.dylib
+ln -s ../../Cellar/libvpx/1.15.1/lib/pkgconfig/vpx.pc vpx.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/libvpx/1.15.1: 22 files, 4.1MB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: opus
+==> Downloading https://ghcr.io/v2/homebrew/core/opus/manifests/1.5.2
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/ab70a7e8383f42047a27c0638675dbd9c3229997a01eed45d76f174664a4b607--opus-1.5.2.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/2ddeeab70dc88748d2f10719e973ed1e8961804bd2de7977c246f6cfc6e85ddf--opus--1.5.2.arm64_sequoia.bottle.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-ohxa10
+==> Pouring opus--1.5.2.arm64_sequoia.bottle.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-ohxa10/opus /opt/homebrew/Cellar/opus
+==> Finishing up
+ln -s ../Cellar/opus/1.5.2/include/opus opus
+ln -s ../../Cellar/opus/1.5.2/share/aclocal/opus.m4 opus.m4
+ln -s ../Cellar/opus/1.5.2/lib/libopus.0.dylib libopus.0.dylib
+ln -s ../Cellar/opus/1.5.2/lib/libopus.a libopus.a
+ln -s ../Cellar/opus/1.5.2/lib/libopus.dylib libopus.dylib
+ln -s ../../Cellar/opus/1.5.2/lib/pkgconfig/opus.pc opus.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/opus/1.5.2: 16 files, 1MB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: sdl2
+==> Downloading https://ghcr.io/v2/homebrew/core/sdl2/manifests/2.32.4-1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/19a61f83e224c628352e0a006f92fe25aff996b6f871d76e131b71ae4001e67b--sdl2-2.32.4-1.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/53292f583ebefa1e20f8432cbf3936d4a514511c6de3ac98d67b758bc49e2675--sdl2--2.32.4.arm64_sequoia.bottle.1.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-72tj9x
+==> Pouring sdl2--2.32.4.arm64_sequoia.bottle.1.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-72tj9x/sdl2 /opt/homebrew/Cellar/sdl2
+==> Finishing up
+ln -s ../Cellar/sdl2/2.32.4/bin/sdl2-config sdl2-config
+ln -s ../Cellar/sdl2/2.32.4/include/SDL2 SDL2
+ln -s ../../Cellar/sdl2/2.32.4/share/aclocal/sdl2.m4 sdl2.m4
+ln -s ../../Cellar/sdl2/2.32.4/lib/cmake/SDL2 SDL2
+ln -s ../Cellar/sdl2/2.32.4/lib/libSDL2-2.0.0.dylib libSDL2-2.0.0.dylib
+ln -s ../Cellar/sdl2/2.32.4/lib/libSDL2.a libSDL2.a
+ln -s ../Cellar/sdl2/2.32.4/lib/libSDL2.dylib libSDL2.dylib
+ln -s ../Cellar/sdl2/2.32.4/lib/libSDL2_test.a libSDL2_test.a
+ln -s ../Cellar/sdl2/2.32.4/lib/libSDL2main.a libSDL2main.a
+ln -s ../../Cellar/sdl2/2.32.4/lib/pkgconfig/sdl2.pc sdl2.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/sdl2/2.32.4: 94 files, 6.4MB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: snappy
+==> Downloading https://ghcr.io/v2/homebrew/core/snappy/manifests/1.2.1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/b2e6bfcdbddf1d451a8dbbb6fc3c44a267b753ac1a889dbb0b9159bf31dacdd5--snappy-1.2.1.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/632130602400d84aa97296620b9fd418c8ff5cd5e147735a707216b9598b51c8--snappy--1.2.1.arm64_sequoia.bottle.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-8rckbg
+==> Pouring snappy--1.2.1.arm64_sequoia.bottle.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-8rckbg/snappy /opt/homebrew/Cellar/snappy
+==> Finishing up
+ln -s ../Cellar/snappy/1.2.1/include/snappy-c.h snappy-c.h
+ln -s ../Cellar/snappy/1.2.1/include/snappy-sinksource.h snappy-sinksource.h
+ln -s ../Cellar/snappy/1.2.1/include/snappy-stubs-public.h snappy-stubs-public.h
+ln -s ../Cellar/snappy/1.2.1/include/snappy.h snappy.h
+ln -s ../../Cellar/snappy/1.2.1/lib/cmake/Snappy Snappy
+ln -s ../Cellar/snappy/1.2.1/lib/libsnappy.1.2.1.dylib libsnappy.1.2.1.dylib
+ln -s ../Cellar/snappy/1.2.1/lib/libsnappy.1.dylib libsnappy.1.dylib
+ln -s ../Cellar/snappy/1.2.1/lib/libsnappy.a libsnappy.a
+ln -s ../Cellar/snappy/1.2.1/lib/libsnappy.dylib libsnappy.dylib
+==> Summary
+🍺  /opt/homebrew/Cellar/snappy/1.2.1: 19 files, 172.2KB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: theora
+==> Downloading https://ghcr.io/v2/homebrew/core/theora/manifests/1.1.1-4
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/dbefdb4ba8626ac7d284e0da23aaeb705c37e0bfbe0c3c22f05fe5fbcadf10e4--theora-1.1.1-4.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/7dcd2039b5cfc6d396f2cfb58cc7df088b9bfa5dbe51673aa5ebc10353115003--theora--1.1.1.arm64_sequoia.bottle.4.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-hfa6el
+==> Pouring theora--1.1.1.arm64_sequoia.bottle.4.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-hfa6el/theora /opt/homebrew/Cellar/theora
+==> Finishing up
+ln -s ../Cellar/theora/1.1.1/include/theora theora
+ln -s ../../Cellar/theora/1.1.1/share/doc/libtheora-1.1.1 libtheora-1.1.1
+ln -s ../Cellar/theora/1.1.1/lib/libtheora.0.dylib libtheora.0.dylib
+ln -s ../Cellar/theora/1.1.1/lib/libtheora.a libtheora.a
+ln -s ../Cellar/theora/1.1.1/lib/libtheora.dylib libtheora.dylib
+ln -s ../Cellar/theora/1.1.1/lib/libtheoradec.1.dylib libtheoradec.1.dylib
+ln -s ../Cellar/theora/1.1.1/lib/libtheoradec.a libtheoradec.a
+ln -s ../Cellar/theora/1.1.1/lib/libtheoradec.dylib libtheoradec.dylib
+ln -s ../Cellar/theora/1.1.1/lib/libtheoraenc.1.dylib libtheoraenc.1.dylib
+ln -s ../Cellar/theora/1.1.1/lib/libtheoraenc.a libtheoraenc.a
+ln -s ../Cellar/theora/1.1.1/lib/libtheoraenc.dylib libtheoraenc.dylib
+ln -s ../../Cellar/theora/1.1.1/lib/pkgconfig/theora.pc theora.pc
+ln -s ../../Cellar/theora/1.1.1/lib/pkgconfig/theoradec.pc theoradec.pc
+ln -s ../../Cellar/theora/1.1.1/lib/pkgconfig/theoraenc.pc theoraenc.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/theora/1.1.1: 98 files, 2MB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: x264
+==> Downloading https://ghcr.io/v2/homebrew/core/x264/manifests/r3108
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/8bf7841097db8a60b1789ab16ac7f9395fc5e484932ab958334695a83e804e68--x264-r3108.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/820f38983d9c093e5881ddf8a26b2b52da7ed1e51f749d55f36aa3a665344e4b--x264--r3108.arm64_sequoia.bottle.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-xtyume
+==> Pouring x264--r3108.arm64_sequoia.bottle.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-xtyume/x264 /opt/homebrew/Cellar/x264
+==> Finishing up
+ln -s ../Cellar/x264/r3108/bin/x264 x264
+ln -s ../Cellar/x264/r3108/include/x264.h x264.h
+ln -s ../Cellar/x264/r3108/include/x264_config.h x264_config.h
+ln -s ../Cellar/x264/r3108/lib/libx264.164.dylib libx264.164.dylib
+ln -s ../Cellar/x264/r3108/lib/libx264.a libx264.a
+ln -s ../Cellar/x264/r3108/lib/libx264.dylib libx264.dylib
+ln -s ../../Cellar/x264/r3108/lib/pkgconfig/x264.pc x264.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/x264/r3108: 12 files, 4.1MB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg dependency: libsamplerate
+==> Downloading https://ghcr.io/v2/homebrew/core/libsamplerate/manifests/0.2.2-1
+Already downloaded: /Users/hasee/Library/Caches/Homebrew/downloads/6be12485f3237a33a9c98a4799bc5e05f5f6520175c5e08fb3545d0f7f45f9cc--libsamplerate-0.2.2-1.bottle_manifest.json
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/763bfdabeca178a5c63920f96c378a83aa3cadfe60aa364b77eb6934588ed1cf--libsamplerate--0.2.2.arm64_sequoia.bottle.1.tar.gz --directory /private/tmp/homebrew-unpack-20250426-43841-8r3giz
+==> Pouring libsamplerate--0.2.2.arm64_sequoia.bottle.1.tar.gz
+mv /private/tmp/homebrew-unpack-20250426-43841-8r3giz/libsamplerate /opt/homebrew/Cellar/libsamplerate
+==> Finishing up
+ln -s ../Cellar/libsamplerate/0.2.2/include/samplerate.h samplerate.h
+ln -s ../../Cellar/libsamplerate/0.2.2/share/doc/libsamplerate libsamplerate
+ln -s ../../Cellar/libsamplerate/0.2.2/lib/cmake/SampleRate SampleRate
+ln -s ../Cellar/libsamplerate/0.2.2/lib/libsamplerate.0.2.2.dylib libsamplerate.0.2.2.dylib
+ln -s ../Cellar/libsamplerate/0.2.2/lib/libsamplerate.0.dylib libsamplerate.0.dylib
+ln -s ../Cellar/libsamplerate/0.2.2/lib/libsamplerate.a libsamplerate.a
+ln -s ../Cellar/libsamplerate/0.2.2/lib/libsamplerate.dylib libsamplerate.dylib
+ln -s ../../Cellar/libsamplerate/0.2.2/lib/pkgconfig/samplerate.pc samplerate.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/libsamplerate/0.2.2: 33 files, 3MB
+==> Installing homebrew-ffmpeg/ffmpeg/ffmpeg
+/usr/bin/env tar --extract --no-same-owner --file /Users/hasee/Library/Caches/Homebrew/downloads/18add3019332df92f86686a4368dc890b71f13ae9d96e7f8d4213de2b713f35e--ffmpeg-7.1.1.tar.xz --directory /private/tmp/homebrew-unpack-20250426-46003-uga1q9
+mv /private/tmp/homebrew-unpack-20250426-46003-uga1q9/ffmpeg-7.1.1 /private/tmp/ffmpeg-20250426-46003-92c34l/ffmpeg-7.1.1
+[34m==>[0m [1mPatching[0m
+cp -p /Users/hasee/Library/Caches/Homebrew/downloads/46e60fa1a0344fdf9e338ff1d9905d190ec121b2f1d4b348cc65a68c98867599--d1ed5c06e3edc5f2b5f3664c80121fa55b0baa95.patch /private/tmp/ffmpeg--patch-20250426-46003-ey9clg/d1ed5c06e3edc5f2b5f3664c80121fa55b0baa95.patch
+[34m==>[0m [1mApplying d1ed5c06e3edc5f2b5f3664c80121fa55b0baa95.patch[0m
+cp -p /Users/hasee/Library/Caches/Homebrew/downloads/89c5a789bbb2e059f601e58af1ca10f4db2a1939f591f896a0240cb1cfb2b8bb--add-av_stream_get_first_dts-for-chromium.patch /private/tmp/ffmpeg--patch-20250426-46003-rjhub0/add-av_stream_get_first_dts-for-chromium.patch
+[34m==>[0m [1mApplying add-av_stream_get_first_dts-for-chromium.patch[0m
+[34m==>[0m [1m./configure --prefix=/opt/homebrew/Cellar/ffmpeg/7.1.1-with-options_1 --enable-shared --cc=clang --host-cflags= --host-ldflags= --enable-gpl --enable-libaom --enable-libdav1d --enable-libharfbuzz --enable-libmp3lame --enable-libopus --enable-libsnappy --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libfontconfig --enable-libfreetype --enable-frei0r --enable-libass --enable-demuxer=dash --enable-neon --enable-opencl --enable-audiotoolbox --enable-videotoolbox --disable-htmlpages[0m
+install prefix            /opt/homebrew/Cellar/ffmpeg/7.1.1-with-options_1
+source path               .
+C compiler                clang
+C library                 
+ARCH                      aarch64 (generic)
+big-endian                no
+runtime cpu detection     yes
+NEON enabled              yes
+DOTPROD enabled           yes
+I8MM enabled              yes
+debug symbols             yes
+strip symbols             yes
+optimize for size         no
+optimizations             yes
+static                    yes
+shared                    yes
+postprocessing support    yes
+network support           yes
+threading support         pthreads
+safe bitstream reader     yes
+texi2html enabled         no
+perl enabled              yes
+pod2man enabled           yes
+makeinfo enabled          no
+makeinfo supports HTML    no
+xmllint enabled           yes
+
+External libraries:
+appkit                  libfreetype             libxcb
+avfoundation            libharfbuzz             libxcb_shape
+bzlib                   libmp3lame              libxcb_shm
+coreimage               libopus                 libxcb_xfixes
+frei0r                  libsnappy               lzma
+iconv                   libtheora               metal
+libaom                  libvorbis               sdl2
+libass                  libvpx                  securetransport
+libdav1d                libx264                 zlib
+libfontconfig           libx265
+
+External libraries providing hardware acceleration:
+audiotoolbox            opencl                  videotoolbox
+
+Libraries:
+avcodec                 avformat                swresample
+avdevice                avutil                  swscale
+avfilter                postproc
+
+Programs:
+ffmpeg                  ffplay                  ffprobe
+
+Enabled decoders:
+aac                     flashsv                 pfm
+aac_at                  flashsv2                pgm
+aac_fixed               flic                    pgmyuv
+aac_latm                flv                     pgssub
+aasc                    fmvc                    pgx
+ac3                     fourxm                  phm
+ac3_at                  fraps                   photocd
+ac3_fixed               frwu                    pictor
+acelp_kelvin            ftr                     pixlet
+adpcm_4xm               g2m                     pjs
+adpcm_adx               g723_1                  png
+adpcm_afc               g729                    ppm
+adpcm_agm               gdv                     prores
+adpcm_aica              gem                     prosumer
+adpcm_argo              gif                     psd
+adpcm_ct                gremlin_dpcm            ptx
+adpcm_dtk               gsm                     qcelp
+adpcm_ea                gsm_ms                  qdm2
+adpcm_ea_maxis_xa       gsm_ms_at               qdm2_at
+adpcm_ea_r1             h261                    qdmc
+adpcm_ea_r2             h263                    qdmc_at
+adpcm_ea_r3             h263i                   qdraw
+adpcm_ea_xas            h263p                   qoa
+adpcm_g722              h264                    qoi
+adpcm_g726              hap                     qpeg
+adpcm_g726le            hca                     qtrle
+adpcm_ima_acorn         hcom                    r10k
+adpcm_ima_alp           hdr                     r210
+adpcm_ima_amv           hevc                    ra_144
+adpcm_ima_apc           hnm4_video              ra_288
+adpcm_ima_apm           hq_hqa                  ralf
+adpcm_ima_cunning       hqx                     rasc
+adpcm_ima_dat4          huffyuv                 rawvideo
+adpcm_ima_dk3           hymt                    realtext
+adpcm_ima_dk4           iac                     rka
+adpcm_ima_ea_eacs       idcin                   rl2
+adpcm_ima_ea_sead       idf                     roq
+adpcm_ima_iss           iff_ilbm                roq_dpcm
+adpcm_ima_moflex        ilbc                    rpza
+adpcm_ima_mtf           ilbc_at                 rscc
+adpcm_ima_oki           imc                     rtv1
+adpcm_ima_qt            imm4                    rv10
+adpcm_ima_qt_at         imm5                    rv20
+adpcm_ima_rad           indeo2                  rv30
+adpcm_ima_smjpeg        indeo3                  rv40
+adpcm_ima_ssi           indeo4                  s302m
+adpcm_ima_wav           indeo5                  sami
+adpcm_ima_ws            interplay_acm           sanm
+adpcm_ms                interplay_dpcm          sbc
+adpcm_mtaf              interplay_video         scpr
+adpcm_psx               ipu                     screenpresso
+adpcm_sbpro_2           jacosub                 sdx2_dpcm
+adpcm_sbpro_3           jpeg2000                sga
+adpcm_sbpro_4           jpegls                  sgi
+adpcm_swf               jv                      sgirle
+adpcm_thp               kgv1                    sheervideo
+adpcm_thp_le            kmvc                    shorten
+adpcm_vima              lagarith                simbiosis_imx
+adpcm_xa                lead                    sipr
+adpcm_xmd               libaom_av1              siren
+adpcm_yamaha            libdav1d                smackaud
+adpcm_zork              libopus                 smacker
+agm                     libvorbis               smc
+aic                     libvpx_vp8              smvjpeg
+alac                    libvpx_vp9              snow
+alac_at                 loco                    sol_dpcm
+alias_pix               lscr                    sonic
+als                     m101                    sp5x
+amr_nb_at               mace3                   speedhq
+amrnb                   mace6                   speex
+amrwb                   magicyuv                srgc
+amv                     mdec                    srt
+anm                     media100                ssa
+ansi                    metasound               stl
+anull                   microdvd                subrip
+apac                    mimic                   subviewer
+ape                     misc4                   subviewer1
+apng                    mjpeg                   sunrast
+aptx                    mjpegb                  svq1
+aptx_hd                 mlp                     svq3
+arbc                    mmvideo                 tak
+argo                    mobiclip                targa
+ass                     motionpixels            targa_y216
+asv1                    movtext                 tdsc
+asv2                    mp1                     text
+atrac1                  mp1_at                  theora
+atrac3                  mp1float                thp
+atrac3al                mp2                     tiertexseqvideo
+atrac3p                 mp2_at                  tiff
+atrac3pal               mp2float                tmv
+atrac9                  mp3                     truehd
+aura                    mp3_at                  truemotion1
+aura2                   mp3adu                  truemotion2
+av1                     mp3adufloat             truemotion2rt
+avrn                    mp3float                truespeech
+avrp                    mp3on4                  tscc
+avs                     mp3on4float             tscc2
+avui                    mpc7                    tta
+bethsoftvid             mpc8                    twinvq
+bfi                     mpeg1video              txd
+bink                    mpeg2video              ulti
+binkaudio_dct           mpeg4                   utvideo
+binkaudio_rdft          mpegvideo               v210
+bintext                 mpl2                    v210x
+bitpacked               msa1                    v308
+bmp                     mscc                    v408
+bmv_audio               msmpeg4v1               v410
+bmv_video               msmpeg4v2               vb
+bonk                    msmpeg4v3               vble
+brender_pix             msnsiren                vbn
+c93                     msp2                    vc1
+cavs                    msrle                   vc1image
+cbd2_dpcm               mss1                    vcr1
+ccaption                mss2                    vmdaudio
+cdgraphics              msvideo1                vmdvideo
+cdtoons                 mszh                    vmix
+cdxl                    mts2                    vmnc
+cfhd                    mv30                    vnull
+cinepak                 mvc1                    vorbis
+clearvideo              mvc2                    vp3
+cljr                    mvdv                    vp4
+cllc                    mvha                    vp5
+comfortnoise            mwsc                    vp6
+cook                    mxpeg                   vp6a
+cpia                    nellymoser              vp6f
+cri                     notchlc                 vp7
+cscd                    nuv                     vp8
+cyuv                    on2avc                  vp9
+dca                     opus                    vplayer
+dds                     osq                     vqa
+derf_dpcm               paf_audio               vqc
+dfa                     paf_video               vvc
+dfpwm                   pam                     wady_dpcm
+dirac                   pbm                     wavarc
+dnxhd                   pcm_alaw                wavpack
+dolby_e                 pcm_alaw_at             wbmp
+dpx                     pcm_bluray              wcmv
+dsd_lsbf                pcm_dvd                 webp
+dsd_lsbf_planar         pcm_f16le               webvtt
+dsd_msbf                pcm_f24le               wmalossless
+dsd_msbf_planar         pcm_f32be               wmapro
+dsicinaudio             pcm_f32le               wmav1
+dsicinvideo             pcm_f64be               wmav2
+dss_sp                  pcm_f64le               wmavoice
+dst                     pcm_lxf                 wmv1
+dvaudio                 pcm_mulaw               wmv2
+dvbsub                  pcm_mulaw_at            wmv3
+dvdsub                  pcm_s16be               wmv3image
+dvvideo                 pcm_s16be_planar        wnv1
+dxa                     pcm_s16le               wrapped_avframe
+dxtory                  pcm_s16le_planar        ws_snd1
+dxv                     pcm_s24be               xan_dpcm
+eac3                    pcm_s24daud             xan_wc3
+eac3_at                 pcm_s24le               xan_wc4
+eacmv                   pcm_s24le_planar        xbin
+eamad                   pcm_s32be               xbm
+eatgq                   pcm_s32le               xface
+eatgv                   pcm_s32le_planar        xl
+eatqi                   pcm_s64be               xma1
+eightbps                pcm_s64le               xma2
+eightsvx_exp            pcm_s8                  xpm
+eightsvx_fib            pcm_s8_planar           xsub
+escape124               pcm_sga                 xwd
+escape130               pcm_u16be               y41p
+evrc                    pcm_u16le               ylc
+exr                     pcm_u24be               yop
+fastaudio               pcm_u24le               yuv4
+ffv1                    pcm_u32be               zero12v
+ffvhuff                 pcm_u32le               zerocodec
+ffwavesynth             pcm_u8                  zlib
+fic                     pcm_vidc                zmbv
+fits                    pcx
+flac                    pdv
+
+Enabled encoders:
+a64multi                huffyuv                 pfm
+a64multi5               ilbc_at                 pgm
+aac                     jpeg2000                pgmyuv
+aac_at                  jpegls                  phm
+ac3                     libaom_av1              png
+ac3_fixed               libmp3lame              ppm
+adpcm_adx               libopus                 prores
+adpcm_argo              libtheora               prores_aw
+adpcm_g722              libvorbis               prores_ks
+adpcm_g726              libvpx_vp8              prores_videotoolbox
+adpcm_g726le            libvpx_vp9              qoi
+adpcm_ima_alp           libx264                 qtrle
+adpcm_ima_amv           libx264rgb              r10k
+adpcm_ima_apm           libx265                 r210
+adpcm_ima_qt            ljpeg                   ra_144
+adpcm_ima_ssi           magicyuv                rawvideo
+adpcm_ima_wav           mjpeg                   roq
+adpcm_ima_ws            mlp                     roq_dpcm
+adpcm_ms                movtext                 rpza
+adpcm_swf               mp2                     rv10
+adpcm_yamaha            mp2fixed                rv20
+alac                    mpeg1video              s302m
+alac_at                 mpeg2video              sbc
+alias_pix               mpeg4                   sgi
+amv                     msmpeg4v2               smc
+anull                   msmpeg4v3               snow
+apng                    msrle                   sonic
+aptx                    msvideo1                sonic_ls
+aptx_hd                 nellymoser              speedhq
+ass                     opus                    srt
+asv1                    pam                     ssa
+asv2                    pbm                     subrip
+avrp                    pcm_alaw                sunrast
+avui                    pcm_alaw_at             svq1
+bitpacked               pcm_bluray              targa
+bmp                     pcm_dvd                 text
+cfhd                    pcm_f32be               tiff
+cinepak                 pcm_f32le               truehd
+cljr                    pcm_f64be               tta
+comfortnoise            pcm_f64le               ttml
+dca                     pcm_mulaw               utvideo
+dfpwm                   pcm_mulaw_at            v210
+dnxhd                   pcm_s16be               v308
+dpx                     pcm_s16be_planar        v408
+dvbsub                  pcm_s16le               v410
+dvdsub                  pcm_s16le_planar        vbn
+dvvideo                 pcm_s24be               vc2
+dxv                     pcm_s24daud             vnull
+eac3                    pcm_s24le               vorbis
+exr                     pcm_s24le_planar        wavpack
+ffv1                    pcm_s32be               wbmp
+ffvhuff                 pcm_s32le               webvtt
+fits                    pcm_s32le_planar        wmav1
+flac                    pcm_s64be               wmav2
+flashsv                 pcm_s64le               wmv1
+flashsv2                pcm_s8                  wmv2
+flv                     pcm_s8_planar           wrapped_avframe
+g723_1                  pcm_u16be               xbm
+gif                     pcm_u16le               xface
+h261                    pcm_u24be               xsub
+h263                    pcm_u24le               xwd
+h263p                   pcm_u32be               y41p
+h264_videotoolbox       pcm_u32le               yuv4
+hap                     pcm_u8                  zlib
+hdr                     pcm_vidc                zmbv
+hevc_videotoolbox       pcx
+
+Enabled hwaccels:
+h263_videotoolbox       mpeg1_videotoolbox      prores_videotoolbox
+h264_videotoolbox       mpeg2_videotoolbox      vp9_videotoolbox
+hevc_videotoolbox       mpeg4_videotoolbox
+
+Enabled parsers:
+aac                     dvdsub                  mpegaudio
+aac_latm                evc                     mpegvideo
+ac3                     flac                    opus
+adx                     ftr                     png
+amr                     g723_1                  pnm
+av1                     g729                    qoi
+avs2                    gif                     rv34
+avs3                    gsm                     sbc
+bmp                     h261                    sipr
+cavsvideo               h263                    tak
+cook                    h264                    vc1
+cri                     hdr                     vorbis
+dca                     hevc                    vp3
+dirac                   ipu                     vp8
+dnxhd                   jpeg2000                vp9
+dolby_e                 jpegxl                  vvc
+dpx                     misc4                   webp
+dvaudio                 mjpeg                   xbm
+dvbsub                  mlp                     xma
+dvd_nav                 mpeg4video              xwd
+
+Enabled demuxers:
+aa                      idf                     pcm_s16be
+aac                     iff                     pcm_s16le
+aax                     ifv                     pcm_s24be
+ac3                     ilbc                    pcm_s24le
+ac4                     image2                  pcm_s32be
+ace                     image2_alias_pix        pcm_s32le
+acm                     image2_brender_pix      pcm_s8
+act                     image2pipe              pcm_u16be
+adf                     image_bmp_pipe          pcm_u16le
+adp                     image_cri_pipe          pcm_u24be
+ads                     image_dds_pipe          pcm_u24le
+adx                     image_dpx_pipe          pcm_u32be
+aea                     image_exr_pipe          pcm_u32le
+afc                     image_gem_pipe          pcm_u8
+aiff                    image_gif_pipe          pcm_vidc
+aix                     image_hdr_pipe          pdv
+alp                     image_j2k_pipe          pjs
+amr                     image_jpeg_pipe         pmp
+amrnb                   image_jpegls_pipe       pp_bnk
+amrwb                   image_jpegxl_pipe       pva
+anm                     image_pam_pipe          pvf
+apac                    image_pbm_pipe          qcp
+apc                     image_pcx_pipe          qoa
+ape                     image_pfm_pipe          r3d
+apm                     image_pgm_pipe          rawvideo
+apng                    image_pgmyuv_pipe       rcwt
+aptx                    image_pgx_pipe          realtext
+aptx_hd                 image_phm_pipe          redspark
+aqtitle                 image_photocd_pipe      rka
+argo_asf                image_pictor_pipe       rl2
+argo_brp                image_png_pipe          rm
+argo_cvg                image_ppm_pipe          roq
+asf                     image_psd_pipe          rpl
+asf_o                   image_qdraw_pipe        rsd
+ass                     image_qoi_pipe          rso
+ast                     image_sgi_pipe          rtp
+au                      image_sunrast_pipe      rtsp
+av1                     image_svg_pipe          s337m
+avi                     image_tiff_pipe         sami
+avr                     image_vbn_pipe          sap
+avs                     image_webp_pipe         sbc
+avs2                    image_xbm_pipe          sbg
+avs3                    image_xpm_pipe          scc
+bethsoftvid             image_xwd_pipe          scd
+bfi                     ingenient               sdns
+bfstm                   ipmovie                 sdp
+bink                    ipu                     sdr2
+binka                   ircam                   sds
+bintext                 iss                     sdx
+bit                     iv8                     segafilm
+bitpacked               ivf                     ser
+bmv                     ivr                     sga
+boa                     jacosub                 shorten
+bonk                    jpegxl_anim             siff
+brstm                   jv                      simbiosis_imx
+c93                     kux                     sln
+caf                     kvag                    smacker
+cavsvideo               laf                     smjpeg
+cdg                     lc3                     smush
+cdxl                    live_flv                sol
+cine                    lmlm4                   sox
+codec2                  loas                    spdif
+codec2raw               lrc                     srt
+concat                  luodat                  stl
+data                    lvf                     str
+daud                    lxf                     subviewer
+dcstr                   m4v                     subviewer1
+derf                    matroska                sup
+dfa                     mca                     svag
+dfpwm                   mcc                     svs
+dhav                    mgsts                   swf
+dirac                   microdvd                tak
+dnxhd                   mjpeg                   tedcaptions
+dsf                     mjpeg_2000              thp
+dsicin                  mlp                     threedostr
+dss                     mlv                     tiertexseq
+dts                     mm                      tmv
+dtshd                   mmf                     truehd
+dv                      mods                    tta
+dvbsub                  moflex                  tty
+dvbtxt                  mov                     txd
+dxa                     mp3                     ty
+ea                      mpc                     usm
+ea_cdata                mpc8                    v210
+eac3                    mpegps                  v210x
+epaf                    mpegts                  vag
+evc                     mpegtsraw               vc1
+ffmetadata              mpegvideo               vc1t
+filmstrip               mpjpeg                  vividas
+fits                    mpl2                    vivo
+flac                    mpsub                   vmd
+flic                    msf                     vobsub
+flv                     msnwc_tcp               voc
+fourxm                  msp                     vpk
+frm                     mtaf                    vplayer
+fsb                     mtv                     vqf
+fwse                    musx                    vvc
+g722                    mv                      w64
+g723_1                  mvi                     wady
+g726                    mxf                     wav
+g726le                  mxg                     wavarc
+g729                    nc                      wc3
+gdv                     nistsphere              webm_dash_manifest
+genh                    nsp                     webvtt
+gif                     nsv                     wsaud
+gsm                     nut                     wsd
+gxf                     nuv                     wsvqa
+h261                    obu                     wtv
+h263                    ogg                     wv
+h264                    oma                     wve
+hca                     osq                     xa
+hcom                    paf                     xbin
+hevc                    pcm_alaw                xmd
+hls                     pcm_f32be               xmv
+hnm                     pcm_f32le               xvag
+iamf                    pcm_f64be               xwma
+ico                     pcm_f64le               yop
+idcin                   pcm_mulaw               yuv4mpegpipe
+
+Enabled muxers:
+a64                     h263                    pcm_s16le
+ac3                     h264                    pcm_s24be
+ac4                     hash                    pcm_s24le
+adts                    hds                     pcm_s32be
+adx                     hevc                    pcm_s32le
+aea                     hls                     pcm_s8
+aiff                    iamf                    pcm_u16be
+alp                     ico                     pcm_u16le
+amr                     ilbc                    pcm_u24be
+amv                     image2                  pcm_u24le
+apm                     image2pipe              pcm_u32be
+apng                    ipod                    pcm_u32le
+aptx                    ircam                   pcm_u8
+aptx_hd                 ismv                    pcm_vidc
+argo_asf                ivf                     psp
+argo_cvg                jacosub                 rawvideo
+asf                     kvag                    rcwt
+asf_stream              latm                    rm
+ass                     lc3                     roq
+ast                     lrc                     rso
+au                      m4v                     rtp
+avi                     matroska                rtp_mpegts
+avif                    matroska_audio          rtsp
+avm2                    md5                     sap
+avs2                    microdvd                sbc
+avs3                    mjpeg                   scc
+bit                     mkvtimestamp_v2         segafilm
+caf                     mlp                     segment
+cavsvideo               mmf                     smjpeg
+codec2                  mov                     smoothstreaming
+codec2raw               mp2                     sox
+crc                     mp3                     spdif
+dash                    mp4                     spx
+data                    mpeg1system             srt
+daud                    mpeg1vcd                stream_segment
+dfpwm                   mpeg1video              streamhash
+dirac                   mpeg2dvd                sup
+dnxhd                   mpeg2svcd               swf
+dts                     mpeg2video              tee
+dv                      mpeg2vob                tg2
+eac3                    mpegts                  tgp
+evc                     mpjpeg                  truehd
+f4v                     mxf                     tta
+ffmetadata              mxf_d10                 ttml
+fifo                    mxf_opatom              uncodedframecrc
+filmstrip               null                    vc1
+fits                    nut                     vc1t
+flac                    obu                     voc
+flv                     oga                     vvc
+framecrc                ogg                     w64
+framehash               ogv                     wav
+framemd5                oma                     webm
+g722                    opus                    webm_chunk
+g723_1                  pcm_alaw                webm_dash_manifest
+g726                    pcm_f32be               webp
+g726le                  pcm_f32le               webvtt
+gif                     pcm_f64be               wsaud
+gsm                     pcm_f64le               wtv
+gxf                     pcm_mulaw               wv
+h261                    pcm_s16be               yuv4mpegpipe
+
+Enabled protocols:
+async                   http                    rtmpt
+cache                   httpproxy               rtmpts
+concat                  https                   rtp
+concatf                 icecast                 srtp
+crypto                  ipfs_gateway            subfile
+data                    ipns_gateway            tcp
+fd                      md5                     tee
+ffrtmphttp              mmsh                    tls
+file                    mmst                    udp
+ftp                     pipe                    udplite
+gopher                  prompeg                 unix
+gophers                 rtmp
+hls                     rtmps
+
+Enabled filters:
+a3dscope                cropdetect              pad_opencl
+aap                     crossfeed               pal100bars
+abench                  crystalizer             pal75bars
+abitscope               cue                     palettegen
+acompressor             curves                  paletteuse
+acontrast               datascope               pan
+acopy                   dblur                   perlin
+acrossfade              dcshift                 perms
+acrossover              dctdnoiz                perspective
+acrusher                deband                  phase
+acue                    deblock                 photosensitivity
+addroi                  decimate                pixdesctest
+adeclick                deconvolve              pixelize
+adeclip                 dedot                   pixscope
+adecorrelate            deesser                 pp
+adelay                  deflate                 pp7
+adenorm                 deflicker               premultiply
+aderivative             dejudder                prewitt
+adrawgraph              delogo                  prewitt_opencl
+adrc                    deshake                 program_opencl
+adynamicequalizer       deshake_opencl          pseudocolor
+adynamicsmooth          despill                 psnr
+aecho                   detelecine              pullup
+aemphasis               dialoguenhance          qp
+aeval                   dilation                random
+aevalsrc                dilation_opencl         readeia608
+aexciter                displace                readvitc
+afade                   doubleweave             realtime
+afdelaysrc              drawbox                 remap
+afftdn                  drawgraph               remap_opencl
+afftfilt                drawgrid                removegrain
+afir                    drawtext                removelogo
+afireqsrc               drmeter                 repeatfields
+afirsrc                 dynaudnorm              replaygain
+aformat                 earwax                  reverse
+afreqshift              ebur128                 rgbashift
+afwtdn                  edgedetect              rgbtestsrc
+agate                   elbg                    roberts
+agraphmonitor           entropy                 roberts_opencl
+ahistogram              epx                     rotate
+aiir                    eq                      sab
+aintegral               equalizer               scale
+ainterleave             erosion                 scale2ref
+alatency                erosion_opencl          scale_vt
+alimiter                estdif                  scdet
+allpass                 exposure                scharr
+allrgb                  extractplanes           scroll
+allyuv                  extrastereo             segment
+aloop                   fade                    select
+alphaextract            feedback                selectivecolor
+alphamerge              fftdnoiz                sendcmd
+amerge                  fftfilt                 separatefields
+ametadata               field                   setdar
+amix                    fieldhint               setfield
+amovie                  fieldmatch              setparams
+amplify                 fieldorder              setpts
+amultiply               fillborders             setrange
+anequalizer             find_rect               setsar
+anlmdn                  firequalizer            settb
+anlmf                   flanger                 shear
+anlms                   floodfill               showcqt
+anoisesrc               format                  showcwt
+anull                   fps                     showfreqs
+anullsink               framepack               showinfo
+anullsrc                framerate               showpalette
+apad                    framestep               showspatial
+aperms                  freezedetect            showspectrum
+aphasemeter             freezeframes            showspectrumpic
+aphaser                 frei0r                  showvolume
+aphaseshift             frei0r_src              showwaves
+apsnr                   fspp                    showwavespic
+apsyclip                fsync                   shuffleframes
+apulsator               gblur                   shufflepixels
+arealtime               geq                     shuffleplanes
+aresample               gradfun                 sidechaincompress
+areverse                gradients               sidechaingate
+arls                    graphmonitor            sidedata
+arnndn                  grayworld               sierpinski
+asdr                    greyedge                signalstats
+asegment                guided                  signature
+aselect                 haas                    silencedetect
+asendcmd                haldclut                silenceremove
+asetnsamples            haldclutsrc             sinc
+asetpts                 hdcd                    sine
+asetrate                headphone               siti
+asettb                  hflip                   smartblur
+ashowinfo               highpass                smptebars
+asidedata               highshelf               smptehdbars
+asisdr                  hilbert                 sobel
+asoftclip               histeq                  sobel_opencl
+aspectralstats          histogram               spectrumsynth
+asplit                  hqdn3d                  speechnorm
+ass                     hqx                     split
+astats                  hstack                  spp
+astreamselect           hsvhold                 ssim
+asubboost               hsvkey                  ssim360
+asubcut                 hue                     stereo3d
+asupercut               huesaturation           stereotools
+asuperpass              hwdownload              stereowiden
+asuperstop              hwmap                   streamselect
+atadenoise              hwupload                subtitles
+atempo                  hysteresis              super2xsai
+atilt                   identity                superequalizer
+atrim                   idet                    surround
+avectorscope            il                      swaprect
+avgblur                 inflate                 swapuv
+avgblur_opencl          interlace               tblend
+avsynctest              interleave              telecine
+axcorrelate             join                    testsrc
+backgroundkey           kerndeint               testsrc2
+bandpass                kirsch                  thistogram
+bandreject              lagfun                  threshold
+bass                    latency                 thumbnail
+bbox                    lenscorrection          tile
+bench                   life                    tiltandshift
+bilateral               limitdiff               tiltshelf
+biquad                  limiter                 tinterlace
+bitplanenoise           loop                    tlut2
+blackdetect             loudnorm                tmedian
+blackframe              lowpass                 tmidequalizer
+blend                   lowshelf                tmix
+blockdetect             lumakey                 tonemap
+blurdetect              lut                     tonemap_opencl
+bm3d                    lut1d                   tpad
+boxblur                 lut2                    transpose
+boxblur_opencl          lut3d                   transpose_opencl
+bwdif                   lutrgb                  transpose_vt
+cas                     lutyuv                  treble
+ccrepack                mandelbrot              tremolo
+cellauto                maskedclamp             trim
+channelmap              maskedmax               unpremultiply
+channelsplit            maskedmerge             unsharp
+chorus                  maskedmin               unsharp_opencl
+chromahold              maskedthreshold         untile
+chromakey               maskfun                 uspp
+chromanr                mcdeint                 v360
+chromashift             mcompand                vaguedenoiser
+ciescope                median                  varblur
+codecview               mergeplanes             vectorscope
+color                   mestimate               vflip
+colorbalance            metadata                vfrdet
+colorchannelmixer       midequalizer            vibrance
+colorchart              minterpolate            vibrato
+colorcontrast           mix                     vif
+colorcorrect            monochrome              vignette
+colorhold               morpho                  virtualbass
+colorize                movie                   vmafmotion
+colorkey                mpdecimate              volume
+colorkey_opencl         mptestsrc               volumedetect
+colorlevels             msad                    vstack
+colormap                multiply                w3fdif
+colormatrix             negate                  waveform
+colorspace              nlmeans                 weave
+colorspectrum           nlmeans_opencl          xbr
+colortemperature        nnedi                   xcorrelate
+compand                 noformat                xfade
+compensationdelay       noise                   xfade_opencl
+concat                  normalize               xmedian
+convolution             null                    xpsnr
+convolution_opencl      nullsink                xstack
+convolve                nullsrc                 yadif
+copy                    openclsrc               yadif_videotoolbox
+coreimage               oscilloscope            yaepblur
+coreimagesrc            overlay                 yuvtestsrc
+corr                    overlay_opencl          zoneplate
+cover_rect              owdenoise               zoompan
+crop                    pad
+
+Enabled bsfs:
+aac_adtstoasc           h264_mp4toannexb        pcm_rechunk
+av1_frame_merge         h264_redundant_pps      pgs_frame_merge
+av1_frame_split         hapqa_extract           prores_metadata
+av1_metadata            hevc_metadata           remove_extradata
+chomp                   hevc_mp4toannexb        setts
+dca_core                imx_dump_header         showinfo
+dovi_rpu                media100_to_mjpegb      text2movsub
+dts2pts                 mjpeg2jpeg              trace_headers
+dump_extradata          mjpega_dump_header      truehd_core
+dv_error_marker         mov2textsub             vp9_metadata
+eac3_core               mpeg2_metadata          vp9_raw_reorder
+evc_frame_merge         mpeg4_unpack_bframes    vp9_superframe
+extract_extradata       noise                   vp9_superframe_split
+filter_units            null                    vvc_metadata
+h264_metadata           opus_metadata           vvc_mp4toannexb
+
+Enabled indevs:
+avfoundation            lavfi                   xcbgrab
+
+Enabled outdevs:
+audiotoolbox            sdl2
+
+License: GPL version 2 or later
+
+WARNING: Disabled dash_demuxer because not all dependencies are satisfied: libxml2
+[34m==>[0m [1mmake install[0m
+GEN	libavutil/libavutil.version
+GEN	libswscale/libswscale.version
+GEN	libswresample/libswresample.version
+GEN	libpostproc/libpostproc.version
+GEN	libavcodec/libavcodec.version
+GEN	libavformat/libavformat.version
+GEN	libavfilter/libavfilter.version
+GEN	libavdevice/libavdevice.version
+OBJCC	libavdevice/audiotoolbox.o
+CC	libavdevice/alldevices.o
+CC	libavdevice/avdevice.o
+OBJCC	libavdevice/avfoundation.o
+CC	libavdevice/utils.o
+CC	libavdevice/lavfi.o
+CC	libavdevice/version.o
+CC	libavdevice/sdl2.o
+CC	libavdevice/xcbgrab.o
+CC	libavfilter/aarch64/vf_bwdif_init_aarch64.o
+AS	libavfilter/aarch64/vf_bwdif_neon.o
+AS	libavfilter/aarch64/vf_nlmeans_neon.o
+CC	libavfilter/aarch64/vf_nlmeans_init.o
+CC	libavfilter/aeval.o
+CC	libavfilter/af_aap.o
+CC	libavfilter/af_acontrast.o
+CC	libavfilter/af_acopy.o
+CC	libavfilter/af_acrossover.o
+CC	libavfilter/af_acrusher.o
+CC	libavfilter/af_adeclick.o
+CC	libavfilter/af_adecorrelate.o
+CC	libavfilter/af_adelay.o
+CC	libavfilter/af_aderivative.o
+CC	libavfilter/af_adenorm.o
+CC	libavfilter/af_adrc.o
+CC	libavfilter/af_adynamicequalizer.o
+CC	libavfilter/af_adynamicsmooth.o
+CC	libavfilter/af_aecho.o
+CC	libavfilter/af_aemphasis.o
+CC	libavfilter/af_aexciter.o
+CC	libavfilter/af_afade.o
+CC	libavfilter/af_afftdn.o
+CC	libavfilter/af_afftfilt.o
+CC	libavfilter/af_afir.o
+CC	libavfilter/af_aformat.o
+CC	libavfilter/af_afreqshift.o
+CC	libavfilter/af_afwtdn.o
+CC	libavfilter/af_agate.o
+CC	libavfilter/af_aiir.o
+CC	libavfilter/af_alimiter.o
+CC	libavfilter/af_amerge.o
+CC	libavfilter/af_amix.o
+CC	libavfilter/af_amultiply.o
+CC	libavfilter/af_anequalizer.o
+CC	libavfilter/af_anlmdn.o
+CC	libavfilter/af_anlms.o
+CC	libavfilter/af_anull.o
+CC	libavfilter/af_apad.o
+CC	libavfilter/af_aphaser.o
+CC	libavfilter/af_apsyclip.o
+CC	libavfilter/af_apulsator.o
+CC	libavfilter/af_aresample.o
+CC	libavfilter/af_arls.o
+CC	libavfilter/af_arnndn.o
+CC	libavfilter/af_asdr.o
+CC	libavfilter/af_asetnsamples.o
+CC	libavfilter/af_asetrate.o
+CC	libavfilter/af_ashowinfo.o
+CC	libavfilter/af_asoftclip.o
+CC	libavfilter/af_astats.o
+CC	libavfilter/af_aspectralstats.o
+CC	libavfilter/af_asupercut.o
+CC	libavfilter/af_asubboost.o
+CC	libavfilter/af_atempo.o
+CC	libavfilter/af_atilt.o
+CC	libavfilter/af_axcorrelate.o
+CC	libavfilter/af_channelmap.o
+CC	libavfilter/af_biquads.o
+CC	libavfilter/af_channelsplit.o
+CC	libavfilter/af_chorus.o
+CC	libavfilter/af_compand.o
+CC	libavfilter/af_compensationdelay.o
+CC	libavfilter/af_crossfeed.o
+CC	libavfilter/af_crystalizer.o
+CC	libavfilter/af_dcshift.o
+CC	libavfilter/af_deesser.o
+CC	libavfilter/af_dialoguenhance.o
+CC	libavfilter/af_drmeter.o
+CC	libavfilter/af_dynaudnorm.o
+CC	libavfilter/af_earwax.o
+CC	libavfilter/af_extrastereo.o
+CC	libavfilter/af_firequalizer.o
+CC	libavfilter/af_haas.o
+CC	libavfilter/af_flanger.o
+CC	libavfilter/af_hdcd.o
+CC	libavfilter/af_headphone.o
+CC	libavfilter/af_loudnorm.o
+CC	libavfilter/af_join.o
+CC	libavfilter/af_mcompand.o
+CC	libavfilter/af_pan.o
+CC	libavfilter/af_sidechaincompress.o
+CC	libavfilter/af_replaygain.o
+CC	libavfilter/af_silencedetect.o
+CC	libavfilter/af_silenceremove.o
+CC	libavfilter/af_speechnorm.o
+CC	libavfilter/af_stereotools.o
+CC	libavfilter/af_stereowiden.o
+CC	libavfilter/af_superequalizer.o
+CC	libavfilter/af_surround.o
+CC	libavfilter/af_tremolo.o
+CC	libavfilter/af_vibrato.o
+CC	libavfilter/af_virtualbass.o
+CC	libavfilter/af_volumedetect.o
+CC	libavfilter/allfilters.o
+CC	libavfilter/af_volume.o
+CC	libavfilter/asink_anullsink.o
+CC	libavfilter/asrc_afdelaysrc.o
+CC	libavfilter/asrc_afirsrc.o
+CC	libavfilter/asrc_anoisesrc.o
+CC	libavfilter/asrc_anullsrc.o
+CC	libavfilter/asrc_hilbert.o
+CC	libavfilter/asrc_sinc.o
+CC	libavfilter/asrc_sine.o
+CC	libavfilter/audio.o
+CC	libavfilter/avf_a3dscope.o
+CC	libavfilter/avf_abitscope.o
+CC	libavfilter/avf_ahistogram.o
+CC	libavfilter/avf_aphasemeter.o
+CC	libavfilter/avf_avectorscope.o
+CC	libavfilter/avf_concat.o
+CC	libavfilter/avf_showcqt.o
+CC	libavfilter/avf_showcwt.o
+CC	libavfilter/avf_showfreqs.o
+CC	libavfilter/avf_showspatial.o
+CC	libavfilter/avf_showspectrum.o
+CC	libavfilter/avf_showwaves.o
+CC	libavfilter/avf_showvolume.o
+CC	libavfilter/avfilter.o
+CC	libavfilter/avfiltergraph.o
+CC	libavfilter/bbox.o
+CC	libavfilter/boxblur.o
+CC	libavfilter/buffersink.o
+CC	libavfilter/buffersrc.o
+CC	libavfilter/bwdifdsp.o
+CC	libavfilter/ccfifo.o
+CC	libavfilter/colorspace.o
+CC	libavfilter/colorspacedsp.o
+CC	libavfilter/drawutils.o
+CC	libavfilter/ebur128.o
+CC	libavfilter/edge_common.o
+CC	libavfilter/f_bench.o
+CC	libavfilter/f_cue.o
+CC	libavfilter/f_drawgraph.o
+CC	libavfilter/f_ebur128.o
+CC	libavfilter/f_graphmonitor.o
+CC	libavfilter/f_interleave.o
+CC	libavfilter/f_latency.o
+CC	libavfilter/f_loop.o
+CC	libavfilter/f_perms.o
+CC	libavfilter/f_metadata.o
+CC	libavfilter/f_realtime.o
+CC	libavfilter/f_reverse.o
+CC	libavfilter/f_segment.o
+CC	libavfilter/f_select.o
+CC	libavfilter/f_sendcmd.o
+CC	libavfilter/f_sidedata.o
+CC	libavfilter/f_streamselect.o
+CC	libavfilter/formats.o
+CC	libavfilter/framepool.o
+CC	libavfilter/framequeue.o
+CC	libavfilter/framesync.o
+CC	libavfilter/generate_wave_table.o
+CC	libavfilter/graphdump.o
+CC	libavfilter/graphparser.o
+CC	libavfilter/lavfutils.o
+CC	libavfilter/lswsutils.o
+OBJCC	libavfilter/metal/utils.o
+HOSTCC	ffbuild/bin2c_host.o
+xcrun -sdk macosx metal libavfilter/metal/vf_yadif_videotoolbox.metal -o libavfilter/metal/vf_yadif_videotoolbox.metal.air
+CC	libavfilter/motion_estimation.o
+CC	libavfilter/opencl.o
+OPENCL	libavfilter/opencl/avgblur.c
+OPENCL	libavfilter/opencl/colorkey.c
+OPENCL	libavfilter/opencl/colorspace_common.c
+OPENCL	libavfilter/opencl/deshake.c
+OPENCL	libavfilter/opencl/convolution.c
+OPENCL	libavfilter/opencl/neighbor.c
+OPENCL	libavfilter/opencl/nlmeans.c
+OPENCL	libavfilter/opencl/overlay.c
+OPENCL	libavfilter/opencl/pad.c
+OPENCL	libavfilter/opencl/remap.c
+OPENCL	libavfilter/opencl/tonemap.c
+OPENCL	libavfilter/opencl/transpose.c
+OPENCL	libavfilter/opencl/unsharp.c
+OPENCL	libavfilter/opencl/xfade.c
+CC	libavfilter/palette.o
+CC	libavfilter/qp_table.o
+CC	libavfilter/perlin.o
+CC	libavfilter/pthread.o
+CC	libavfilter/scale_eval.o
+CC	libavfilter/scene_sad.o
+CC	libavfilter/setpts.o
+CC	libavfilter/settb.o
+CC	libavfilter/split.o
+CC	libavfilter/src_avsynctest.o
+CC	libavfilter/src_movie.o
+CC	libavfilter/textutils.o
+CC	libavfilter/trim.o
+CC	libavfilter/transform.o
+CC	libavfilter/vaf_spectrumsynth.o
+CC	libavfilter/version.o
+CC	libavfilter/vf_addroi.o
+CC	libavfilter/vf_alphamerge.o
+CC	libavfilter/vf_aspect.o
+CC	libavfilter/vf_amplify.o
+CC	libavfilter/vf_atadenoise.o
+CC	libavfilter/vf_avgblur.o
+CC	libavfilter/vf_avgblur_opencl.o
+CC	libavfilter/vf_backgroundkey.o
+CC	libavfilter/vf_bbox.o
+CC	libavfilter/vf_bilateral.o
+CC	libavfilter/vf_bitplanenoise.o
+CC	libavfilter/vf_blackdetect.o
+CC	libavfilter/vf_blackframe.o
+CC	libavfilter/vf_blend.o
+CC	libavfilter/vf_blockdetect.o
+CC	libavfilter/vf_blurdetect.o
+CC	libavfilter/vf_bm3d.o
+CC	libavfilter/vf_bwdif.o
+CC	libavfilter/vf_boxblur.o
+CC	libavfilter/vf_cas.o
+CC	libavfilter/vf_ccrepack.o
+CC	libavfilter/vf_chromakey.o
+CC	libavfilter/vf_chromanr.o
+CC	libavfilter/vf_chromashift.o
+CC	libavfilter/vf_ciescope.o
+CC	libavfilter/vf_codecview.o
+CC	libavfilter/vf_colorbalance.o
+CC	libavfilter/vf_colorchannelmixer.o
+CC	libavfilter/vf_colorconstancy.o
+CC	libavfilter/vf_colorcontrast.o
+CC	libavfilter/vf_colorcorrect.o
+CC	libavfilter/vf_colorize.o
+CC	libavfilter/vf_colorkey.o
+CC	libavfilter/vf_colorkey_opencl.o
+CC	libavfilter/vf_colorlevels.o
+CC	libavfilter/vf_colormap.o
+CC	libavfilter/vf_colormatrix.o
+CC	libavfilter/vf_colorspace.o
+CC	libavfilter/vf_convolution.o
+CC	libavfilter/vf_colortemperature.o
+CC	libavfilter/vf_convolution_opencl.o
+CC	libavfilter/vf_convolve.o
+CC	libavfilter/vf_copy.o
+OBJCC	libavfilter/vf_coreimage.o
+CC	libavfilter/vf_corr.o
+CC	libavfilter/vf_cover_rect.o
+CC	libavfilter/vf_crop.o
+CC	libavfilter/vf_cropdetect.o
+CC	libavfilter/vf_curves.o
+CC	libavfilter/vf_datascope.o
+CC	libavfilter/vf_dblur.o
+CC	libavfilter/vf_dctdnoiz.o
+CC	libavfilter/vf_deband.o
+CC	libavfilter/vf_deblock.o
+CC	libavfilter/vf_decimate.o
+CC	libavfilter/vf_dedot.o
+CC	libavfilter/vf_deflicker.o
+CC	libavfilter/vf_dejudder.o
+CC	libavfilter/vf_delogo.o
+CC	libavfilter/vf_deshake.o
+CC	libavfilter/vf_despill.o
+CC	libavfilter/vf_detelecine.o
+CC	libavfilter/vf_deshake_opencl.o
+CC	libavfilter/vf_displace.o
+CC	libavfilter/vf_drawbox.o
+CC	libavfilter/vf_drawtext.o
+CC	libavfilter/vf_edgedetect.o
+CC	libavfilter/vf_elbg.o
+CC	libavfilter/vf_entropy.o
+CC	libavfilter/vf_epx.o
+CC	libavfilter/vf_eq.o
+CC	libavfilter/vf_estdif.o
+CC	libavfilter/vf_extractplanes.o
+CC	libavfilter/vf_exposure.o
+CC	libavfilter/vf_fade.o
+CC	libavfilter/vf_feedback.o
+CC	libavfilter/vf_fftdnoiz.o
+CC	libavfilter/vf_fftfilt.o
+CC	libavfilter/vf_field.o
+CC	libavfilter/vf_fieldhint.o
+CC	libavfilter/vf_fieldmatch.o
+CC	libavfilter/vf_fieldorder.o
+CC	libavfilter/vf_fillborders.o
+CC	libavfilter/vf_find_rect.o
+CC	libavfilter/vf_floodfill.o
+CC	libavfilter/vf_format.o
+CC	libavfilter/vf_fps.o
+CC	libavfilter/vf_framepack.o
+CC	libavfilter/vf_framerate.o
+CC	libavfilter/vf_framestep.o
+CC	libavfilter/vf_freezedetect.o
+CC	libavfilter/vf_freezeframes.o
+CC	libavfilter/vf_fspp.o
+CC	libavfilter/vf_frei0r.o
+CC	libavfilter/vf_fsync.o
+CC	libavfilter/vf_gblur.o
+CC	libavfilter/vf_geq.o
+CC	libavfilter/vf_gradfun.o
+CC	libavfilter/vf_grayworld.o
+CC	libavfilter/vf_guided.o
+CC	libavfilter/vf_hflip.o
+CC	libavfilter/vf_histeq.o
+CC	libavfilter/vf_histogram.o
+CC	libavfilter/vf_hqdn3d.o
+CC	libavfilter/vf_hqx.o
+CC	libavfilter/vf_hsvkey.o
+CC	libavfilter/vf_hue.o
+CC	libavfilter/vf_huesaturation.o
+CC	libavfilter/vf_hwmap.o
+CC	libavfilter/vf_hwdownload.o
+CC	libavfilter/vf_hwupload.o
+CC	libavfilter/vf_hysteresis.o
+CC	libavfilter/vf_identity.o
+CC	libavfilter/vf_idet.o
+CC	libavfilter/vf_il.o
+CC	libavfilter/vf_kerndeint.o
+CC	libavfilter/vf_lagfun.o
+CC	libavfilter/vf_lenscorrection.o
+CC	libavfilter/vf_limitdiff.o
+CC	libavfilter/vf_limiter.o
+CC	libavfilter/vf_lumakey.o
+CC	libavfilter/vf_lut.o
+CC	libavfilter/vf_lut2.o
+CC	libavfilter/vf_lut3d.o
+CC	libavfilter/vf_maskedclamp.o
+CC	libavfilter/vf_maskedmerge.o
+CC	libavfilter/vf_maskedminmax.o
+CC	libavfilter/vf_maskedthreshold.o
+CC	libavfilter/vf_maskfun.o
+CC	libavfilter/vf_mcdeint.o
+CC	libavfilter/vf_median.o
+CC	libavfilter/vf_mergeplanes.o
+CC	libavfilter/vf_midequalizer.o
+CC	libavfilter/vf_mestimate.o
+CC	libavfilter/vf_minterpolate.o
+CC	libavfilter/vf_monochrome.o
+CC	libavfilter/vf_mix.o
+CC	libavfilter/vf_mpdecimate.o
+CC	libavfilter/vf_morpho.o
+CC	libavfilter/vf_multiply.o
+CC	libavfilter/vf_negate.o
+CC	libavfilter/vf_neighbor.o
+CC	libavfilter/vf_nlmeans.o
+CC	libavfilter/vf_nlmeans_opencl.o
+CC	libavfilter/vf_neighbor_opencl.o
+CC	libavfilter/vf_noise.o
+CC	libavfilter/vf_nnedi.o
+CC	libavfilter/vf_normalize.o
+CC	libavfilter/vf_null.o
+CC	libavfilter/vf_overlay.o
+CC	libavfilter/vf_overlay_opencl.o
+CC	libavfilter/vf_owdenoise.o
+CC	libavfilter/vf_pad.o
+CC	libavfilter/vf_pad_opencl.o
+CC	libavfilter/vf_palettegen.o
+CC	libavfilter/vf_paletteuse.o
+CC	libavfilter/vf_perspective.o
+CC	libavfilter/vf_phase.o
+CC	libavfilter/vf_photosensitivity.o
+CC	libavfilter/vf_pixdesctest.o
+CC	libavfilter/vf_pixelize.o
+CC	libavfilter/vf_pp.o
+CC	libavfilter/vf_pp7.o
+CC	libavfilter/vf_premultiply.o
+CC	libavfilter/vf_program_opencl.o
+CC	libavfilter/vf_pseudocolor.o
+CC	libavfilter/vf_psnr.o
+CC	libavfilter/vf_pullup.o
+CC	libavfilter/vf_qp.o
+CC	libavfilter/vf_random.o
+CC	libavfilter/vf_readeia608.o
+CC	libavfilter/vf_readvitc.o
+CC	libavfilter/vf_remap_opencl.o
+CC	libavfilter/vf_remap.o
+CC	libavfilter/vf_removegrain.o
+CC	libavfilter/vf_removelogo.o
+CC	libavfilter/vf_repeatfields.o
+CC	libavfilter/vf_sab.o
+CC	libavfilter/vf_rotate.o
+CC	libavfilter/vf_scale.o
+CC	libavfilter/vf_scale_vt.o
+CC	libavfilter/vf_scdet.o
+CC	libavfilter/vf_scroll.o
+CC	libavfilter/vf_selectivecolor.o
+CC	libavfilter/vf_separatefields.o
+CC	libavfilter/vf_setparams.o
+CC	libavfilter/vf_shear.o
+CC	libavfilter/vf_showpalette.o
+CC	libavfilter/vf_showinfo.o
+CC	libavfilter/vf_shuffleframes.o
+CC	libavfilter/vf_shufflepixels.o
+CC	libavfilter/vf_shuffleplanes.o
+CC	libavfilter/vf_signalstats.o
+CC	libavfilter/vf_signature.o
+CC	libavfilter/vf_siti.o
+CC	libavfilter/vf_smartblur.o
+CC	libavfilter/vf_ssim.o
+CC	libavfilter/vf_ssim360.o
+CC	libavfilter/vf_spp.o
+CC	libavfilter/vf_stack.o
+CC	libavfilter/vf_stereo3d.o
+CC	libavfilter/vf_subtitles.o
+CC	libavfilter/vf_super2xsai.o
+CC	libavfilter/vf_swaprect.o
+CC	libavfilter/vf_swapuv.o
+CC	libavfilter/vf_telecine.o
+CC	libavfilter/vf_threshold.o
+CC	libavfilter/vf_thumbnail.o
+CC	libavfilter/vf_tile.o
+CC	libavfilter/vf_tiltandshift.o
+CC	libavfilter/vf_tinterlace.o
+CC	libavfilter/vf_tmidequalizer.o
+CC	libavfilter/vf_tonemap.o
+CC	libavfilter/vf_tonemap_opencl.o
+CC	libavfilter/vf_tpad.o
+CC	libavfilter/vf_transpose.o
+CC	libavfilter/vf_transpose_opencl.o
+CC	libavfilter/vf_transpose_vt.o
+CC	libavfilter/vf_unsharp.o
+CC	libavfilter/vf_unsharp_opencl.o
+CC	libavfilter/vf_uspp.o
+CC	libavfilter/vf_untile.o
+CC	libavfilter/vf_v360.o
+CC	libavfilter/vf_varblur.o
+CC	libavfilter/vf_vaguedenoiser.o
+CC	libavfilter/vf_vflip.o
+CC	libavfilter/vf_vectorscope.o
+CC	libavfilter/vf_vfrdet.o
+CC	libavfilter/vf_vibrance.o
+CC	libavfilter/vf_vif.o
+CC	libavfilter/vf_vignette.o
+CC	libavfilter/vf_vmafmotion.o
+CC	libavfilter/vf_w3fdif.o
+CC	libavfilter/vf_waveform.o
+CC	libavfilter/vf_weave.o
+CC	libavfilter/vf_xbr.o
+CC	libavfilter/vf_xfade.o
+CC	libavfilter/vf_xfade_opencl.o
+CC	libavfilter/vf_xmedian.o
+CC	libavfilter/vf_xpsnr.o
+CC	libavfilter/vf_yadif.o
+OBJCC	libavfilter/vf_yadif_videotoolbox.o
+CC	libavfilter/vf_yaepblur.o
+CC	libavfilter/vf_zoompan.o
+CC	libavfilter/video.o
+CC	libavfilter/vsink_nullsink.o
+CC	libavfilter/vsrc_cellauto.o
+CC	libavfilter/vsrc_gradients.o
+CC	libavfilter/vsrc_mandelbrot.o
+CC	libavfilter/vsrc_life.o
+CC	libavfilter/vsrc_mptestsrc.o
+CC	libavfilter/vsrc_perlin.o
+CC	libavfilter/vsrc_testsrc.o
+CC	libavfilter/vsrc_sierpinski.o
+CC	libavfilter/yadif_common.o
+CC	libavfilter/log2_tab.o
+AS	libswscale/aarch64/hscale.o
+AS	libswscale/aarch64/input.o
+AS	libswscale/aarch64/output.o
+AS	libswscale/aarch64/range_convert_neon.o
+CC	libswscale/aarch64/rgb2rgb.o
+CC	libswscale/aarch64/swscale.o
+AS	libswscale/aarch64/rgb2rgb_neon.o
+CC	libswscale/aarch64/swscale_unscaled.o
+AS	libswscale/aarch64/swscale_unscaled_neon.o
+AS	libswscale/aarch64/yuv2rgb_neon.o
+CC	libswscale/alphablend.o
+CC	libswscale/gamma.o
+CC	libswscale/half2float.o
+CC	libswscale/hscale.o
+CC	libswscale/hscale_fast_bilinear.o
+CC	libswscale/input.o
+CC	libswscale/options.o
+CC	libswscale/output.o
+CC	libswscale/rgb2rgb.o
+CC	libswscale/swscale.o
+CC	libswscale/slice.o
+CC	libswscale/swscale_unscaled.o
+CC	libswscale/utils.o
+CC	libswscale/version.o
+CC	libswscale/vscale.o
+CC	libswscale/yuv2rgb.o
+CC	libswscale/log2_tab.o
+CC	libavutil/aarch64/cpu.o
+CC	libavutil/aarch64/float_dsp_init.o
+AS	libavutil/aarch64/float_dsp_neon.o
+CC	libavutil/aarch64/tx_float_init.o
+AS	libavutil/aarch64/tx_float_neon.o
+CC	libavutil/adler32.o
+CC	libavutil/aes.o
+CC	libavutil/aes_ctr.o
+CC	libavutil/ambient_viewing_environment.o
+CC	libavutil/audio_fifo.o
+CC	libavutil/avsscanf.o
+CC	libavutil/base64.o
+CC	libavutil/avstring.o
+CC	libavutil/blowfish.o
+CC	libavutil/bprint.o
+CC	libavutil/camellia.o
+CC	libavutil/buffer.o
+CC	libavutil/cast5.o
+CC	libavutil/channel_layout.o
+CC	libavutil/cpu.o
+CC	libavutil/crc.o
+CC	libavutil/csp.o
+CC	libavutil/des.o
+CC	libavutil/detection_bbox.o
+CC	libavutil/dict.o
+CC	libavutil/display.o
+CC	libavutil/dovi_meta.o
+CC	libavutil/downmix_info.o
+CC	libavutil/encryption_info.o
+CC	libavutil/error.o
+CC	libavutil/eval.o
+CC	libavutil/executor.o
+CC	libavutil/fifo.o
+CC	libavutil/file.o
+CC	libavutil/file_open.o
+CC	libavutil/film_grain_params.o
+CC	libavutil/fixed_dsp.o
+CC	libavutil/float_dsp.o
+CC	libavutil/frame.o
+CC	libavutil/hash.o
+CC	libavutil/hdr_dynamic_metadata.o
+CC	libavutil/hdr_dynamic_vivid_metadata.o
+CC	libavutil/hmac.o
+CC	libavutil/hwcontext.o
+CC	libavutil/hwcontext_opencl.o
+CC	libavutil/hwcontext_stub.o
+CC	libavutil/hwcontext_videotoolbox.o
+CC	libavutil/iamf.o
+CC	libavutil/imgutils.o
+CC	libavutil/integer.o
+CC	libavutil/intmath.o
+CC	libavutil/lfg.o
+CC	libavutil/lls.o
+CC	libavutil/log.o
+CC	libavutil/log2_tab.o
+CC	libavutil/lzo.o
+CC	libavutil/mastering_display_metadata.o
+CC	libavutil/mathematics.o
+CC	libavutil/md5.o
+CC	libavutil/mem.o
+CC	libavutil/murmur3.o
+CC	libavutil/opt.o
+CC	libavutil/pixdesc.o
+CC	libavutil/parseutils.o
+CC	libavutil/pixelutils.o
+CC	libavutil/random_seed.o
+CC	libavutil/rational.o
+CC	libavutil/rc4.o
+CC	libavutil/ripemd.o
+CC	libavutil/reverse.o
+CC	libavutil/samplefmt.o
+CC	libavutil/sha.o
+CC	libavutil/sha512.o
+CC	libavutil/slicethread.o
+CC	libavutil/spherical.o
+CC	libavutil/stereo3d.o
+CC	libavutil/tea.o
+CC	libavutil/threadmessage.o
+CC	libavutil/time.o
+CC	libavutil/timecode.o
+CC	libavutil/timestamp.o
+CC	libavutil/tree.o
+CC	libavutil/twofish.o
+CC	libavutil/tx.o
+CC	libavutil/tx_double.o
+CC	libavutil/tx_float.o
+CC	libavutil/tx_int32.o
+CC	libavutil/utils.o
+CC	libavutil/uuid.o
+CC	libavutil/version.o
+CC	libavutil/video_enc_params.o
+CC	libavutil/video_hint.o
+CC	libavutil/xga_font_data.o
+CC	libavutil/xtea.o
+CC	libpostproc/postprocess.o
+CC	libpostproc/version.o
+CC	libavformat/3dostr.o
+CC	libavformat/4xm.o
+CC	libavformat/a64.o
+CC	libavformat/aadec.o
+CC	libavformat/aacdec.o
+CC	libavformat/aaxdec.o
+CC	libavformat/ac3dec.o
+CC	libavformat/ac4dec.o
+CC	libavformat/ac4enc.o
+CC	libavformat/acedec.o
+CC	libavformat/acm.o
+CC	libavformat/act.o
+CC	libavformat/ads.o
+CC	libavformat/adtsenc.o
+CC	libavformat/adp.o
+CC	libavformat/adxdec.o
+CC	libavformat/aeadec.o
+CC	libavformat/aeaenc.o
+CC	libavformat/afc.o
+CC	libavformat/aiff.o
+CC	libavformat/aiffdec.o
+CC	libavformat/aiffenc.o
+CC	libavformat/aixdec.o
+CC	libavformat/allformats.o
+CC	libavformat/alp.o
+CC	libavformat/amr.o
+CC	libavformat/amvenc.o
+CC	libavformat/apac.o
+CC	libavformat/anm.o
+CC	libavformat/apc.o
+CC	libavformat/ape.o
+CC	libavformat/apetag.o
+CC	libavformat/apm.o
+CC	libavformat/apngdec.o
+CC	libavformat/apngenc.o
+CC	libavformat/aptxdec.o
+CC	libavformat/aqtitledec.o
+CC	libavformat/argo_asf.o
+CC	libavformat/argo_brp.o
+CC	libavformat/argo_cvg.o
+CC	libavformat/asf.o
+CC	libavformat/asf_tags.o
+CC	libavformat/asfcrypt.o
+CC	libavformat/asfdec_f.o
+CC	libavformat/asfdec_o.o
+CC	libavformat/asfenc.o
+CC	libavformat/assdec.o
+CC	libavformat/ast.o
+CC	libavformat/assenc.o
+CC	libavformat/astdec.o
+CC	libavformat/astenc.o
+CC	libavformat/async.o
+CC	libavformat/au.o
+CC	libavformat/av1.o
+CC	libavformat/av1dec.o
+CC	libavformat/avc.o
+CC	libavformat/avformat.o
+CC	libavformat/avidec.o
+CC	libavformat/avienc.o
+CC	libavformat/avio.o
+CC	libavformat/aviobuf.o
+CC	libavformat/avlanguage.o
+CC	libavformat/avr.o
+CC	libavformat/avs.o
+CC	libavformat/avs2dec.o
+CC	libavformat/avs3dec.o
+CC	libavformat/bethsoftvid.o
+CC	libavformat/bfi.o
+CC	libavformat/bink.o
+CC	libavformat/binka.o
+CC	libavformat/bintext.o
+CC	libavformat/bit.o
+CC	libavformat/bmv.o
+CC	libavformat/boadec.o
+CC	libavformat/bonk.o
+CC	libavformat/brstm.o
+CC	libavformat/c93.o
+CC	libavformat/cache.o
+CC	libavformat/caf.o
+CC	libavformat/cafdec.o
+CC	libavformat/cafenc.o
+CC	libavformat/cavsvideodec.o
+CC	libavformat/cdg.o
+CC	libavformat/cdxl.o
+CC	libavformat/cinedec.o
+CC	libavformat/codec2.o
+CC	libavformat/concat.o
+CC	libavformat/concatdec.o
+CC	libavformat/crcenc.o
+CC	libavformat/crypto.o
+CC	libavformat/dash.o
+CC	libavformat/dashenc.o
+CC	libavformat/data_uri.o
+CC	libavformat/dauddec.o
+CC	libavformat/daudenc.o
+CC	libavformat/dcstr.o
+CC	libavformat/demux.o
+CC	libavformat/demux_utils.o
+CC	libavformat/derf.o
+CC	libavformat/dfa.o
+CC	libavformat/dfpwmdec.o
+CC	libavformat/dhav.o
+CC	libavformat/diracdec.o
+CC	libavformat/dnxhddec.o
+CC	libavformat/dovi_isom.o
+CC	libavformat/dsfdec.o
+CC	libavformat/dsicin.o
+CC	libavformat/dss.o
+CC	libavformat/dtsdec.o
+CC	libavformat/dtshddec.o
+CC	libavformat/dump.o
+CC	libavformat/dv.o
+CC	libavformat/dvbsub.o
+CC	libavformat/dvenc.o
+CC	libavformat/dvbtxt.o
+CC	libavformat/dxa.o
+CC	libavformat/eacdata.o
+CC	libavformat/epafdec.o
+CC	libavformat/electronicarts.o
+CC	libavformat/evc.o
+CC	libavformat/evcdec.o
+CC	libavformat/ffmetadec.o
+CC	libavformat/ffmetaenc.o
+CC	libavformat/fifo.o
+CC	libavformat/file.o
+CC	libavformat/filmstripdec.o
+CC	libavformat/filmstripenc.o
+CC	libavformat/fitsdec.o
+CC	libavformat/fitsenc.o
+CC	libavformat/flacdec.o
+CC	libavformat/flac_picture.o
+CC	libavformat/flacenc_header.o
+CC	libavformat/flacenc.o
+CC	libavformat/flic.o
+CC	libavformat/flvenc.o
+CC	libavformat/flvdec.o
+CC	libavformat/format.o
+CC	libavformat/framecrcenc.o
+CC	libavformat/framehash.o
+CC	libavformat/frmdec.o
+CC	libavformat/fsb.o
+CC	libavformat/ftp.o
+CC	libavformat/fwse.o
+CC	libavformat/g722.o
+CC	libavformat/g723_1.o
+CC	libavformat/g729dec.o
+CC	libavformat/g726.o
+CC	libavformat/gdv.o
+CC	libavformat/genh.o
+CC	libavformat/gif.o
+CC	libavformat/gifdec.o
+CC	libavformat/gopher.o
+CC	libavformat/gsmdec.o
+CC	libavformat/gxf.o
+CC	libavformat/gxfenc.o
+CC	libavformat/h261dec.o
+CC	libavformat/h264dec.o
+CC	libavformat/h263dec.o
+CC	libavformat/hashenc.o
+CC	libavformat/hca.o
+CC	libavformat/hcom.o
+CC	libavformat/hdsenc.o
+CC	libavformat/hevc.o
+CC	libavformat/hevcdec.o
+CC	libavformat/hls.o
+CC	libavformat/hls_sample_encryption.o
+CC	libavformat/hlsenc.o
+CC	libavformat/hlsplaylist.o
+CC	libavformat/hlsproto.o
+CC	libavformat/hnm.o
+CC	libavformat/http.o
+CC	libavformat/iamf.o
+CC	libavformat/iamf_parse.o
+CC	libavformat/httpauth.o
+CC	libavformat/iamf_reader.o
+CC	libavformat/iamf_writer.o
+CC	libavformat/iamfdec.o
+CC	libavformat/iamfenc.o
+CC	libavformat/icecast.o
+CC	libavformat/icodec.o
+CC	libavformat/icoenc.o
+CC	libavformat/id3v1.o
+CC	libavformat/id3v2.o
+CC	libavformat/id3v2enc.o
+CC	libavformat/idroqdec.o
+CC	libavformat/idcin.o
+CC	libavformat/idroqenc.o
+CC	libavformat/iff.o
+CC	libavformat/ifv.o
+CC	libavformat/ilbc.o
+CC	libavformat/img2.o
+CC	libavformat/img2_alias_pix.o
+CC	libavformat/img2_brender_pix.o
+CC	libavformat/img2dec.o
+CC	libavformat/img2enc.o
+CC	libavformat/imx.o
+CC	libavformat/ingenientdec.o
+CC	libavformat/ip.o
+CC	libavformat/ipfsgateway.o
+CC	libavformat/ipmovie.o
+CC	libavformat/ipudec.o
+CC	libavformat/ircam.o
+CC	libavformat/ircamdec.o
+CC	libavformat/ircamenc.o
+CC	libavformat/isom.o
+CC	libavformat/isom_tags.o
+CC	libavformat/iss.o
+CC	libavformat/iv8.o
+CC	libavformat/ivfenc.o
+CC	libavformat/ivfdec.o
+CC	libavformat/jacosubdec.o
+CC	libavformat/jacosubenc.o
+CC	libavformat/jpegxl_anim_dec.o
+CC	libavformat/jvdec.o
+CC	libavformat/kvag.o
+CC	libavformat/lafdec.o
+CC	libavformat/latmenc.o
+CC	libavformat/lc3.o
+CC	libavformat/lmlm4.o
+CC	libavformat/loasdec.o
+CC	libavformat/lrc.o
+CC	libavformat/lrcdec.o
+CC	libavformat/lrcenc.o
+CC	libavformat/luodatdec.o
+CC	libavformat/lvfdec.o
+CC	libavformat/lxfdec.o
+CC	libavformat/m4vdec.o
+CC	libavformat/matroska.o
+CC	libavformat/matroskadec.o
+CC	libavformat/matroskaenc.o
+CC	libavformat/mca.o
+CC	libavformat/mgsts.o
+CC	libavformat/metadata.o
+CC	libavformat/mccdec.o
+CC	libavformat/md5proto.o
+CC	libavformat/microdvddec.o
+CC	libavformat/microdvdenc.o
+CC	libavformat/mj2kdec.o
+CC	libavformat/mkvtimestamp_v2.o
+CC	libavformat/mlpdec.o
+CC	libavformat/mlvdec.o
+CC	libavformat/mm.o
+CC	libavformat/mms.o
+CC	libavformat/mmf.o
+CC	libavformat/mmsh.o
+CC	libavformat/mmst.o
+CC	libavformat/mods.o
+CC	libavformat/moflex.o
+CC	libavformat/mov.o
+CC	libavformat/mov_chan.o
+CC	libavformat/mov_esds.o
+CC	libavformat/movenc.o
+CC	libavformat/movenc_ttml.o
+CC	libavformat/movenccenc.o
+CC	libavformat/movenchint.o
+CC	libavformat/mp3dec.o
+CC	libavformat/mp3enc.o
+CC	libavformat/mpc.o
+CC	libavformat/mpeg.o
+CC	libavformat/mpc8.o
+CC	libavformat/mpegenc.o
+CC	libavformat/mpegts.o
+CC	libavformat/mpegtsenc.o
+CC	libavformat/mpegvideodec.o
+CC	libavformat/mpjpeg.o
+CC	libavformat/mpjpegdec.o
+CC	libavformat/mpl2dec.o
+CC	libavformat/msf.o
+CC	libavformat/mpsubdec.o
+CC	libavformat/msnwc_tcp.o
+CC	libavformat/mspdec.o
+CC	libavformat/mtaf.o
+CC	libavformat/mtv.o
+CC	libavformat/musx.o
+CC	libavformat/mux.o
+CC	libavformat/mux_utils.o
+CC	libavformat/mvdec.o
+CC	libavformat/mvi.o
+CC	libavformat/mxf.o
+CC	libavformat/mxfdec.o
+CC	libavformat/mxfenc.o
+CC	libavformat/mxg.o
+CC	libavformat/nal.o
+CC	libavformat/ncdec.o
+CC	libavformat/network.o
+CC	libavformat/nspdec.o
+CC	libavformat/nistspheredec.o
+CC	libavformat/nsvdec.o
+CC	libavformat/nullenc.o
+CC	libavformat/nut.o
+CC	libavformat/nutdec.o
+CC	libavformat/nutenc.o
+CC	libavformat/nuv.o
+CC	libavformat/oggenc.o
+CC	libavformat/oggdec.o
+CC	libavformat/oggparsecelt.o
+CC	libavformat/oggparsedirac.o
+CC	libavformat/oggparseflac.o
+CC	libavformat/oggparseogm.o
+CC	libavformat/oggparseopus.o
+CC	libavformat/oggparseskeleton.o
+CC	libavformat/oggparsespeex.o
+CC	libavformat/oggparsetheora.o
+CC	libavformat/oggparsevorbis.o
+CC	libavformat/oggparsevp8.o
+CC	libavformat/oma.o
+CC	libavformat/omadec.o
+CC	libavformat/omaenc.o
+CC	libavformat/os_support.o
+CC	libavformat/options.o
+CC	libavformat/osq.o
+CC	libavformat/paf.o
+CC	libavformat/pcm.o
+CC	libavformat/pcmdec.o
+CC	libavformat/pcmenc.o
+CC	libavformat/pdvdec.o
+CC	libavformat/pjsdec.o
+CC	libavformat/pmpdec.o
+CC	libavformat/pp_bnk.o
+CC	libavformat/prompeg.o
+CC	libavformat/protocols.o
+CC	libavformat/psxstr.o
+CC	libavformat/pva.o
+CC	libavformat/pvfdec.o
+CC	libavformat/qcp.o
+CC	libavformat/qoadec.o
+CC	libavformat/qtpalette.o
+CC	libavformat/rawdec.o
+CC	libavformat/r3d.o
+CC	libavformat/rawenc.o
+CC	libavformat/rawutils.o
+CC	libavformat/rawvideodec.o
+CC	libavformat/rcwtdec.o
+CC	libavformat/rcwtenc.o
+CC	libavformat/rdt.o
+CC	libavformat/realtextdec.o
+CC	libavformat/redspark.o
+CC	libavformat/replaygain.o
+CC	libavformat/riff.o
+CC	libavformat/riffdec.o
+CC	libavformat/riffenc.o
+CC	libavformat/rka.o
+CC	libavformat/rl2.o
+CC	libavformat/rm.o
+CC	libavformat/rmdec.o
+CC	libavformat/rmenc.o
+CC	libavformat/rmsipr.o
+CC	libavformat/rpl.o
+CC	libavformat/rsd.o
+CC	libavformat/rso.o
+CC	libavformat/rsodec.o
+CC	libavformat/rsoenc.o
+CC	libavformat/rtmpdigest.o
+CC	libavformat/rtmphttp.o
+CC	libavformat/rtmppkt.o
+CC	libavformat/rtmpproto.o
+CC	libavformat/rtp.o
+CC	libavformat/rtpdec.o
+CC	libavformat/rtpdec_ac3.o
+CC	libavformat/rtpdec_amr.o
+CC	libavformat/rtpdec_asf.o
+CC	libavformat/rtpdec_dv.o
+CC	libavformat/rtpdec_g726.o
+CC	libavformat/rtpdec_h261.o
+CC	libavformat/rtpdec_h263.o
+CC	libavformat/rtpdec_h263_rfc2190.o
+CC	libavformat/rtpdec_h264.o
+CC	libavformat/rtpdec_hevc.o
+CC	libavformat/rtpdec_ilbc.o
+CC	libavformat/rtpdec_jpeg.o
+CC	libavformat/rtpdec_latm.o
+CC	libavformat/rtpdec_mpa_robust.o
+CC	libavformat/rtpdec_mpeg12.o
+CC	libavformat/rtpdec_mpeg4.o
+CC	libavformat/rtpdec_qcelp.o
+CC	libavformat/rtpdec_mpegts.o
+CC	libavformat/rtpdec_qt.o
+CC	libavformat/rtpdec_qdm2.o
+CC	libavformat/rtpdec_rfc4175.o
+CC	libavformat/rtpdec_svq3.o
+CC	libavformat/rtpdec_vc2hq.o
+CC	libavformat/rtpdec_vp8.o
+CC	libavformat/rtpdec_vp9.o
+CC	libavformat/rtpdec_xiph.o
+CC	libavformat/rtpenc_aac.o
+CC	libavformat/rtpenc_amr.o
+CC	libavformat/rtpenc.o
+CC	libavformat/rtpenc_chain.o
+CC	libavformat/rtpenc_h261.o
+CC	libavformat/rtpenc_h263.o
+CC	libavformat/rtpenc_h263_rfc2190.o
+CC	libavformat/rtpenc_h264_hevc.o
+CC	libavformat/rtpenc_jpeg.o
+CC	libavformat/rtpenc_latm.o
+CC	libavformat/rtpenc_mpegts.o
+CC	libavformat/rtpenc_mpv.o
+CC	libavformat/rtpenc_vc2hq.o
+CC	libavformat/rtpenc_rfc4175.o
+CC	libavformat/rtpenc_vp8.o
+CC	libavformat/rtpenc_vp9.o
+CC	libavformat/rtpenc_xiph.o
+CC	libavformat/rtpproto.o
+CC	libavformat/rtsp.o
+CC	libavformat/rtspdec.o
+CC	libavformat/rtspenc.o
+CC	libavformat/s337m.o
+CC	libavformat/samidec.o
+CC	libavformat/sapdec.o
+CC	libavformat/sapenc.o
+CC	libavformat/sauce.o
+CC	libavformat/sbcdec.o
+CC	libavformat/sbgdec.o
+CC	libavformat/sccdec.o
+CC	libavformat/scd.o
+CC	libavformat/sccenc.o
+CC	libavformat/sdns.o
+CC	libavformat/sdp.o
+CC	libavformat/sdr2.o
+CC	libavformat/sdsdec.o
+CC	libavformat/seek.o
+CC	libavformat/sdxdec.o
+CC	libavformat/segafilmenc.o
+CC	libavformat/segment.o
+CC	libavformat/segafilm.o
+CC	libavformat/serdec.o
+CC	libavformat/sga.o
+CC	libavformat/shortendec.o
+CC	libavformat/sierravmd.o
+CC	libavformat/siff.o
+CC	libavformat/smacker.o
+CC	libavformat/smjpegdec.o
+CC	libavformat/smjpeg.o
+CC	libavformat/smjpegenc.o
+CC	libavformat/smoothstreamingenc.o
+CC	libavformat/smush.o
+CC	libavformat/sol.o
+CC	libavformat/soxenc.o
+CC	libavformat/soxdec.o
+CC	libavformat/spdif.o
+CC	libavformat/spdifdec.o
+CC	libavformat/spdifenc.o
+CC	libavformat/srtdec.o
+CC	libavformat/srtp.o
+CC	libavformat/srtenc.o
+CC	libavformat/srtpproto.o
+CC	libavformat/stldec.o
+CC	libavformat/subfile.o
+CC	libavformat/subtitles.o
+CC	libavformat/subviewer1dec.o
+CC	libavformat/subviewerdec.o
+CC	libavformat/supdec.o
+CC	libavformat/supenc.o
+CC	libavformat/svag.o
+CC	libavformat/svs.o
+CC	libavformat/swfdec.o
+CC	libavformat/swf.o
+CC	libavformat/swfenc.o
+CC	libavformat/takdec.o
+CC	libavformat/tcp.o
+CC	libavformat/tedcaptionsdec.o
+CC	libavformat/tee.o
+CC	libavformat/tee_common.o
+CC	libavformat/teeproto.o
+CC	libavformat/thp.o
+CC	libavformat/tls.o
+CC	libavformat/tiertexseq.o
+CC	libavformat/tls_securetransport.o
+CC	libavformat/tmv.o
+CC	libavformat/tta.o
+CC	libavformat/ttaenc.o
+CC	libavformat/tty.o
+CC	libavformat/ttmlenc.o
+CC	libavformat/txd.o
+CC	libavformat/ty.o
+CC	libavformat/udp.o
+CC	libavformat/uncodedframecrcenc.o
+CC	libavformat/unix.o
+CC	libavformat/url.o
+CC	libavformat/urldecode.o
+CC	libavformat/usmdec.o
+CC	libavformat/utils.o
+CC	libavformat/vag.o
+CC	libavformat/vc1dec.o
+CC	libavformat/vc1test.o
+CC	libavformat/vc1testenc.o
+CC	libavformat/version.o
+CC	libavformat/vividas.o
+CC	libavformat/vivo.o
+CC	libavformat/voc.o
+CC	libavformat/voc_packet.o
+CC	libavformat/vocdec.o
+CC	libavformat/vocenc.o
+CC	libavformat/vorbiscomment.o
+CC	libavformat/vpcc.o
+CC	libavformat/vpk.o
+CC	libavformat/vplayerdec.o
+CC	libavformat/vqf.o
+CC	libavformat/vvc.o
+CC	libavformat/vvcdec.o
+CC	libavformat/w64.o
+CC	libavformat/wady.o
+CC	libavformat/wavarc.o
+CC	libavformat/wavdec.o
+CC	libavformat/wavenc.o
+CC	libavformat/wc3movie.o
+CC	libavformat/webm_chunk.o
+CC	libavformat/webmdashenc.o
+CC	libavformat/webpenc.o
+CC	libavformat/webvttdec.o
+CC	libavformat/webvttenc.o
+CC	libavformat/westwood_audenc.o
+CC	libavformat/westwood_aud.o
+CC	libavformat/westwood_vqa.o
+CC	libavformat/wsddec.o
+CC	libavformat/wtv_common.o
+CC	libavformat/wtvdec.o
+CC	libavformat/wtvenc.o
+CC	libavformat/wv.o
+CC	libavformat/wvdec.o
+CC	libavformat/wvedec.o
+CC	libavformat/wvenc.o
+CC	libavformat/xa.o
+CC	libavformat/xmv.o
+CC	libavformat/xmd.o
+CC	libavformat/xvag.o
+CC	libavformat/xwma.o
+CC	libavformat/yop.o
+CC	libavformat/yuv4mpegdec.o
+CC	libavformat/yuv4mpegenc.o
+CC	libavformat/ac3_channel_layout_tab.o
+CC	libavformat/dca_sample_rate_tab.o
+CC	libavformat/golomb_tab.o
+CC	libavformat/jpegtables.o
+CC	libavformat/jpegxl_parse.o
+CC	libavformat/log2_tab.o
+CC	libavformat/mpeg4audio_sample_rates.o
+CC	libavformat/mpegaudiotabs.o
+CC	libavformat/rangecoder_dec.o
+CC	libavformat/to_upper4.o
+CC	libavcodec/012v.o
+CC	libavcodec/4xm.o
+CC	libavcodec/8bps.o
+CC	libavcodec/8svx.o
+CC	libavcodec/a64multienc.o
+CC	libavcodec/aac/aacdec.o
+CC	libavcodec/aac/aacdec_ac.o
+CC	libavcodec/aac/aacdec_fixed.o
+CC	libavcodec/aac/aacdec_float.o
+CC	libavcodec/aac/aacdec_lpd.o
+CC	libavcodec/aac/aacdec_tab.o
+CC	libavcodec/aac/aacdec_usac.o
+CC	libavcodec/aac_ac3_parser.o
+CC	libavcodec/aac_parser.o
+CC	libavcodec/aaccoder.o
+CC	libavcodec/aacenc.o
+CC	libavcodec/aacenc_is.o
+CC	libavcodec/aacenc_ltp.o
+CC	libavcodec/aacenc_pred.o
+CC	libavcodec/aacenc_tns.o
+CC	libavcodec/aacenctab.o
+CC	libavcodec/aacps_common.o
+CC	libavcodec/aacps_fixed.o
+CC	libavcodec/aacps_float.o
+CC	libavcodec/aacpsdsp_fixed.o
+CC	libavcodec/aacpsdsp_float.o
+CC	libavcodec/aacpsy.o
+CC	libavcodec/aacsbr.o
+CC	libavcodec/aacsbr_fixed.o
+CC	libavcodec/aactab.o
+CC	libavcodec/aandcttab.o
+CC	libavcodec/aarch64/aacpsdsp_init_aarch64.o
+AS	libavcodec/aarch64/aacpsdsp_neon.o
+CC	libavcodec/aarch64/ac3dsp_init_aarch64.o
+AS	libavcodec/aarch64/ac3dsp_neon.o
+CC	libavcodec/aarch64/fdctdsp_init_aarch64.o
+AS	libavcodec/aarch64/fdctdsp_neon.o
+CC	libavcodec/aarch64/fmtconvert_init.o
+AS	libavcodec/aarch64/fmtconvert_neon.o
+AS	libavcodec/aarch64/h264cmc_neon.o
+CC	libavcodec/aarch64/h264chroma_init_aarch64.o
+CC	libavcodec/aarch64/h264dsp_init_aarch64.o
+AS	libavcodec/aarch64/h264dsp_neon.o
+AS	libavcodec/aarch64/h264idct_neon.o
+CC	libavcodec/aarch64/h264pred_init.o
+AS	libavcodec/aarch64/h264pred_neon.o
+CC	libavcodec/aarch64/h264qpel_init_aarch64.o
+AS	libavcodec/aarch64/h264qpel_neon.o
+AS	libavcodec/aarch64/h26x/epel_neon.o
+AS	libavcodec/aarch64/h26x/qpel_neon.o
+AS	libavcodec/aarch64/h26x/sao_neon.o
+AS	libavcodec/aarch64/hevcdsp_deblock_neon.o
+AS	libavcodec/aarch64/hevcdsp_idct_neon.o
+CC	libavcodec/aarch64/hevcdsp_init_aarch64.o
+CC	libavcodec/aarch64/hpeldsp_init_aarch64.o
+AS	libavcodec/aarch64/hpeldsp_neon.o
+CC	libavcodec/aarch64/idctdsp_init_aarch64.o
+AS	libavcodec/aarch64/idctdsp_neon.o
+CC	libavcodec/aarch64/me_cmp_init_aarch64.o
+AS	libavcodec/aarch64/me_cmp_neon.o
+CC	libavcodec/aarch64/mpegaudiodsp_init.o
+AS	libavcodec/aarch64/mpegaudiodsp_neon.o
+AS	libavcodec/aarch64/mpegvideoencdsp_neon.o
+CC	libavcodec/aarch64/mpegvideoencdsp_init.o
+CC	libavcodec/aarch64/opusdsp_init.o
+AS	libavcodec/aarch64/opusdsp_neon.o
+AS	libavcodec/aarch64/pixblockdsp_neon.o
+CC	libavcodec/aarch64/pixblockdsp_init_aarch64.o
+CC	libavcodec/aarch64/rv40dsp_init_aarch64.o
+CC	libavcodec/aarch64/sbrdsp_init_aarch64.o
+AS	libavcodec/aarch64/sbrdsp_neon.o
+AS	libavcodec/aarch64/simple_idct_neon.o
+CC	libavcodec/aarch64/synth_filter_init.o
+CC	libavcodec/aarch64/vc1dsp_init_aarch64.o
+AS	libavcodec/aarch64/synth_filter_neon.o
+AS	libavcodec/aarch64/vc1dsp_neon.o
+AS	libavcodec/aarch64/videodsp.o
+CC	libavcodec/aarch64/videodsp_init.o
+CC	libavcodec/aarch64/vorbisdsp_init.o
+AS	libavcodec/aarch64/vorbisdsp_neon.o
+CC	libavcodec/aarch64/vp8dsp_init_aarch64.o
+AS	libavcodec/aarch64/vp8dsp_neon.o
+CC	libavcodec/aarch64/vp9dsp_init_10bpp_aarch64.o
+CC	libavcodec/aarch64/vp9dsp_init_12bpp_aarch64.o
+CC	libavcodec/aarch64/vp9dsp_init_aarch64.o
+AS	libavcodec/aarch64/vp9itxfm_16bpp_neon.o
+AS	libavcodec/aarch64/vp9itxfm_neon.o
+AS	libavcodec/aarch64/vp9lpf_16bpp_neon.o
+AS	libavcodec/aarch64/vp9lpf_neon.o
+AS	libavcodec/aarch64/vp9mc_16bpp_neon.o
+AS	libavcodec/aarch64/vp9mc_aarch64.o
+AS	libavcodec/aarch64/vp9mc_neon.o
+AS	libavcodec/aarch64/vvc/alf.o
+CC	libavcodec/aarch64/vvc/dsp_init.o
+AS	libavcodec/aarch64/vvc/inter.o
+AS	libavcodec/aarch64/vvc/sad.o
+CC	libavcodec/aasc.o
+CC	libavcodec/ac3.o
+CC	libavcodec/ac3_channel_layout_tab.o
+CC	libavcodec/ac3dec_fixed.o
+CC	libavcodec/ac3_parser.o
+CC	libavcodec/ac3dec_data.o
+CC	libavcodec/ac3dec_float.o
+CC	libavcodec/ac3dsp.o
+CC	libavcodec/ac3enc.o
+CC	libavcodec/ac3enc_fixed.o
+CC	libavcodec/ac3enc_float.o
+CC	libavcodec/ac3tab.o
+CC	libavcodec/acelp_filters.o
+CC	libavcodec/acelp_pitch_delay.o
+CC	libavcodec/acelp_vectors.o
+CC	libavcodec/adpcm.o
+CC	libavcodec/adpcm_data.o
+CC	libavcodec/adpcmenc.o
+CC	libavcodec/adts_header.o
+CC	libavcodec/adts_parser.o
+CC	libavcodec/adx.o
+CC	libavcodec/adx_parser.o
+CC	libavcodec/adxdec.o
+CC	libavcodec/adxenc.o
+CC	libavcodec/agm.o
+CC	libavcodec/aic.o
+CC	libavcodec/alac.o
+CC	libavcodec/alac_data.o
+CC	libavcodec/alacdsp.o
+CC	libavcodec/alacenc.o
+CC	libavcodec/aliaspixdec.o
+CC	libavcodec/aliaspixenc.o
+CC	libavcodec/allcodecs.o
+CC	libavcodec/amr_parser.o
+CC	libavcodec/alsdec.o
+CC	libavcodec/amrnbdec.o
+CC	libavcodec/amrwbdec.o
+CC	libavcodec/anm.o
+CC	libavcodec/ansi.o
+CC	libavcodec/aom_film_grain.o
+CC	libavcodec/apedec.o
+CC	libavcodec/apac.o
+CC	libavcodec/aptx.o
+CC	libavcodec/aptxdec.o
+CC	libavcodec/aptxenc.o
+CC	libavcodec/arbc.o
+CC	libavcodec/argo.o
+CC	libavcodec/ass.o
+CC	libavcodec/ass_split.o
+CC	libavcodec/assdec.o
+CC	libavcodec/assenc.o
+CC	libavcodec/asv.o
+CC	libavcodec/asvdec.o
+CC	libavcodec/asvenc.o
+CC	libavcodec/atrac.o
+CC	libavcodec/atrac1.o
+CC	libavcodec/atrac3plus.o
+CC	libavcodec/atrac3.o
+CC	libavcodec/atrac3plusdec.o
+CC	libavcodec/atrac3plusdsp.o
+CC	libavcodec/atrac9dec.o
+CC	libavcodec/atsc_a53.o
+CC	libavcodec/audio_frame_queue.o
+CC	libavcodec/audiodsp.o
+CC	libavcodec/audiotoolboxdec.o
+CC	libavcodec/audiotoolboxenc.o
+CC	libavcodec/aura.o
+CC	libavcodec/av1_parser.o
+CC	libavcodec/av1_parse.o
+CC	libavcodec/av1dec.o
+CC	libavcodec/avcodec.o
+CC	libavcodec/avfft.o
+CC	libavcodec/avdct.o
+CC	libavcodec/avrndec.o
+CC	libavcodec/avs.o
+CC	libavcodec/avs2.o
+CC	libavcodec/avs2_parser.o
+CC	libavcodec/avs3_parser.o
+CC	libavcodec/avuidec.o
+CC	libavcodec/avuienc.o
+CC	libavcodec/bethsoftvideo.o
+CC	libavcodec/bgmc.o
+CC	libavcodec/bfi.o
+CC	libavcodec/bink.o
+CC	libavcodec/binkaudio.o
+CC	libavcodec/binkdsp.o
+CC	libavcodec/bintext.o
+CC	libavcodec/bitpacked_dec.o
+CC	libavcodec/bitpacked_enc.o
+CC	libavcodec/bitstream.o
+CC	libavcodec/bitstream_filters.o
+CC	libavcodec/bmp.o
+CC	libavcodec/blockdsp.o
+CC	libavcodec/bmp_parser.o
+CC	libavcodec/bmpenc.o
+CC	libavcodec/bmvaudio.o
+CC	libavcodec/bmvvideo.o
+CC	libavcodec/bonk.o
+CC	libavcodec/brenderpix.o
+CC	libavcodec/bsf.o
+CC	libavcodec/bsf/aac_adtstoasc.o
+CC	libavcodec/bsf/av1_frame_merge.o
+CC	libavcodec/bsf/av1_frame_split.o
+CC	libavcodec/bsf/av1_metadata.o
+CC	libavcodec/bsf/chomp.o
+CC	libavcodec/bsf/dca_core.o
+CC	libavcodec/bsf/dovi_rpu.o
+CC	libavcodec/bsf/dts2pts.o
+CC	libavcodec/bsf/dump_extradata.o
+CC	libavcodec/bsf/dv_error_marker.o
+CC	libavcodec/bsf/eac3_core.o
+CC	libavcodec/bsf/evc_frame_merge.o
+CC	libavcodec/bsf/extract_extradata.o
+CC	libavcodec/bsf/filter_units.o
+CC	libavcodec/bsf/h264_metadata.o
+CC	libavcodec/bsf/h264_mp4toannexb.o
+CC	libavcodec/bsf/h264_redundant_pps.o
+CC	libavcodec/bsf/h265_metadata.o
+CC	libavcodec/bsf/h266_metadata.o
+CC	libavcodec/bsf/hapqa_extract.o
+CC	libavcodec/bsf/hevc_mp4toannexb.o
+CC	libavcodec/bsf/imx_dump_header.o
+CC	libavcodec/bsf/media100_to_mjpegb.o
+CC	libavcodec/bsf/mjpeg2jpeg.o
+CC	libavcodec/bsf/mjpega_dump_header.o
+CC	libavcodec/bsf/movsub.o
+CC	libavcodec/bsf/mpeg2_metadata.o
+CC	libavcodec/bsf/mpeg4_unpack_bframes.o
+CC	libavcodec/bsf/opus_metadata.o
+CC	libavcodec/bsf/noise.o
+CC	libavcodec/bsf/null.o
+CC	libavcodec/bsf/pcm_rechunk.o
+CC	libavcodec/bsf/pgs_frame_merge.o
+CC	libavcodec/bsf/prores_metadata.o
+CC	libavcodec/bsf/remove_extradata.o
+CC	libavcodec/bsf/setts.o
+CC	libavcodec/bsf/showinfo.o
+CC	libavcodec/bsf/trace_headers.o
+CC	libavcodec/bsf/truehd_core.o
+CC	libavcodec/bsf/vp9_metadata.o
+CC	libavcodec/bsf/vp9_raw_reorder.o
+CC	libavcodec/bsf/vp9_superframe.o
+CC	libavcodec/bsf/vp9_superframe_split.o
+CC	libavcodec/bsf/vvc_mp4toannexb.o
+CC	libavcodec/bswapdsp.o
+CC	libavcodec/c93.o
+CC	libavcodec/canopus.o
+CC	libavcodec/cabac.o
+CC	libavcodec/cavs.o
+CC	libavcodec/cavs_parser.o
+CC	libavcodec/cavsdata.o
+CC	libavcodec/cavsdec.o
+CC	libavcodec/cavsdsp.o
+CC	libavcodec/cbrt_data.o
+CC	libavcodec/cbrt_data_fixed.o
+CC	libavcodec/cbs.o
+CC	libavcodec/cbs_av1.o
+CC	libavcodec/cbs_bsf.o
+CC	libavcodec/cbs_h2645.o
+CC	libavcodec/cbs_mpeg2.o
+CC	libavcodec/cbs_vp8.o
+CC	libavcodec/cbs_sei.o
+CC	libavcodec/cbs_vp9.o
+CC	libavcodec/cdgraphics.o
+CC	libavcodec/ccaption_dec.o
+CC	libavcodec/cdtoons.o
+CC	libavcodec/cdxl.o
+CC	libavcodec/celp_filters.o
+CC	libavcodec/celp_math.o
+CC	libavcodec/cfhd.o
+CC	libavcodec/cfhddata.o
+CC	libavcodec/cfhddsp.o
+CC	libavcodec/cfhdenc.o
+CC	libavcodec/cfhdencdsp.o
+CC	libavcodec/cga_data.o
+CC	libavcodec/cinepak.o
+CC	libavcodec/cinepakenc.o
+CC	libavcodec/clearvideo.o
+CC	libavcodec/cljrdec.o
+CC	libavcodec/cljrenc.o
+CC	libavcodec/cllc.o
+CC	libavcodec/cngdec.o
+CC	libavcodec/cngenc.o
+CC	libavcodec/codec_desc.o
+CC	libavcodec/codec_par.o
+CC	libavcodec/container_fifo.o
+CC	libavcodec/cook.o
+CC	libavcodec/cook_parser.o
+CC	libavcodec/cpia.o
+CC	libavcodec/cri.o
+CC	libavcodec/cri_parser.o
+CC	libavcodec/cscd.o
+CC	libavcodec/d3d11va.o
+CC	libavcodec/cyuv.o
+CC	libavcodec/dca.o
+CC	libavcodec/dca_core.o
+CC	libavcodec/dca_exss.o
+CC	libavcodec/dca_lbr.o
+CC	libavcodec/dca_parser.o
+CC	libavcodec/dca_sample_rate_tab.o
+CC	libavcodec/dca_xll.o
+CC	libavcodec/dcaadpcm.o
+CC	libavcodec/dcadata.o
+CC	libavcodec/dcadct.o
+CC	libavcodec/dcadec.o
+CC	libavcodec/dcadsp.o
+CC	libavcodec/dcaenc.o
+CC	libavcodec/dcahuff.o
+CC	libavcodec/dct32_fixed.o
+CC	libavcodec/dct32_float.o
+CC	libavcodec/dds.o
+CC	libavcodec/decode.o
+CC	libavcodec/dfpwmdec.o
+CC	libavcodec/dfa.o
+CC	libavcodec/dfpwmenc.o
+CC	libavcodec/dirac.o
+CC	libavcodec/dirac_arith.o
+CC	libavcodec/dirac_dwt.o
+CC	libavcodec/dirac_parser.o
+CC	libavcodec/dirac_vlc.o
+CC	libavcodec/diracdec.o
+CC	libavcodec/diracdsp.o
+CC	libavcodec/diractab.o
+CC	libavcodec/dnxhd_parser.o
+CC	libavcodec/dnxhddata.o
+CC	libavcodec/dnxhddec.o
+CC	libavcodec/dnxhdenc.o
+CC	libavcodec/dolby_e.o
+CC	libavcodec/dolby_e_parse.o
+CC	libavcodec/dolby_e_parser.o
+CC	libavcodec/dovi_rpu.o
+CC	libavcodec/dovi_rpudec.o
+CC	libavcodec/dovi_rpuenc.o
+CC	libavcodec/dpcm.o
+CC	libavcodec/dpx.o
+CC	libavcodec/dpx_parser.o
+CC	libavcodec/dpxenc.o
+CC	libavcodec/dsd.o
+CC	libavcodec/dsddec.o
+CC	libavcodec/dsicinaudio.o
+CC	libavcodec/dsicinvideo.o
+CC	libavcodec/dss_sp.o
+CC	libavcodec/dstdec.o
+CC	libavcodec/dv_profile.o
+CC	libavcodec/dv.o
+CC	libavcodec/dvaudio_parser.o
+CC	libavcodec/dvaudiodec.o
+CC	libavcodec/dvbsub_parser.o
+CC	libavcodec/dvbsubdec.o
+CC	libavcodec/dvbsubenc.o
+CC	libavcodec/dvd_nav_parser.o
+CC	libavcodec/dvdata.o
+CC	libavcodec/dvdec.o
+CC	libavcodec/dvdsub.o
+CC	libavcodec/dvdsub_parser.o
+CC	libavcodec/dvdsubdec.o
+CC	libavcodec/dvdsubenc.o
+CC	libavcodec/dvenc.o
+CC	libavcodec/dxa.o
+CC	libavcodec/dxtory.o
+CC	libavcodec/dxv.o
+CC	libavcodec/dxvenc.o
+CC	libavcodec/dynamic_hdr_vivid.o
+CC	libavcodec/eac3_data.o
+CC	libavcodec/eac3enc.o
+CC	libavcodec/eacmv.o
+CC	libavcodec/eaidct.o
+CC	libavcodec/eamad.o
+CC	libavcodec/eatgv.o
+CC	libavcodec/eatgq.o
+CC	libavcodec/eatqi.o
+CC	libavcodec/elbg.o
+CC	libavcodec/elsdec.o
+CC	libavcodec/error_resilience.o
+CC	libavcodec/encode.o
+CC	libavcodec/escape124.o
+CC	libavcodec/escape130.o
+CC	libavcodec/evc_parse.o
+CC	libavcodec/evc_parser.o
+CC	libavcodec/evc_ps.o
+CC	libavcodec/evrcdec.o
+CC	libavcodec/exif.o
+CC	libavcodec/exrdsp.o
+CC	libavcodec/exr.o
+CC	libavcodec/exrenc.o
+CC	libavcodec/faanidct.o
+CC	libavcodec/faandct.o
+CC	libavcodec/fastaudio.o
+CC	libavcodec/fdctdsp.o
+CC	libavcodec/faxcompr.o
+CC	libavcodec/ffv1.o
+CC	libavcodec/ffv1dec.o
+CC	libavcodec/ffv1enc.o
+CC	libavcodec/ffwavesynth.o
+CC	libavcodec/fic.o
+CC	libavcodec/fits.o
+CC	libavcodec/fitsdec.o
+CC	libavcodec/fitsenc.o
+CC	libavcodec/flac.o
+CC	libavcodec/flac_parser.o
+CC	libavcodec/flacdata.o
+CC	libavcodec/flacdec.o
+CC	libavcodec/flacdsp.o
+CC	libavcodec/flacenc.o
+CC	libavcodec/flacencdsp.o
+CC	libavcodec/flashsv.o
+CC	libavcodec/flashsv2enc.o
+CC	libavcodec/float2half.o
+CC	libavcodec/flicvideo.o
+CC	libavcodec/flashsvenc.o
+CC	libavcodec/flvdec.o
+CC	libavcodec/flvenc.o
+CC	libavcodec/fmtconvert.o
+CC	libavcodec/fmvc.o
+CC	libavcodec/frame_thread_encoder.o
+CC	libavcodec/fraps.o
+CC	libavcodec/frwu.o
+CC	libavcodec/ftr.o
+CC	libavcodec/ftr_parser.o
+CC	libavcodec/g2meet.o
+CC	libavcodec/g722.o
+CC	libavcodec/g722dsp.o
+CC	libavcodec/g722dec.o
+CC	libavcodec/g722enc.o
+CC	libavcodec/g723_1.o
+CC	libavcodec/g723_1_parser.o
+CC	libavcodec/g723_1dec.o
+CC	libavcodec/g723_1enc.o
+CC	libavcodec/g726.o
+CC	libavcodec/g729_parser.o
+CC	libavcodec/g729dec.o
+CC	libavcodec/g729postfilter.o
+CC	libavcodec/gdv.o
+CC	libavcodec/gemdec.o
+CC	libavcodec/gif.o
+CC	libavcodec/get_buffer.o
+CC	libavcodec/gif_parser.o
+CC	libavcodec/gifdec.o
+CC	libavcodec/golomb.o
+CC	libavcodec/gsm_parser.o
+CC	libavcodec/gsmdec.o
+CC	libavcodec/gsmdec_data.o
+CC	libavcodec/h261.o
+CC	libavcodec/h261_parser.o
+CC	libavcodec/h261data.o
+CC	libavcodec/h261dec.o
+CC	libavcodec/h261enc.o
+CC	libavcodec/h263.o
+CC	libavcodec/h263_parser.o
+CC	libavcodec/h263data.o
+CC	libavcodec/h263dec.o
+CC	libavcodec/h263dsp.o
+CC	libavcodec/h2645_parse.o
+CC	libavcodec/h2645_sei.o
+CC	libavcodec/h2645_vui.o
+CC	libavcodec/h2645data.o
+CC	libavcodec/h264_cabac.o
+CC	libavcodec/h264_cavlc.o
+CC	libavcodec/h264_levels.o
+CC	libavcodec/h264_direct.o
+CC	libavcodec/h264_loopfilter.o
+CC	libavcodec/h264_mb.o
+CC	libavcodec/h264_parse.o
+CC	libavcodec/h264_parser.o
+CC	libavcodec/h264_picture.o
+CC	libavcodec/h264_refs.o
+CC	libavcodec/h264_ps.o
+CC	libavcodec/h264_sei.o
+CC	libavcodec/h264_slice.o
+CC	libavcodec/h264chroma.o
+CC	libavcodec/h264data.o
+CC	libavcodec/h264dec.o
+CC	libavcodec/h264dsp.o
+CC	libavcodec/h264idct.o
+CC	libavcodec/h264pred.o
+CC	libavcodec/h264qpel.o
+CC	libavcodec/h265_profile_level.o
+CC	libavcodec/h274.o
+CC	libavcodec/half2float.o
+CC	libavcodec/hap.o
+CC	libavcodec/hapdec.o
+CC	libavcodec/hapenc.o
+CC	libavcodec/hcadec.o
+CC	libavcodec/hcom.o
+CC	libavcodec/hdr_parser.o
+CC	libavcodec/hdrdec.o
+CC	libavcodec/hdrenc.o
+CC	libavcodec/hevc/cabac.o
+CC	libavcodec/hevc/data.o
+CC	libavcodec/hevc/dsp.o
+CC	libavcodec/hevc/filter.o
+CC	libavcodec/hevc/hevcdec.o
+CC	libavcodec/hevc/mvs.o
+CC	libavcodec/hevc/parse.o
+CC	libavcodec/hevc/parser.o
+CC	libavcodec/hevc/pred.o
+CC	libavcodec/hevc/ps.o
+CC	libavcodec/hevc/refs.o
+CC	libavcodec/hevc/sei.o
+CC	libavcodec/hnm4video.o
+CC	libavcodec/hpeldsp.o
+CC	libavcodec/hq_hqa.o
+CC	libavcodec/hq_hqadsp.o
+CC	libavcodec/hqx.o
+CC	libavcodec/hqxdsp.o
+CC	libavcodec/hqxvlc.o
+CC	libavcodec/htmlsubtitles.o
+CC	libavcodec/huffman.o
+CC	libavcodec/huffyuv.o
+CC	libavcodec/huffyuvdec.o
+CC	libavcodec/huffyuvdsp.o
+CC	libavcodec/huffyuvenc.o
+CC	libavcodec/huffyuvencdsp.o
+CC	libavcodec/idcinvideo.o
+CC	libavcodec/idctdsp.o
+CC	libavcodec/iff.o
+CC	libavcodec/iirfilter.o
+CC	libavcodec/ilbcdec.o
+CC	libavcodec/imc.o
+CC	libavcodec/imgconvert.o
+CC	libavcodec/imm5.o
+CC	libavcodec/imm4.o
+CC	libavcodec/imx.o
+CC	libavcodec/indeo2.o
+CC	libavcodec/indeo3.o
+CC	libavcodec/indeo4.o
+CC	libavcodec/indeo5.o
+CC	libavcodec/intelh263dec.o
+CC	libavcodec/interplayacm.o
+CC	libavcodec/interplayvideo.o
+CC	libavcodec/intrax8.o
+CC	libavcodec/intrax8dsp.o
+CC	libavcodec/ipu_parser.o
+CC	libavcodec/ituh263dec.o
+CC	libavcodec/ituh263enc.o
+CC	libavcodec/ivi.o
+CC	libavcodec/ivi_dsp.o
+CC	libavcodec/j2kenc.o
+CC	libavcodec/jacosubdec.o
+CC	libavcodec/jfdctfst.o
+CC	libavcodec/jfdctint.o
+CC	libavcodec/jni.o
+CC	libavcodec/jpeg2000.o
+CC	libavcodec/jpeg2000_parser.o
+CC	libavcodec/jpeg2000dec.o
+CC	libavcodec/jpeg2000dsp.o
+CC	libavcodec/jpeg2000dwt.o
+CC	libavcodec/jpeg2000htdec.o
+CC	libavcodec/jpegls.o
+CC	libavcodec/jpeglsdec.o
+CC	libavcodec/jpegquanttables.o
+CC	libavcodec/jpeglsenc.o
+CC	libavcodec/jpegtables.o
+CC	libavcodec/jpegxl_parser.o
+CC	libavcodec/jpegxl_parse.o
+CC	libavcodec/jrevdct.o
+CC	libavcodec/jvdec.o
+CC	libavcodec/kgv1dec.o
+CC	libavcodec/kbdwin.o
+CC	libavcodec/kmvc.o
+CC	libavcodec/lagarith.o
+CC	libavcodec/lagarithrac.o
+CC	libavcodec/latm_parser.o
+CC	libavcodec/lcevcdec.o
+CC	libavcodec/lcldec.o
+CC	libavcodec/leaddec.o
+CC	libavcodec/lclenc.o
+CC	libavcodec/libaom.o
+CC	libavcodec/libaomdec.o
+CC	libavcodec/libaomenc.o
+CC	libavcodec/libdav1d.o
+CC	libavcodec/libmp3lame.o
+CC	libavcodec/libopus.o
+CC	libavcodec/libopusdec.o
+CC	libavcodec/libopusenc.o
+CC	libavcodec/libtheoraenc.o
+CC	libavcodec/libvorbisdec.o
+CC	libavcodec/libvorbisenc.o
+CC	libavcodec/libvpxdec.o
+CC	libavcodec/libvpxenc.o
+CC	libavcodec/libx264.o
+CC	libavcodec/libx265.o
+CC	libavcodec/ljpegenc.o
+CC	libavcodec/loco.o
+CC	libavcodec/lossless_audiodsp.o
+CC	libavcodec/lossless_videodsp.o
+CC	libavcodec/lossless_videoencdsp.o
+CC	libavcodec/lpc.o
+CC	libavcodec/lscrdec.o
+CC	libavcodec/lsp.o
+CC	libavcodec/lzf.o
+CC	libavcodec/lzw.o
+CC	libavcodec/lzwenc.o
+CC	libavcodec/m101.o
+CC	libavcodec/mace.o
+CC	libavcodec/magicyuv.o
+CC	libavcodec/magicyuvenc.o
+CC	libavcodec/mathtables.o
+CC	libavcodec/mdec.o
+CC	libavcodec/me_cmp.o
+CC	libavcodec/mediacodec.o
+CC	libavcodec/metasound.o
+CC	libavcodec/microdvddec.o
+CC	libavcodec/midivid.o
+CC	libavcodec/mimic.o
+CC	libavcodec/misc4.o
+CC	libavcodec/misc4_parser.o
+CC	libavcodec/mjpeg_parser.o
+CC	libavcodec/mjpegbdec.o
+CC	libavcodec/mjpegdec.o
+CC	libavcodec/mjpegdec_common.o
+CC	libavcodec/mjpegenc.o
+CC	libavcodec/mjpegenc_common.o
+CC	libavcodec/mjpegenc_huffman.o
+CC	libavcodec/mlp.o
+CC	libavcodec/mlp_parse.o
+CC	libavcodec/mlp_parser.o
+CC	libavcodec/mlpdec.o
+CC	libavcodec/mlpdsp.o
+CC	libavcodec/mlpenc.o
+CC	libavcodec/mlz.o
+CC	libavcodec/mmvideo.o
+CC	libavcodec/mobiclip.o
+CC	libavcodec/motion_est.o
+CC	libavcodec/motionpixels.o
+CC	libavcodec/movtextdec.o
+CC	libavcodec/movtextenc.o
+CC	libavcodec/mpc.o
+CC	libavcodec/mpc7.o
+CC	libavcodec/mpc8.o
+CC	libavcodec/mpeg12.o
+CC	libavcodec/mpeg12data.o
+CC	libavcodec/mpeg12dec.o
+CC	libavcodec/mpeg12enc.o
+CC	libavcodec/mpeg4audio.o
+CC	libavcodec/mpeg12framerate.o
+CC	libavcodec/mpeg4video.o
+CC	libavcodec/mpeg4audio_sample_rates.o
+CC	libavcodec/mpeg4video_parser.o
+CC	libavcodec/mpeg4videodec.o
+CC	libavcodec/mpeg4videodsp.o
+CC	libavcodec/mpeg4videoenc.o
+CC	libavcodec/mpeg_er.o
+CC	libavcodec/mpegaudio.o
+CC	libavcodec/mpegaudio_parser.o
+CC	libavcodec/mpegaudiodata.o
+CC	libavcodec/mpegaudiodec_common.o
+CC	libavcodec/mpegaudiodec_fixed.o
+CC	libavcodec/mpegaudiodec_float.o
+CC	libavcodec/mpegaudiodecheader.o
+CC	libavcodec/mpegaudiodsp.o
+CC	libavcodec/mpegaudiodsp_data.o
+CC	libavcodec/mpegaudiodsp_fixed.o
+CC	libavcodec/mpegaudiodsp_float.o
+CC	libavcodec/mpegaudioenc_fixed.o
+CC	libavcodec/mpegaudioenc_float.o
+CC	libavcodec/mpegaudiotabs.o
+CC	libavcodec/mpegpicture.o
+CC	libavcodec/mpegutils.o
+CC	libavcodec/mpegvideo.o
+CC	libavcodec/mpegvideo_dec.o
+CC	libavcodec/mpegvideo_enc.o
+CC	libavcodec/mpegvideo_motion.o
+CC	libavcodec/mpegvideo_parser.o
+CC	libavcodec/mpegvideodata.o
+CC	libavcodec/mpegvideoencdsp.o
+CC	libavcodec/mpl2dec.o
+CC	libavcodec/mqc.o
+CC	libavcodec/mqcdec.o
+CC	libavcodec/mqcenc.o
+CC	libavcodec/mscc.o
+CC	libavcodec/msgsmdec.o
+CC	libavcodec/msmpeg4.o
+CC	libavcodec/msmpeg4_vc1_data.o
+CC	libavcodec/msmpeg4data.o
+CC	libavcodec/msmpeg4dec.o
+CC	libavcodec/msmpeg4enc.o
+CC	libavcodec/msp2dec.o
+CC	libavcodec/msrle.o
+CC	libavcodec/msrledec.o
+CC	libavcodec/msrleenc.o
+CC	libavcodec/mss1.o
+CC	libavcodec/mss12.o
+CC	libavcodec/mss2.o
+CC	libavcodec/mss2dsp.o
+CC	libavcodec/mss3.o
+CC	libavcodec/mss34dsp.o
+CC	libavcodec/mss4.o
+CC	libavcodec/msvideo1.o
+CC	libavcodec/msvideo1enc.o
+CC	libavcodec/mv30.o
+CC	libavcodec/mvcdec.o
+CC	libavcodec/mvha.o
+CC	libavcodec/mwsc.o
+CC	libavcodec/mxpegdec.o
+CC	libavcodec/nellymoser.o
+CC	libavcodec/nellymoserdec.o
+CC	libavcodec/nellymoserenc.o
+CC	libavcodec/neon/mpegvideo.o
+CC	libavcodec/notchlc.o
+CC	libavcodec/null.o
+CC	libavcodec/nuv.o
+CC	libavcodec/on2avc.o
+CC	libavcodec/on2avcdata.o
+CC	libavcodec/options.o
+CC	libavcodec/opus/celt.o
+CC	libavcodec/opus/dec.o
+CC	libavcodec/opus/dec_celt.o
+CC	libavcodec/opus/dsp.o
+CC	libavcodec/opus/enc.o
+CC	libavcodec/opus/enc_psy.o
+CC	libavcodec/opus/parse.o
+CC	libavcodec/opus/parser.o
+CC	libavcodec/opus/pvq.o
+CC	libavcodec/opus/rc.o
+CC	libavcodec/opus/silk.o
+CC	libavcodec/opus/tab.o
+CC	libavcodec/osq.o
+CC	libavcodec/packet.o
+CC	libavcodec/pafaudio.o
+CC	libavcodec/pafvideo.o
+CC	libavcodec/pamenc.o
+CC	libavcodec/parser.o
+CC	libavcodec/parsers.o
+CC	libavcodec/pcm-bluray.o
+CC	libavcodec/pcm-blurayenc.o
+CC	libavcodec/pcm-dvd.o
+CC	libavcodec/pcm-dvdenc.o
+CC	libavcodec/pcm.o
+CC	libavcodec/pcx.o
+CC	libavcodec/pcxenc.o
+CC	libavcodec/pdvdec.o
+CC	libavcodec/pgssubdec.o
+CC	libavcodec/pgxdec.o
+CC	libavcodec/photocd.o
+CC	libavcodec/pictordec.o
+CC	libavcodec/pixblockdsp.o
+CC	libavcodec/pixlet.o
+CC	libavcodec/png.o
+CC	libavcodec/png_parser.o
+CC	libavcodec/pngdec.o
+CC	libavcodec/pngdsp.o
+CC	libavcodec/pngenc.o
+CC	libavcodec/pnm.o
+CC	libavcodec/pnm_parser.o
+CC	libavcodec/pnmdec.o
+CC	libavcodec/pnmenc.o
+CC	libavcodec/profiles.o
+CC	libavcodec/proresdata.o
+CC	libavcodec/proresdec.o
+CC	libavcodec/proresdsp.o
+CC	libavcodec/proresenc_anatoliy.o
+CC	libavcodec/proresenc_kostya.o
+CC	libavcodec/prosumer.o
+CC	libavcodec/psd.o
+CC	libavcodec/psymodel.o
+CC	libavcodec/pthread.o
+CC	libavcodec/pthread_frame.o
+CC	libavcodec/pthread_slice.o
+CC	libavcodec/ptx.o
+CC	libavcodec/qcelpdec.o
+CC	libavcodec/qdm2.o
+CC	libavcodec/qdmc.o
+CC	libavcodec/qdrw.o
+CC	libavcodec/qoadec.o
+CC	libavcodec/qoi_parser.o
+CC	libavcodec/qoidec.o
+CC	libavcodec/qoienc.o
+CC	libavcodec/qpeg.o
+CC	libavcodec/qpeldsp.o
+CC	libavcodec/qsv_api.o
+CC	libavcodec/qtrle.o
+CC	libavcodec/qtrleenc.o
+CC	libavcodec/r210dec.o
+CC	libavcodec/r210enc.o
+CC	libavcodec/ra144.o
+CC	libavcodec/ra144dec.o
+CC	libavcodec/ra144enc.o
+CC	libavcodec/ra288.o
+CC	libavcodec/ralf.o
+CC	libavcodec/rangecoder.o
+CC	libavcodec/rasc.o
+CC	libavcodec/raw.o
+CC	libavcodec/ratecontrol.o
+CC	libavcodec/rawdec.o
+CC	libavcodec/rawenc.o
+CC	libavcodec/realtextdec.o
+CC	libavcodec/refstruct.o
+CC	libavcodec/rka.o
+CC	libavcodec/rl.o
+CC	libavcodec/rl2.o
+CC	libavcodec/rle.o
+CC	libavcodec/roqaudioenc.o
+CC	libavcodec/roqvideo.o
+CC	libavcodec/roqvideodec.o
+CC	libavcodec/rpza.o
+CC	libavcodec/roqvideoenc.o
+CC	libavcodec/rpzaenc.o
+CC	libavcodec/rscc.o
+CC	libavcodec/rtjpeg.o
+CC	libavcodec/rtv1.o
+CC	libavcodec/rv10.o
+CC	libavcodec/rv10enc.o
+CC	libavcodec/rv20enc.o
+CC	libavcodec/rv30.o
+CC	libavcodec/rv30dsp.o
+CC	libavcodec/rv34.o
+CC	libavcodec/rv34_parser.o
+CC	libavcodec/rv34dsp.o
+CC	libavcodec/rv40.o
+CC	libavcodec/rv40dsp.o
+CC	libavcodec/s302m.o
+CC	libavcodec/s302menc.o
+CC	libavcodec/samidec.o
+CC	libavcodec/sanm.o
+CC	libavcodec/sbc.o
+CC	libavcodec/sbc_parser.o
+CC	libavcodec/sbcdec.o
+CC	libavcodec/sbcdec_data.o
+CC	libavcodec/sbcdsp.o
+CC	libavcodec/sbcdsp_data.o
+CC	libavcodec/sbcenc.o
+CC	libavcodec/sbrdsp.o
+CC	libavcodec/sbrdsp_fixed.o
+CC	libavcodec/scpr.o
+CC	libavcodec/screenpresso.o
+CC	libavcodec/sga.o
+CC	libavcodec/sgidec.o
+CC	libavcodec/sgienc.o
+CC	libavcodec/sgirledec.o
+CC	libavcodec/sheervideo.o
+CC	libavcodec/shorten.o
+CC	libavcodec/simple_idct.o
+CC	libavcodec/sinewin.o
+CC	libavcodec/sipr.o
+CC	libavcodec/sipr16k.o
+CC	libavcodec/sipr_parser.o
+CC	libavcodec/siren.o
+CC	libavcodec/smacker.o
+CC	libavcodec/smc.o
+CC	libavcodec/smcenc.o
+CC	libavcodec/snappy.o
+CC	libavcodec/snow.o
+CC	libavcodec/snow_dwt.o
+CC	libavcodec/snowdec.o
+CC	libavcodec/snowenc.o
+CC	libavcodec/sonic.o
+CC	libavcodec/sp5xdec.o
+CC	libavcodec/speedhq.o
+CC	libavcodec/speedhqdec.o
+CC	libavcodec/speedhqenc.o
+CC	libavcodec/speexdec.o
+CC	libavcodec/srtdec.o
+CC	libavcodec/srtenc.o
+CC	libavcodec/startcode.o
+CC	libavcodec/subviewerdec.o
+CC	libavcodec/sunrast.o
+CC	libavcodec/sunrastenc.o
+CC	libavcodec/svq1.o
+CC	libavcodec/svq1dec.o
+CC	libavcodec/svq1enc.o
+CC	libavcodec/svq3.o
+CC	libavcodec/synth_filter.o
+CC	libavcodec/tak.o
+CC	libavcodec/tak_parser.o
+CC	libavcodec/takdec.o
+CC	libavcodec/takdsp.o
+CC	libavcodec/targa.o
+CC	libavcodec/targa_y216dec.o
+CC	libavcodec/targaenc.o
+CC	libavcodec/tdsc.o
+CC	libavcodec/textdec.o
+CC	libavcodec/texturedsp.o
+CC	libavcodec/texturedspenc.o
+CC	libavcodec/threadprogress.o
+CC	libavcodec/tiertexseqv.o
+CC	libavcodec/tiff.o
+CC	libavcodec/tiff_common.o
+CC	libavcodec/tiffenc.o
+CC	libavcodec/tmv.o
+CC	libavcodec/to_upper4.o
+CC	libavcodec/tpeldsp.o
+CC	libavcodec/truemotion1.o
+CC	libavcodec/truemotion2.o
+CC	libavcodec/truemotion2rt.o
+CC	libavcodec/truespeech.o
+CC	libavcodec/tscc.o
+CC	libavcodec/tscc2.o
+CC	libavcodec/tta.o
+CC	libavcodec/ttadata.o
+CC	libavcodec/ttadsp.o
+CC	libavcodec/ttaenc.o
+CC	libavcodec/ttaencdsp.o
+CC	libavcodec/ttmlenc.o
+CC	libavcodec/twinvq.o
+CC	libavcodec/twinvqdec.o
+CC	libavcodec/txd.o
+CC	libavcodec/ulti.o
+CC	libavcodec/utils.o
+CC	libavcodec/utvideodec.o
+CC	libavcodec/utvideodsp.o
+CC	libavcodec/utvideoenc.o
+CC	libavcodec/v210dec.o
+CC	libavcodec/v210enc.o
+CC	libavcodec/v210x.o
+CC	libavcodec/v308dec.o
+CC	libavcodec/v308enc.o
+CC	libavcodec/v408dec.o
+CC	libavcodec/v408enc.o
+CC	libavcodec/v410dec.o
+CC	libavcodec/v410enc.o
+CC	libavcodec/vb.o
+CC	libavcodec/vble.o
+CC	libavcodec/vbndec.o
+CC	libavcodec/vbnenc.o
+CC	libavcodec/vc1_block.o
+CC	libavcodec/vc1.o
+CC	libavcodec/vc1_mc.o
+CC	libavcodec/vc1_loopfilter.o
+CC	libavcodec/vc1_parser.o
+CC	libavcodec/vc1_pred.o
+CC	libavcodec/vc1data.o
+CC	libavcodec/vc1dec.o
+CC	libavcodec/vc2enc.o
+CC	libavcodec/vc1dsp.o
+CC	libavcodec/vc2enc_dwt.o
+CC	libavcodec/vcr1.o
+CC	libavcodec/version.o
+CC	libavcodec/videodsp.o
+CC	libavcodec/videotoolbox.o
+CC	libavcodec/videotoolbox_vp9.o
+CC	libavcodec/videotoolboxenc.o
+CC	libavcodec/vima.o
+CC	libavcodec/vlc.o
+CC	libavcodec/vmdaudio.o
+CC	libavcodec/vmdvideo.o
+CC	libavcodec/vmixdec.o
+CC	libavcodec/vmnc.o
+CC	libavcodec/vorbis.o
+CC	libavcodec/vorbis_data.o
+CC	libavcodec/vorbis_parser.o
+CC	libavcodec/vorbisdec.o
+CC	libavcodec/vorbisdsp.o
+CC	libavcodec/vorbisenc.o
+CC	libavcodec/vp3_parser.o
+CC	libavcodec/vp3.o
+CC	libavcodec/vp3dsp.o
+CC	libavcodec/vp5.o
+CC	libavcodec/vp56.o
+CC	libavcodec/vp56data.o
+CC	libavcodec/vp56dsp.o
+CC	libavcodec/vp6.o
+CC	libavcodec/vp6dsp.o
+CC	libavcodec/vp8.o
+CC	libavcodec/vp8_parser.o
+CC	libavcodec/vp8data.o
+CC	libavcodec/vp8dsp.o
+CC	libavcodec/vp9.o
+CC	libavcodec/vp9_parser.o
+CC	libavcodec/vp9block.o
+CC	libavcodec/vp9data.o
+CC	libavcodec/vp9dsp.o
+CC	libavcodec/vp9dsp_10bpp.o
+CC	libavcodec/vp9dsp_12bpp.o
+CC	libavcodec/vp9dsp_8bpp.o
+CC	libavcodec/vp9lpf.o
+CC	libavcodec/vp9mvs.o
+CC	libavcodec/vp9recon.o
+CC	libavcodec/vp9prob.o
+CC	libavcodec/vpx_rac.o
+CC	libavcodec/vqavideo.o
+CC	libavcodec/vqcdec.o
+CC	libavcodec/vvc/cabac.o
+CC	libavcodec/vvc/ctu.o
+CC	libavcodec/vvc/data.o
+CC	libavcodec/vvc/dec.o
+CC	libavcodec/vvc/dsp.o
+CC	libavcodec/vvc/filter.o
+CC	libavcodec/vvc/inter.o
+CC	libavcodec/vvc/intra.o
+CC	libavcodec/vvc/intra_utils.o
+CC	libavcodec/vvc/itx_1d.o
+CC	libavcodec/vvc/mvs.o
+CC	libavcodec/vvc/ps.o
+CC	libavcodec/vvc/refs.o
+CC	libavcodec/vvc/thread.o
+CC	libavcodec/vvc_parser.o
+CC	libavcodec/wavarc.o
+CC	libavcodec/wavpack.o
+CC	libavcodec/wavpackdata.o
+CC	libavcodec/wavpackenc.o
+CC	libavcodec/wbmpdec.o
+CC	libavcodec/wbmpenc.o
+CC	libavcodec/wcmv.o
+CC	libavcodec/webp.o
+CC	libavcodec/webp_parser.o
+CC	libavcodec/webvttdec.o
+CC	libavcodec/webvttenc.o
+CC	libavcodec/wma.o
+CC	libavcodec/wma_common.o
+CC	libavcodec/wma_freqs.o
+CC	libavcodec/wmadec.o
+CC	libavcodec/wmaenc.o
+CC	libavcodec/wmalosslessdec.o
+CC	libavcodec/wmaprodec.o
+CC	libavcodec/wmavoice.o
+CC	libavcodec/wmv2.o
+CC	libavcodec/wmv2data.o
+CC	libavcodec/wmv2dec.o
+CC	libavcodec/wmv2dsp.o
+CC	libavcodec/wmv2enc.o
+CC	libavcodec/wnv1.o
+CC	libavcodec/wrapped_avframe.o
+CC	libavcodec/ws-snd1.o
+CC	libavcodec/xan.o
+CC	libavcodec/xbm_parser.o
+CC	libavcodec/xbmdec.o
+CC	libavcodec/xbmenc.o
+CC	libavcodec/xface.o
+CC	libavcodec/xfacedec.o
+CC	libavcodec/xfaceenc.o
+CC	libavcodec/xiph.o
+CC	libavcodec/xl.o
+CC	libavcodec/xma_parser.o
+CC	libavcodec/xpmdec.o
+CC	libavcodec/xsubdec.o
+CC	libavcodec/xsubenc.o
+CC	libavcodec/xvididct.o
+CC	libavcodec/xwd_parser.o
+CC	libavcodec/xwddec.o
+CC	libavcodec/xwdenc.o
+CC	libavcodec/xxan.o
+CC	libavcodec/y41pdec.o
+CC	libavcodec/y41penc.o
+CC	libavcodec/ylc.o
+CC	libavcodec/yop.o
+CC	libavcodec/yuv4dec.o
+CC	libavcodec/yuv4enc.o
+CC	libavcodec/zerocodec.o
+CC	libavcodec/zlib_wrapper.o
+CC	libavcodec/zmbv.o
+CC	libavcodec/log2_tab.o
+CC	libavcodec/zmbvenc.o
+CC	libavcodec/reverse.o
+CC	libswresample/aarch64/audio_convert_init.o
+AS	libswresample/aarch64/audio_convert_neon.o
+AS	libswresample/aarch64/resample.o
+CC	libswresample/aarch64/resample_init.o
+CC	libswresample/dither.o
+CC	libswresample/audioconvert.o
+CC	libswresample/options.o
+CC	libswresample/rematrix.o
+CC	libswresample/resample.o
+CC	libswresample/resample_dsp.o
+CC	libswresample/swresample.o
+CC	libswresample/swresample_frame.o
+CC	libswresample/version.o
+CC	libswresample/log2_tab.o
+AR	libavformat/libavformat.a
+AR	libpostproc/libpostproc.a
+AR	libswscale/libswscale.a
+HOSTCC	doc/print_options.o
+CC	fftools/ffmpeg_demux.o
+AR	libavutil/libavutil.a
+CC	fftools/ffmpeg_dec.o
+CC	fftools/ffmpeg_enc.o
+CC	fftools/ffmpeg_filter.o
+CC	fftools/ffmpeg_hw.o
+CC	fftools/ffmpeg_mux.o
+CC	fftools/ffmpeg_mux_init.o
+CC	fftools/ffmpeg_opt.o
+CC	fftools/ffmpeg_sched.o
+CC	fftools/objpool.o
+CC	fftools/sync_queue.o
+CC	fftools/thread_queue.o
+CC	fftools/cmdutils.o
+CC	fftools/opt_common.o
+CC	fftools/ffmpeg.o
+CC	fftools/ffplay_renderer.o
+CC	fftools/ffplay.o
+CC	fftools/ffprobe.o
+GEN	libavdevice/libavdevice.pc
+INSTALL	presets/libvpx-1080p.ffpreset
+INSTALL	presets/libvpx-1080p50_60.ffpreset
+INSTALL	presets/libvpx-360p.ffpreset
+INSTALL	presets/libvpx-720p.ffpreset
+INSTALL	presets/libvpx-720p50_60.ffpreset
+INSTALL	doc/ffprobe.xsd
+INSTALL	libavdevice/avdevice.h
+INSTALL	libavdevice/version.h
+INSTALL	libavdevice/version_major.h
+INSTALL	doc/examples/avio_http_serve_files.c
+INSTALL	doc/examples/avio_list_dir.c
+INSTALL	doc/examples/avio_read_callback.c
+INSTALL	doc/examples/decode_audio.c
+INSTALL	doc/examples/decode_filter_audio.c
+INSTALL	doc/examples/decode_filter_video.c
+INSTALL	doc/examples/decode_video.c
+INSTALL	doc/examples/demux_decode.c
+INSTALL	doc/examples/encode_audio.c
+INSTALL	doc/examples/encode_video.c
+INSTALL	doc/examples/extract_mvs.c
+INSTALL	doc/examples/filter_audio.c
+INSTALL	doc/examples/hw_decode.c
+INSTALL	doc/examples/mux.c
+INSTALL	doc/examples/qsv_decode.c
+INSTALL	doc/examples/qsv_transcode.c
+INSTALL	doc/examples/remux.c
+INSTALL	doc/examples/resample_audio.c
+INSTALL	doc/examples/scale_video.c
+INSTALL	doc/examples/show_metadata.c
+INSTALL	doc/examples/transcode_aac.c
+INSTALL	doc/examples/transcode.c
+INSTALL	doc/examples/vaapi_encode.c
+INSTALL	doc/examples/vaapi_transcode.c
+INSTALL	doc/examples/README
+INSTALL	doc/examples/Makefile
+GEN	libavfilter/libavfilter.pc
+INSTALL	libavfilter/avfilter.h
+INSTALL	libavfilter/buffersink.h
+INSTALL	libavfilter/buffersrc.h
+INSTALL	libavfilter/version.h
+INSTALL	libavfilter/version_major.h
+INSTALL	doc/examples/avio_http_serve_files.c
+INSTALL	doc/examples/avio_list_dir.c
+INSTALL	doc/examples/avio_read_callback.c
+INSTALL	doc/examples/decode_audio.c
+INSTALL	doc/examples/decode_filter_audio.c
+INSTALL	doc/examples/decode_filter_video.c
+INSTALL	doc/examples/decode_video.c
+INSTALL	doc/examples/demux_decode.c
+INSTALL	doc/examples/encode_audio.c
+INSTALL	doc/examples/encode_video.c
+INSTALL	doc/examples/extract_mvs.c
+INSTALL	doc/examples/filter_audio.c
+INSTALL	doc/examples/hw_decode.c
+INSTALL	doc/examples/mux.c
+INSTALL	doc/examples/qsv_decode.c
+INSTALL	doc/examples/qsv_transcode.c
+INSTALL	doc/examples/remux.c
+INSTALL	doc/examples/resample_audio.c
+INSTALL	doc/examples/scale_video.c
+INSTALL	doc/examples/show_metadata.c
+INSTALL	doc/examples/transcode_aac.c
+INSTALL	doc/examples/transcode.c
+INSTALL	doc/examples/vaapi_encode.c
+INSTALL	doc/examples/vaapi_transcode.c
+INSTALL	doc/examples/README
+INSTALL	doc/examples/Makefile
+GEN	libavformat/libavformat.pc
+INSTALL	libavformat/avformat.h
+INSTALL	libavformat/avio.h
+INSTALL	libavformat/version.h
+INSTALL	libavformat/version_major.h
+GEN	libavcodec/libavcodec.pc
+INSTALL	libavcodec/ac3_parser.h
+INSTALL	libavcodec/adts_parser.h
+INSTALL	libavcodec/avcodec.h
+INSTALL	libavcodec/avdct.h
+INSTALL	libavcodec/avfft.h
+INSTALL	libavcodec/bsf.h
+INSTALL	libavcodec/codec.h
+INSTALL	libavcodec/codec_desc.h
+INSTALL	libavcodec/codec_id.h
+INSTALL	libavcodec/codec_par.h
+INSTALL	libavcodec/d3d11va.h
+INSTALL	libavcodec/defs.h
+INSTALL	libavcodec/dirac.h
+INSTALL	libavcodec/dv_profile.h
+INSTALL	libavcodec/dxva2.h
+INSTALL	libavcodec/jni.h
+INSTALL	libavcodec/mediacodec.h
+INSTALL	libavcodec/packet.h
+INSTALL	libavcodec/qsv.h
+INSTALL	libavcodec/vdpau.h
+INSTALL	libavcodec/version.h
+INSTALL	libavcodec/version_major.h
+INSTALL	libavcodec/videotoolbox.h
+INSTALL	libavcodec/vorbis_parser.h
+GEN	libpostproc/libpostproc.pc
+INSTALL	libpostproc/postprocess.h
+INSTALL	libpostproc/version.h
+INSTALL	libpostproc/version_major.h
+GEN	libswresample/libswresample.pc
+INSTALL	libswresample/swresample.h
+INSTALL	libswresample/version.h
+INSTALL	libswresample/version_major.h
+GEN	libswscale/libswscale.pc
+INSTALL	libswscale/swscale.h
+INSTALL	libswscale/version.h
+INSTALL	libswscale/version_major.h
+GEN	libavutil/libavutil.pc
+AR	libavdevice/libavdevice.a
+INSTALL	libavutil/adler32.h
+INSTALL	libavutil/aes.h
+INSTALL	libavutil/aes_ctr.h
+INSTALL	libavutil/ambient_viewing_environment.h
+INSTALL	libavutil/attributes.h
+INSTALL	libavutil/audio_fifo.h
+INSTALL	libavutil/avassert.h
+INSTALL	libavutil/avstring.h
+INSTALL	libavutil/avutil.h
+INSTALL	libavutil/base64.h
+INSTALL	libavutil/blowfish.h
+INSTALL	libavutil/bprint.h
+INSTALL	libavutil/bswap.h
+INSTALL	libavutil/buffer.h
+INSTALL	libavutil/cast5.h
+INSTALL	libavutil/camellia.h
+INSTALL	libavutil/channel_layout.h
+INSTALL	libavutil/common.h
+INSTALL	libavutil/cpu.h
+INSTALL	libavutil/crc.h
+INSTALL	libavutil/csp.h
+INSTALL	libavutil/des.h
+INSTALL	libavutil/detection_bbox.h
+INSTALL	libavutil/dict.h
+INSTALL	libavutil/display.h
+INSTALL	libavutil/dovi_meta.h
+INSTALL	libavutil/downmix_info.h
+INSTALL	libavutil/encryption_info.h
+INSTALL	libavutil/error.h
+INSTALL	libavutil/eval.h
+INSTALL	libavutil/executor.h
+INSTALL	libavutil/fifo.h
+INSTALL	libavutil/file.h
+INSTALL	libavutil/frame.h
+INSTALL	libavutil/hash.h
+INSTALL	libavutil/hdr_dynamic_metadata.h
+INSTALL	libavutil/hdr_dynamic_vivid_metadata.h
+INSTALL	libavutil/hmac.h
+INSTALL	libavutil/hwcontext.h
+INSTALL	libavutil/hwcontext_cuda.h
+INSTALL	libavutil/hwcontext_d3d11va.h
+INSTALL	libavutil/hwcontext_d3d12va.h
+INSTALL	libavutil/hwcontext_drm.h
+INSTALL	libavutil/hwcontext_dxva2.h
+INSTALL	libavutil/hwcontext_qsv.h
+INSTALL	libavutil/hwcontext_mediacodec.h
+INSTALL	libavutil/hwcontext_opencl.h
+INSTALL	libavutil/hwcontext_vaapi.h
+INSTALL	libavutil/hwcontext_videotoolbox.h
+INSTALL	libavutil/hwcontext_vdpau.h
+INSTALL	libavutil/hwcontext_vulkan.h
+INSTALL	libavutil/iamf.h
+INSTALL	libavutil/imgutils.h
+INSTALL	libavutil/intfloat.h
+INSTALL	libavutil/intreadwrite.h
+INSTALL	libavutil/lfg.h
+INSTALL	libavutil/log.h
+INSTALL	libavutil/lzo.h
+INSTALL	libavutil/macros.h
+INSTALL	libavutil/mathematics.h
+INSTALL	libavutil/mastering_display_metadata.h
+INSTALL	libavutil/md5.h
+INSTALL	libavutil/mem.h
+INSTALL	libavutil/motion_vector.h
+INSTALL	libavutil/murmur3.h
+INSTALL	libavutil/opt.h
+INSTALL	libavutil/parseutils.h
+INSTALL	libavutil/pixdesc.h
+INSTALL	libavutil/pixelutils.h
+INSTALL	libavutil/pixfmt.h
+INSTALL	libavutil/random_seed.h
+INSTALL	libavutil/rc4.h
+INSTALL	libavutil/rational.h
+INSTALL	libavutil/replaygain.h
+INSTALL	libavutil/ripemd.h
+INSTALL	libavutil/samplefmt.h
+INSTALL	libavutil/sha.h
+INSTALL	libavutil/sha512.h
+INSTALL	libavutil/spherical.h
+INSTALL	libavutil/stereo3d.h
+INSTALL	libavutil/threadmessage.h
+INSTALL	libavutil/time.h
+INSTALL	libavutil/timecode.h
+INSTALL	libavutil/timestamp.h
+INSTALL	libavutil/tree.h
+INSTALL	libavutil/twofish.h
+INSTALL	libavutil/uuid.h
+INSTALL	libavutil/version.h
+INSTALL	libavutil/video_enc_params.h
+INSTALL	libavutil/xtea.h
+INSTALL	libavutil/tea.h
+INSTALL	libavutil/tx.h
+INSTALL	libavutil/film_grain_params.h
+INSTALL	libavutil/video_hint.h
+INSTALL	libavutil/avconfig.h
+INSTALL	libavutil/ffversion.h
+GEN	libavdevice/libavdevice.ver
+HOSTLD	ffbuild/bin2c
+xcrun -sdk macosx metallib --split-module-without-linking libavfilter/metal/vf_yadif_videotoolbox.metal.air -o libavfilter/metal/vf_yadif_videotoolbox.metallib
+CC	libavfilter/opencl/avgblur.o
+CC	libavfilter/opencl/colorkey.o
+CC	libavfilter/opencl/colorspace_common.o
+CC	libavfilter/opencl/convolution.o
+CC	libavfilter/opencl/deshake.o
+CC	libavfilter/opencl/neighbor.o
+CC	libavfilter/opencl/nlmeans.o
+CC	libavfilter/opencl/overlay.o
+CC	libavfilter/opencl/pad.o
+CC	libavfilter/opencl/remap.o
+CC	libavfilter/opencl/tonemap.o
+CC	libavfilter/opencl/transpose.o
+CC	libavfilter/opencl/unsharp.o
+CC	libavfilter/opencl/xfade.o
+GEN	libswscale/libswscale.ver
+GEN	libavutil/libavutil.ver
+GEN	libpostproc/libpostproc.ver
+GEN	libavformat/libavformat.ver
+GEN	libavcodec/libavcodec.ver
+GEN	libswresample/libswresample.ver
+INSTALL	libavformat/libavformat.a
+AR	libavcodec/libavcodec.a
+AR	libswresample/libswresample.a
+INSTALL	libpostproc/libpostproc.a
+INSTALL	libswscale/libswscale.a
+HOSTLD	doc/print_options
+INSTALL	libavutil/libavutil.a
+INSTALL	libavdevice/libavdevice.a
+BIN2C	libavfilter/metal/vf_yadif_videotoolbox.metallib.c
+LD	libavutil/libavutil.59.dylib
+INSTALL	libswresample/libswresample.a
+GENTEXI	doc/avoptions_codec.texi
+GENTEXI	doc/avoptions_format.texi
+LD	libswscale/libswscale.8.dylib
+LD	libpostproc/libpostproc.58.dylib
+LD	libswresample/libswresample.5.dylib
+INSTALL	libavcodec/libavcodec.a
+INSTALL	libpostproc/libpostproc.pc
+INSTALL	libavutil/libavutil.dylib
+INSTALL	libswscale/libswscale.pc
+INSTALL	libavutil/libavutil.pc
+STRIP	install-libavutil-shared
+INSTALL	libavcodec/libavcodec.pc
+INSTALL	libavformat/libavformat.pc
+INSTALL	libswresample/libswresample.pc
+INSTALL	libswscale/libswscale.dylib
+INSTALL	libavdevice/libavdevice.pc
+INSTALL	libavfilter/libavfilter.pc
+STRIP	install-libswscale-shared
+INSTALL	libpostproc/libpostproc.dylib
+STRIP	install-libpostproc-shared
+LD	libavcodec/libavcodec.61.dylib
+INSTALL	libswresample/libswresample.dylib
+STRIP	install-libswresample-shared
+LD	libavformat/libavformat.61.dylib
+INSTALL	libavcodec/libavcodec.dylib
+STRIP	install-libavcodec-shared
+INSTALL	libavformat/libavformat.dylib
+STRIP	install-libavformat-shared
+CC	libavfilter/metal/vf_yadif_videotoolbox.metallib.o
+GEN	libavfilter/libavfilter.ver
+AR	libavfilter/libavfilter.a
+LD	libavfilter/libavfilter.10.dylib
+INSTALL	libavfilter/libavfilter.a
+LD	libavdevice/libavdevice.61.dylib
+INSTALL	libavfilter/libavfilter.dylib
+STRIP	install-libavfilter-shared
+LD	ffmpeg_g
+LD	ffplay_g
+LD	ffprobe_g
+INSTALL	libavdevice/libavdevice.dylib
+STRIP	install-libavdevice-shared
+STRIP	ffmpeg
+STRIP	ffplay
+STRIP	ffprobe
+POD	doc/ffmpeg-utils.pod
+POD	doc/ffmpeg-resampler.pod
+POD	doc/ffmpeg-scaler.pod
+POD	doc/ffmpeg-codecs.pod
+POD	doc/ffmpeg-bitstream-filters.pod
+POD	doc/ffmpeg-protocols.pod
+POD	doc/ffmpeg-formats.pod
+POD	doc/ffmpeg-devices.pod
+POD	doc/ffmpeg-all.pod
+POD	doc/ffplay.pod
+POD	doc/ffplay-all.pod
+POD	doc/ffprobe.pod
+POD	doc/ffprobe-all.pod
+POD	doc/ffmpeg.pod
+POD	doc/libswscale.pod
+POD	doc/libavutil.pod
+POD	doc/ffmpeg-filters.pod
+POD	doc/libswresample.pod
+POD	doc/libavcodec.pod
+POD	doc/libavformat.pod
+MAN	doc/ffmpeg-utils.1
+POD	doc/libavfilter.pod
+MAN	doc/ffmpeg-scaler.1
+MAN	doc/ffmpeg-resampler.1
+POD	doc/libavdevice.pod
+MAN	doc/ffmpeg-bitstream-filters.1
+MAN	doc/ffmpeg-codecs.1
+MAN	doc/ffmpeg-protocols.1
+MAN	doc/ffmpeg-formats.1
+MAN	doc/ffmpeg-devices.1
+MAN	doc/libavutil.3
+MAN	doc/libswscale.3
+MAN	doc/libswresample.3
+MAN	doc/libavcodec.3
+MAN	doc/libavformat.3
+MAN	doc/libavdevice.3
+MAN	doc/libavfilter.3
+MAN	doc/ffmpeg.1
+MAN	doc/ffplay.1
+MAN	doc/ffprobe.1
+MAN	doc/ffprobe-all.1
+MAN	doc/ffmpeg-filters.1
+MAN	doc/ffplay-all.1
+MAN	doc/ffmpeg-all.1
+INSTALL	doc/ffmpeg.1
+INSTALL	doc/ffplay.1
+INSTALL	doc/ffprobe.1
+INSTALL	doc/ffmpeg-all.1
+INSTALL	doc/ffplay-all.1
+INSTALL	doc/ffprobe-all.1
+INSTALL	doc/ffmpeg-utils.1
+INSTALL	doc/ffmpeg-scaler.1
+INSTALL	doc/ffmpeg-resampler.1
+INSTALL	doc/ffmpeg-codecs.1
+INSTALL	doc/ffmpeg-bitstream-filters.1
+INSTALL	doc/ffmpeg-formats.1
+INSTALL	doc/ffmpeg-protocols.1
+INSTALL	doc/ffmpeg-devices.1
+INSTALL	doc/ffmpeg-filters.1
+INSTALL	doc/libavutil.3
+INSTALL	doc/libswscale.3
+INSTALL	doc/libswresample.3
+INSTALL	doc/libavcodec.3
+INSTALL	doc/libavformat.3
+INSTALL	doc/libavdevice.3
+INSTALL	doc/libavfilter.3
+INSTALL	doc/ffmpeg.1
+INSTALL	doc/ffplay.1
+INSTALL	doc/ffprobe.1
+INSTALL	doc/ffmpeg-all.1
+INSTALL	doc/ffplay-all.1
+INSTALL	doc/ffprobe-all.1
+INSTALL	doc/ffmpeg-utils.1
+INSTALL	doc/ffmpeg-scaler.1
+INSTALL	doc/ffmpeg-resampler.1
+INSTALL	doc/ffmpeg-codecs.1
+INSTALL	doc/ffmpeg-bitstream-filters.1
+INSTALL	doc/ffmpeg-formats.1
+INSTALL	doc/ffmpeg-protocols.1
+INSTALL	doc/ffmpeg-devices.1
+INSTALL	doc/ffmpeg-filters.1
+INSTALL	doc/libavutil.3
+INSTALL	doc/libswscale.3
+INSTALL	doc/libswresample.3
+INSTALL	doc/libavcodec.3
+INSTALL	doc/libavformat.3
+INSTALL	doc/libavdevice.3
+INSTALL	doc/libavfilter.3
+INSTALL	install-progs-yes
+INSTALL	ffmpeg
+INSTALL	ffplay
+INSTALL	ffprobe
+rm libavfilter/metal/vf_yadif_videotoolbox.metal.air libavfilter/metal/vf_yadif_videotoolbox.metallib libavfilter/metal/vf_yadif_videotoolbox.metallib.c
+[34m==>[0m [1mmake alltools[0m
+CC	tools/enc_recon_frame_test.o
+CC	tools/decode_simple.o
+xcrun -sdk macosx metal libavfilter/metal/vf_yadif_videotoolbox.metal -o libavfilter/metal/vf_yadif_videotoolbox.metal.air
+CC	tools/qt-faststart.o
+CC	tools/scale_slice_test.o
+CC	tools/uncoded_frame.o
+CC	tools/cws2fws.o
+CC	tools/trasher.o
+CC	tools/enum_options.o
+CC	tools/graph2dot.o
+CC	tools/ismindex.o
+CC	tools/pktdumper.o
+CC	tools/aviocat.o
+CC	tools/probetest.o
+CC	tools/seek_print.o
+CC	tools/sidxindex.o
+CC	tools/venc_data_dump.o
+CC	tools/fourcc2pixfmt.o
+CC	tools/crypto_bench.o
+CC	tools/ffhash.o
+CC	tools/ffeval.o
+CC	tools/ffescape.o
+LD	tools/trasher
+LD	tools/cws2fws
+LD	tools/aviocat
+LD	tools/pktdumper
+LD	tools/seek_print
+LD	tools/qt-faststart
+LD	tools/probetest
+LD	tools/sidxindex
+LD	tools/venc_data_dump
+LD	tools/fourcc2pixfmt
+LD	tools/ffhash
+LD	tools/ffeval
+LD	tools/ffescape
+LD	tools/ismindex
+LD	tools/crypto_bench
+xcrun -sdk macosx metallib --split-module-without-linking libavfilter/metal/vf_yadif_videotoolbox.metal.air -o libavfilter/metal/vf_yadif_videotoolbox.metallib
+BIN2C	libavfilter/metal/vf_yadif_videotoolbox.metallib.c
+CC	libavfilter/metal/vf_yadif_videotoolbox.metallib.o
+GEN	libavfilter/libavfilter.ver
+LD	libavfilter/libavfilter.10.dylib
+LD	libavdevice/libavdevice.61.dylib
+LD	tools/graph2dot
+LD	tools/enum_options
+LD	tools/enc_recon_frame_test
+LD	tools/scale_slice_test
+LD	tools/uncoded_frame
+rm libavfilter/metal/vf_yadif_videotoolbox.metal.air libavfilter/metal/vf_yadif_videotoolbox.metallib
+==> Cleaning
+==> Finishing up
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/aviocat aviocat
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/bisect-create bisect-create
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/clean-diff clean-diff
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/crypto_bench crypto_bench
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/cws2fws cws2fws
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/dvd2concat dvd2concat
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/enc_recon_frame_test enc_recon_frame_test
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/enum_options enum_options
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/ffescape ffescape
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/ffeval ffeval
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/ffhash ffhash
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/ffmpeg ffmpeg
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/ffplay ffplay
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/ffprobe ffprobe
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/fourcc2pixfmt fourcc2pixfmt
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/gen-rc gen-rc
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/general_assembly.pl general_assembly.pl
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/graph2dot graph2dot
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/ismindex ismindex
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/libav-merge-next-commit libav-merge-next-commit
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/loudnorm.rb loudnorm.rb
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/make_chlayout_test make_chlayout_test
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/missing_codec_desc missing_codec_desc
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/murge murge
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/normalize.py normalize.py
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/patcheck patcheck
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/pktdumper pktdumper
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/plotframes plotframes
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/probetest probetest
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/qt-faststart qt-faststart
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/scale_slice_test scale_slice_test
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/seek_print seek_print
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/sidxindex sidxindex
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/source2c source2c
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/target_dec_fate.sh target_dec_fate.sh
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/trasher trasher
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/uncoded_frame uncoded_frame
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/unwrap-diff unwrap-diff
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/venc_data_dump venc_data_dump
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/bin/zmqshell.py zmqshell.py
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/include/libavcodec libavcodec
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/include/libavdevice libavdevice
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/include/libavfilter libavfilter
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/include/libavformat libavformat
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/include/libavutil libavutil
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/include/libpostproc libpostproc
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/include/libswresample libswresample
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/include/libswscale libswscale
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/share/ffmpeg ffmpeg
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffmpeg-all.1 ffmpeg-all.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffmpeg-bitstream-filters.1 ffmpeg-bitstream-filters.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffmpeg-codecs.1 ffmpeg-codecs.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffmpeg-devices.1 ffmpeg-devices.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffmpeg-filters.1 ffmpeg-filters.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffmpeg-formats.1 ffmpeg-formats.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffmpeg-protocols.1 ffmpeg-protocols.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffmpeg-resampler.1 ffmpeg-resampler.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffmpeg-scaler.1 ffmpeg-scaler.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffmpeg-utils.1 ffmpeg-utils.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffmpeg.1 ffmpeg.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffplay-all.1 ffplay-all.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffplay.1 ffplay.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffprobe-all.1 ffprobe-all.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man1/ffprobe.1 ffprobe.1
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man3/libavcodec.3 libavcodec.3
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man3/libavdevice.3 libavdevice.3
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man3/libavfilter.3 libavfilter.3
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man3/libavformat.3 libavformat.3
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man3/libavutil.3 libavutil.3
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man3/libswresample.3 libswresample.3
+ln -s ../../../Cellar/ffmpeg/7.1.1-with-options_1/share/man/man3/libswscale.3 libswscale.3
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavcodec.61.19.101.dylib libavcodec.61.19.101.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavcodec.61.dylib libavcodec.61.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavcodec.a libavcodec.a
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavcodec.dylib libavcodec.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavdevice.61.3.100.dylib libavdevice.61.3.100.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavdevice.61.dylib libavdevice.61.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavdevice.a libavdevice.a
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavdevice.dylib libavdevice.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavfilter.10.4.100.dylib libavfilter.10.4.100.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavfilter.10.dylib libavfilter.10.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavfilter.a libavfilter.a
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavfilter.dylib libavfilter.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavformat.61.7.100.dylib libavformat.61.7.100.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavformat.61.dylib libavformat.61.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavformat.a libavformat.a
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavformat.dylib libavformat.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavutil.59.39.100.dylib libavutil.59.39.100.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavutil.59.dylib libavutil.59.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavutil.a libavutil.a
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libavutil.dylib libavutil.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libpostproc.58.3.100.dylib libpostproc.58.3.100.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libpostproc.58.dylib libpostproc.58.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libpostproc.a libpostproc.a
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libpostproc.dylib libpostproc.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libswresample.5.3.100.dylib libswresample.5.3.100.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libswresample.5.dylib libswresample.5.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libswresample.a libswresample.a
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libswresample.dylib libswresample.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libswscale.8.3.100.dylib libswscale.8.3.100.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libswscale.8.dylib libswscale.8.dylib
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libswscale.a libswscale.a
+ln -s ../Cellar/ffmpeg/7.1.1-with-options_1/lib/libswscale.dylib libswscale.dylib
+ln -s ../../Cellar/ffmpeg/7.1.1-with-options_1/lib/pkgconfig/libavcodec.pc libavcodec.pc
+ln -s ../../Cellar/ffmpeg/7.1.1-with-options_1/lib/pkgconfig/libavdevice.pc libavdevice.pc
+ln -s ../../Cellar/ffmpeg/7.1.1-with-options_1/lib/pkgconfig/libavfilter.pc libavfilter.pc
+ln -s ../../Cellar/ffmpeg/7.1.1-with-options_1/lib/pkgconfig/libavformat.pc libavformat.pc
+ln -s ../../Cellar/ffmpeg/7.1.1-with-options_1/lib/pkgconfig/libavutil.pc libavutil.pc
+ln -s ../../Cellar/ffmpeg/7.1.1-with-options_1/lib/pkgconfig/libpostproc.pc libpostproc.pc
+ln -s ../../Cellar/ffmpeg/7.1.1-with-options_1/lib/pkgconfig/libswresample.pc libswresample.pc
+ln -s ../../Cellar/ffmpeg/7.1.1-with-options_1/lib/pkgconfig/libswscale.pc libswscale.pc
+==> Summary
+🍺  /opt/homebrew/Cellar/ffmpeg/7.1.1-with-options_1: 286 files, 50.7MB, built in 58 seconds
+==> Running `brew cleanup ffmpeg`...
+Disable this behaviour by setting HOMEBREW_NO_INSTALL_CLEANUP.
+Hide these hints with HOMEBREW_NO_ENV_HINTS (see `man brew`).
+Removing: /Users/hasee/Library/Caches/Homebrew/ffmpeg--7.1.1-with-options.tar.xz... (10.5MB)
+Removing: /Users/hasee/Library/Caches/Homebrew/ffmpeg--patch--0eb23ab90c0e5904590731dd3b81c86a4127785bc2b367267d77723990fb94a2.patch... (1.2KB)
+Removing: /Users/hasee/Library/Caches/Homebrew/ffmpeg--patch--57e26caced5a1382cb639235f9555fc50e45e7bf8333f7c9ae3d49b3241d3f77.patch... (1.2KB)

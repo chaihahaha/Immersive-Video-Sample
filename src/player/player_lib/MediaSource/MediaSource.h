@@ -307,7 +307,7 @@ public:
     //!
     //! \return MediaInfo
     //!
-    virtual MediaInfo GetMediaInfo(){return mMediaInfo;};
+    virtual const MediaInfo& GetMediaInfo() const{return mMediaInfo;};
 
     // only used in android player
     void SetDecodeSurface(void* surface, int tex_id, int video_id)

@@ -38,6 +38,9 @@
 #include "360SCVPImpl.h"
 #include "360SCVPHevcTileMerge.h"
 #include "../utils/tinyxml2.h"
+#include <iostream>
+
+#define LOG(a) std::cerr
 
 using namespace tinyxml2;
 //#define XYZ_ORDER

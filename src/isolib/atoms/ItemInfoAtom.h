@@ -41,67 +41,19 @@
 
 VCD_MP4_BEGIN
 
-class ItemInfoEntry;
-class ItemInfoExtension;
-
-class ItemInfoAtom : public FullAtom
+class ItemInfoExtension
 {
 public:
 
     //!
     //! \brief Constructor
     //!
-    ItemInfoAtom();
-    ItemInfoAtom(uint8_t version);
+    ItemInfoExtension()          = default;
 
     //!
     //! \brief Destructor
     //!
-    virtual ~ItemInfoAtom() = default;
-
-    //!
-    //! \brief    Clear contents
-    //!
-    //! \return   void
-    //!
-    void Clear();
-
-    //!
-    //! \brief    Get Entry Count
-    //!
-    //! \return   std::uint32_t
-    //!           number of entries
-    //!
-    std::uint32_t GetEntryCount() const;
-
-    //!
-    //! \brief    Get Item Ids
-    //!
-    //! \return   std::vector<std::uint32_t>
-    //!           All Item IDs in this ItemInfoBox
-    //!
-    std::vector<std::uint32_t> GetItemIds() const;
-
-    //!
-    //! \brief    Add Item Info Entry
-    //!
-    //! \param    [in] const ItemInfoEntry&
-    //!           infoEntry
-    //!
-    //! \return   void
-    //!
-    void AddItemInfoEntry(const ItemInfoEntry& infoEntry);
-
-    //!
-    //! \brief    Get Item Info Entry
-    //!
-    //! \param    [in] const std::uint32_t
-    //!           index
-    //!
-    //! \return   const ItemInfoEntry&
-    //!           ItemInformationEntry
-    //!
-    const ItemInfoEntry& GetItemInfoEntry(const std::uint32_t idx) const;
+    virtual ~ItemInfoExtension() = default;
 
     //!
     //! \brief    Write atom information to stream
@@ -111,7 +63,7 @@ public:
     //!
     //! \return   void
     //!
-    virtual void ToStream(Stream& str);
+    virtual void ToStream(Stream& str) = 0;
 
     //!
     //! \brief    Parse atom information from stream
@@ -121,73 +73,8 @@ public:
     //!
     //! \return   void
     //!
-    virtual void FromStream(Stream& str);
-
-    //!
-    //! \brief    Get Items Number
-    //!
-    //! \param    [in] FourCCInt
-    //!           item Type
-    //! \param    [in] unsigned int
-    //!           index
-    //!
-    //! \return   ItemInfoEntry*
-    //!           ItemInfoEntry
-    //!
-    ItemInfoEntry* GetItemsNumber(FourCCInt itemType, unsigned int index = 0);
-
-    //!
-    //! \brief    Find Item With Type And ID
-    //!
-    //! \param    [in] FourCCInt
-    //!           item Type
-    //! \param    [in] unsigned int
-    //!           ID
-    //! \param    [in] unsigned int&
-    //!           index
-    //!
-    //! \return   ItemInfoEntry*
-    //!           ItemInfoEntry
-    //!
-    ItemInfoEntry* FindItemWithTypeAndID(FourCCInt itemType, unsigned int itemID, unsigned int& index);
-
-    //!
-    //! \brief    Get the number of items
-    //!
-    //! \param    [in] FourCCInt
-    //!           item Type
-    //!
-    //! \return   unsigned int
-    //!           number of items
-    //!
-    unsigned int CountNumberOfItems(FourCCInt itemType);
-
-    //!
-    //! \brief    Get Items By Type
-    //!
-    //! \param    [in] FourCCInt
-    //!           item Type
-    //!
-    //! \return   std::vector<ItemInfoEntry>
-    //!           vector of items
-    //!
-    std::vector<ItemInfoEntry> GetItemsByType(FourCCInt itemType) const;
-
-    //!
-    //! \brief    Get Items By Id
-    //!
-    //! \param    [in] uint32_t
-    //!           item id
-    //!
-    //! \return   ItemInfoEntry
-    //!           ItemInfoEntry
-    //!
-    ItemInfoEntry GetItemById(uint32_t itemId) const;
-
-private:
-    std::vector<ItemInfoEntry> m_itemInfoList;  //!< std::vector of the ItemInfoEntry Atoms
+    virtual void FromStream(Stream& str) = 0;
 };
-
 class ItemInfoEntry : public FullAtom
 {
 public:
@@ -203,6 +90,7 @@ public:
     virtual ~ItemInfoEntry();
 
     ItemInfoEntry(const ItemInfoEntry& itemInfoEntry) = default;
+    //ItemInfoEntry& operator=(const ItemInfoEntry&) = delete;
     ItemInfoEntry& operator=(const ItemInfoEntry&) = default;
 
     //!
@@ -341,7 +229,7 @@ public:
     //!
     //! \return   void
     //!
-    virtual void ToStream(Stream& str);
+    virtual void ToStream(Stream& str) override;
 
     //!
     //! \brief    Parse atom information from stream
@@ -351,7 +239,7 @@ public:
     //!
     //! \return   void
     //!
-    virtual void FromStream(Stream& str);
+    virtual void FromStream(Stream& str) override;
 
 private:
     std::uint32_t m_itemID;                                  //!< ID of the item
@@ -367,19 +255,64 @@ private:
     std::string m_itemUriType;                               //!< Item UIR type
 };
 
-class ItemInfoExtension
+class ItemInfoAtom : public FullAtom
 {
 public:
 
     //!
     //! \brief Constructor
     //!
-    ItemInfoExtension()          = default;
+    ItemInfoAtom();
+    ItemInfoAtom(uint8_t version);
 
     //!
     //! \brief Destructor
     //!
-    virtual ~ItemInfoExtension() = default;
+    virtual ~ItemInfoAtom() = default;
+
+    //!
+    //! \brief    Clear contents
+    //!
+    //! \return   void
+    //!
+    void Clear();
+
+    //!
+    //! \brief    Get Entry Count
+    //!
+    //! \return   std::uint32_t
+    //!           number of entries
+    //!
+    std::uint32_t GetEntryCount() const;
+
+    //!
+    //! \brief    Get Item Ids
+    //!
+    //! \return   std::vector<std::uint32_t>
+    //!           All Item IDs in this ItemInfoBox
+    //!
+    std::vector<std::uint32_t> GetItemIds() const;
+
+    //!
+    //! \brief    Add Item Info Entry
+    //!
+    //! \param    [in] const ItemInfoEntry&
+    //!           infoEntry
+    //!
+    //! \return   void
+    //!
+    void AddItemInfoEntry(const ItemInfoEntry& infoEntry);
+
+    //!
+    //! \brief    Get Item Info Entry
+    //!
+    //! \param    [in] const std::uint32_t
+    //!           index
+    //!
+    //! \return   const ItemInfoEntry&
+    //!           ItemInformationEntry
+    //!
+    const ItemInfoEntry& GetItemInfoEntry(const std::uint32_t idx) const;
 
     //!
     //! \brief    Write atom information to stream
@@ -389,7 +322,7 @@ public:
     //!
     //! \return   void
     //!
-    virtual void ToStream(Stream& str) = 0;
+    virtual void ToStream(Stream& str) override;
 
     //!
     //! \brief    Parse atom information from stream
@@ -399,8 +332,74 @@ public:
     //!
     //! \return   void
     //!
-    virtual void FromStream(Stream& str) = 0;
+    virtual void FromStream(Stream& str) override;
+
+    //!
+    //! \brief    Get Items Number
+    //!
+    //! \param    [in] FourCCInt
+    //!           item Type
+    //! \param    [in] unsigned int
+    //!           index
+    //!
+    //! \return   ItemInfoEntry*
+    //!           ItemInfoEntry
+    //!
+    ItemInfoEntry* GetItemsNumber(FourCCInt itemType, unsigned int index = 0);
+
+    //!
+    //! \brief    Find Item With Type And ID
+    //!
+    //! \param    [in] FourCCInt
+    //!           item Type
+    //! \param    [in] unsigned int
+    //!           ID
+    //! \param    [in] unsigned int&
+    //!           index
+    //!
+    //! \return   ItemInfoEntry*
+    //!           ItemInfoEntry
+    //!
+    ItemInfoEntry* FindItemWithTypeAndID(FourCCInt itemType, unsigned int itemID, unsigned int& index);
+
+    //!
+    //! \brief    Get the number of items
+    //!
+    //! \param    [in] FourCCInt
+    //!           item Type
+    //!
+    //! \return   unsigned int
+    //!           number of items
+    //!
+    unsigned int CountNumberOfItems(FourCCInt itemType);
+
+    //!
+    //! \brief    Get Items By Type
+    //!
+    //! \param    [in] FourCCInt
+    //!           item Type
+    //!
+    //! \return   std::vector<ItemInfoEntry>
+    //!           vector of items
+    //!
+    std::vector<ItemInfoEntry> GetItemsByType(FourCCInt itemType) const;
+
+    //!
+    //! \brief    Get Items By Id
+    //!
+    //! \param    [in] uint32_t
+    //!           item id
+    //!
+    //! \return   ItemInfoEntry
+    //!           ItemInfoEntry
+    //!
+    ItemInfoEntry GetItemById(uint32_t itemId) const;
+
+private:
+    std::vector<ItemInfoEntry> m_itemInfoList;  //!< std::vector of the ItemInfoEntry Atoms
 };
+
+
 
 class FDItemInfoExtension : public ItemInfoExtension
 {
@@ -527,7 +526,7 @@ public:
     //!
     //! \return   void
     //!
-    virtual void ToStream(Stream& str);
+    virtual void ToStream(Stream& str) override;
 
     //!
     //! \brief    Parse atom information from stream
@@ -537,7 +536,7 @@ public:
     //!
     //! \return   void
     //!
-    virtual void FromStream(Stream& str);
+    virtual void FromStream(Stream& str) override;
 
 private:
     std::string m_contentLocation;    //!< Content location

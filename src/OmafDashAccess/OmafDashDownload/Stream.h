@@ -154,7 +154,6 @@ class StreamBlocks : public VCD::MP4::StreamIO {
     offset_t offset = input_offset;
 
     if (stream_size_ < input_offset + size) {
-      OMAF_LOG(LOG_WARNING, "dash stream has not enough data for offset %ld, size %ld\n", input_offset, size);
       return 0;
     }
 
@@ -237,7 +236,6 @@ class StreamBlocks : public VCD::MP4::StreamIO {
       of.close();
       return true;
     } catch (const std::exception &ex) {
-      OMAF_LOG(LOG_ERROR, "Exception when cache the file: %s, ex: %s\n", filename.c_str(), ex.what());
       if (of.is_open()) {
         of.close();
       }

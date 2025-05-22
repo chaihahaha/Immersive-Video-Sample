@@ -36,7 +36,7 @@
 #include <math.h>
 #include "CubeMapRender.h"
 #include "CubeMapRenderTarget.h"
-#include "EGLRenderContext.h"
+//#include "EGLRenderContext.h"
 #include "ERPRender.h"
 #include "ERPRenderTarget.h"
 #include "MultiViewRenderTarget.h"
