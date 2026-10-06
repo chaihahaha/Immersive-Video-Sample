@@ -5,6 +5,10 @@
 
 > 这段移植的历史背景、失败原因复盘、以及内存问题的根因分析，
 > 见 [PORTING_POSTMORTEM.md](PORTING_POSTMORTEM.md)。本文只讲**怎么跑起来**。
+>
+> 第 1 章记录了**每个依赖的实际版本、来源，以及当初是怎么装/怎么编出来的**
+> （emsdk 3.1.40 的安装方式、FFmpeg wasm 库的 OrbStack 交叉编译流程等），
+> 换机器时照着第 1.7 节的清单核对即可。
 
 ---
 
@@ -23,31 +27,81 @@
 
 ## 1. 环境准备
 
-### 1.1 必需组件
+### 1.1 依赖总览（含实际来源与版本）
 
-| 组件 | 版本 / 路径 | 说明 |
-|---|---|---|
-| Emscripten SDK | 3.1.40，`~/source/emsdk` | 其他版本未验证；3.1.40 的 libc++ 与本文档的构建参数配套 |
-| FFmpeg wasm 静态库 | `~/source/ffmpeg_wasm_lib` | 预编译好的 `libavcodec.a` 等，**路径在 CMakeLists 里是写死的** |
-| CMake | ≥ 3.5（本机 4.4.3） | 源码里 `CMAKE_MINIMUM_REQUIRED` 已从 2.8 提到 3.5，否则 CMake 4 会直接报错 |
-| Python 3 | 任意 | 只用来跑本地静态服务器 |
-| 浏览器 | Chrome / Chromium（桌面版） | 需要 WebGL2 + SharedArrayBuffer |
+下面这些是**本机上真实存在、并经过核对**的版本。最后一列写明了它当初是怎么来的。
 
-### 1.2 激活 emsdk
+| 组件 | 实际版本 | 位置 | 来源 / 备注 |
+|---|---|---|---|
+| Emscripten SDK | **3.1.40** | `~/source/emsdk` | 官方 `emsdk` 脚本安装；仓库从 `ghfast.top` 镜像克隆 |
+| emsdk 自带 Node | **20.18.0_64bit** | `~/source/emsdk/node/` | emsdk 自己下载的，**不是**系统 node |
+| emsdk 自带 Python | **3.9.2_64bit** | `~/source/emsdk/python/` | 同上 |
+| Emscripten 源码树 | 3.1.40-git (`5c27e79dd`) | `~/source/emscripten` | 单独 clone 的源码（与 emsdk 装出的 upstream 同一提交，用于对照/改源码） |
+| FFmpeg wasm 静态库 | FFmpeg **n5.1.4** | `~/source/ffmpeg_wasm_lib/{include,lib}` | 用下面 1.4 的 Docker 流程交叉编译 |
+| ffmpeg.wasm 构建仓库 | fork，`main` @ `e2dd60e` | `~/source/ffmpeg.wasm` | fork 自 `ffmpegwasm/ffmpeg.wasm`，remote 是 `git@github.com:chaihahaha/ffmpeg.wasm`，**已推送** |
+| 容器 / 交叉编译环境 | Docker **27.5.1** + BuildKit **v0.18.2** | **OrbStack** | `docker context` 当前就是 `orbstack *`（见 1.5） |
+| CMake | **4.4.3** | `/opt/homebrew/bin/cmake` | 系统 cmake ≥ 3.5 即可；CMake 4 需要额外一个 policy 参数 |
+| 系统 Python | 3.12.7 | | 只用来跑本地静态服务器 |
+| 系统 Node | v25.9.0 | | 与构建无关（emcc 用的是 emsdk 内置 node） |
+| 浏览器 | Chrome / Chromium 桌面版 | | 需要 WebGL2 + SharedArrayBuffer |
+
+> **不需要**的东西：任何 C/C++ 原生编译环境、FFmpeg 的系统包、SDL、curl —— 全部由 emsdk 和预编译库提供。
+
+### 1.2 emsdk / Emscripten 是怎么装的
+
+安装过程（与官方文档一致）大致是：
 
 ```bash
+# 1) 克隆 emsdk（当时走了 ghfast.top 这个 GitHub 镜像来避开网络问题）
+git clone https://ghfast.top/github.com/emscripten-core/emsdk.git ~/source/emsdk
+cd ~/source/emsdk
+
+# 2) 安装并激活指定版本
+./emsdk install 3.1.40
+./emsdk activate 3.1.40
+
+# 3) 每次开新 shell 都要 source 一次
 source ~/source/emsdk/emsdk_env.sh
-emcc --version        # 应显示 3.1.40
 ```
 
-> **重要**：Emscripten 默认把缓存放在 `~/.emscripten_cache`。
-> 如果在受限环境里该目录不可写，需要把它指到工作区内：
->
-> ```bash
-> export EM_CACHE=$PWD/.emcache
-> ```
->
-> 本文档后续命令都假定你已经设好这个变量。
+判断装对了没有：
+
+```bash
+emcc --version
+# emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.40 (5c27e79dd0a9c4e27ef2326841698cdd4f6b5784)
+
+cat ~/source/emsdk/upstream/emscripten/emscripten-version.txt
+# "3.1.40"
+```
+
+**为什么是 3.1.40**：FFmpeg 的 wasm 库是在 `emscripten/emsdk:3.1.40` 这个 Docker 镜像里编出来的。
+播放器的 `render.wasm` 必须用**同一个版本**的 emcc 才能安全地和那些 `.a` 链接。
+换版本很可能出 ABI 问题。
+
+#### ⚠️ `EM_CACHE` 的顺序坑
+
+Emscripten 的缓存目录默认是 `~/.emscripten_cache`。**`emsdk_env.sh` 自己会设置 `EM_CACHE`**
+（见 `emsdk/emsdk.py` 里针对旧版本 SDK 的处理），所以你如果**先 export 再 source，会被它覆盖掉**：
+
+```bash
+# ✗ 错误顺序：EM_CACHE 被 emsdk_env.sh 覆盖
+export EM_CACHE=$PWD/.emcache
+source ~/source/emsdk/emsdk_env.sh
+
+# ✓ 正确顺序：先 source，再 export
+source ~/source/emsdk/emsdk_env.sh
+export EM_CACHE=$PWD/.emcache
+emcc --version
+```
+
+如果那个目录不可写（受限环境、只读家目录、沙箱等），不设 `EM_CACHE` 会直接失败：
+
+```
+PermissionError: [Errno 1] Operation not permitted: '/Users/hasee/.emscripten_cache'
+```
+
+把缓存指到工作区里就能解决，这也是为什么建议固定写成
+`export EM_CACHE=$PWD/.emcache`（`.emcache/` 已经在 `.gitignore` 里，有 160 MB 左右）。
 
 ### 1.3 关于 FFmpeg 静态库
 
@@ -58,12 +112,158 @@ target_include_directories(render PRIVATE /Users/hasee/source/ffmpeg_wasm_lib/in
 SET(LINK_LIB ${LINK_LIB} MediaPlayer ... /Users/hasee/source/ffmpeg_wasm_lib/lib/libavcodec.a ...)
 ```
 
-换机器时需要把这些路径改成你自己的。这个库的性质是：
+换机器时需要把这些路径改成你自己的。这个库的实际性质（读 `ffmpeg_wasm_lib/include/config.h`
+和 `config_components.h` 核对过）：
 
-* FFmpeg **5.1.4**，用同一个 emsdk 3.1.40 编译；
-* `-pthread` + atomics；
-* `CONFIG_HEVC_DECODER 1`；
-* **没有** VAAPI / VideoToolbox / MediaCodec —— 纯软解。
+| 项目 | 值 |
+|---|---|
+| 版本 | FFmpeg **n5.1.4** |
+| 目标 | `--target-os=none --arch=x86_32 --enable-cross-compile --disable-asm` |
+| 工具链 | `--nm=emnm --ar=emar --ranlib=emranlib --cc=emcc --cxx=em++` |
+| 线程 | **`HAVE_PTHREADS 1`** —— 多线程版本，和播放器的 `-pthread` 匹配 |
+| 关键解码器 | `CONFIG_HEVC_DECODER 1`、`CONFIG_H264_DECODER 1`（共启用 456 个解码器） |
+| 启用的外部库 | libx264、libx265、libvpx、libmp3lame、libass、libwebp、`--enable-gpl` |
+| 硬件加速 | **无** VAAPI / VideoToolbox / MediaCodec —— 纯软件解码 |
+
+`~/source/ffmpeg_wasm_lib/` 目录结构：
+
+```
+include/            头文件（含 config.h / config_components.h / curl/）
+include.zip         头文件打包
+lib/                静态库
+  libavcodec.a      19.7 MB
+  libavutil.a  libswscale.a  libswresample.a  libavformat.a  libavfilter.a ...
+  libx264.a  libx265.a
+  libcurl.a         446 KB，见 1.6
+lib.tar.gz          库的打包（10.5 MB）
+third.tar.gz        第三方依赖打包（11 MB）
+```
+
+库里装的是 **wasm 目标文件**（不是主机原生对象），可以用
+`strings libavcodec.a | grep target_features` 确认。
+
+### 1.4 FFmpeg wasm 库是怎么编出来的（Docker 交叉编译）
+
+构建工程在 `~/source/ffmpeg.wasm`。**这就是你问的那个仓库 —— 它是有 `.git` 的**，
+而且已经推送到你的 fork：
+
+```bash
+cd ~/source/ffmpeg.wasm
+git remote -v
+# origin  git@github.com:chaihahaha/ffmpeg.wasm (fetch)
+# origin  git@github.com:chaihahaha/ffmpeg.wasm (push)
+
+git log --oneline -1
+# e2dd60e new dockerfile          ← 你自己的提交 (chai836275709@gmail.com, 2025-05-23)
+
+git status -sb
+# ## main...origin/main           ← 与远程同步，没有未推送内容
+```
+
+> 如果你之前"没看到 `.git`"，很可能看的是 `~/source/ffmpeg_wasm_lib/` ——
+> 那只是把构建产物解包出来的目录，本来就不是 git 仓库。
+
+你改过的 `Dockerfile`（提交 `e2dd60e`）要点：
+
+* 基础镜像 **`FROM emscripten/emsdk:3.1.40`** —— 和播放器用的 emcc 版本一致；
+* **`FFMPEG_VERSION=n5.1.4`**；
+* 只保留 **x264 / x265** 两个前置库，其余（libvpx、lame、ogg、theora、opus、vorbis、
+  zlib、libwebp、freetype、fribidi、harfbuzz、libass、zimg）**全部注释掉** —— 因为
+  播放器只需要 HEVC 解码，不需要那一整条滤镜/字幕/编码依赖链；
+* 把 `ffmpeg-wasm-builder` 和 `exportor` 两个阶段也注释掉了 —— 也就是说这次构建
+  **只产出原生静态库**，不产出 `ffmpeg-core.js`（不是 ffmpeg.wasm 那套 JS API）；
+* 所有 `ADD` 的 URL 都走 `https://ghfast.top/github.com/...` 镜像。
+
+`build/ffmpeg.sh` 里的 configure 骨架：
+
+```bash
+--target-os=none --arch=x86_32 --enable-cross-compile --disable-asm
+--disable-stripping --disable-programs --disable-doc --disable-debug
+--disable-runtime-cpudetect --disable-autodetect
+--nm=emnm --ar=emar --ranlib=emranlib --cc=emcc --cxx=em++ --objcc=emcc --dep-cc=emcc
+--extra-cflags="$CFLAGS" --extra-cxxflags="$CXXFLAGS"
+# FFMPEG_ST 未定义时不加 --disable-pthreads，即多线程构建
+```
+你对这个文件只改了一处：`emmake make -j` → `emmake make -j 2`（限制并行度，省内存）。
+
+`Makefile` 里所有构建目标最终都是：
+
+```bash
+docker buildx build --build-arg ... -o ./packages/core$(PKG_SUFFIX) .
+```
+
+> 注意：`ffmpeg_wasm_lib/include/config.h` 里记录的实际 configure 行是
+> `... --enable-gpl --enable-libx264 --enable-libx265 --enable-libvpx --enable-libmp3lame --enable-libass --enable-libwebp`，
+> 比当前 Dockerfile 的裁剪版更全。说明产出 `lib.tar.gz` 的那次构建用的是**较早一版 Dockerfile**，
+> 之后你才把它精简到只留 x264/x265。两者都能用，当前文档以实际产出的库为准。
+
+### 1.5 OrbStack 有没有用到？—— **用到了**
+
+ffmpeg 的 wasm 交叉编译就是跑在 OrbStack 里的，证据：
+
+```bash
+docker context ls
+# NAME            DOCKER ENDPOINT
+# default         unix:///var/run/docker.sock
+# desktop-linux   unix:///Users/hasee/.docker/run/docker.sock
+# orbstack *      unix:///Users/hasee/.orbstack/run/docker.sock     ← 当前激活
+
+docker info --format '{{.ServerVersion}} | {{.OperatingSystem}} | {{.Name}}'
+# 27.5.1 | OrbStack | orbstack
+
+docker buildx ls
+# orbstack*  running  v0.18.2  linux/amd64 (+2), linux/arm64, ...
+```
+
+* `docker buildx build` 会走 `orbstack` 这个 builder，默认构建 `linux/amd64` ——
+  也就是在 Apple Silicon 上**交叉编译出 amd64 容器**，再在容器里用 emcc 编 to wasm。
+* 主机上还装了一个 OrbStack Linux 机器：`orb list` → `gt  running  gentoo  arm64  4.5 GB`。
+* `desktop-linux` 这个 context 存在但 daemon 没跑 —— Docker Desktop 只是留了个占位。
+
+**重要区分**：
+
+| 阶段 | 需要 OrbStack / Docker 吗 |
+|---|---|
+| 编译 FFmpeg wasm 静态库（一次性，产物已在 `ffmpeg_wasm_lib/`） | **需要** |
+| 编译并运行播放器（本文档的主流程） | **不需要**，主机上 `emcc` + `cmake` + `python3` 就够 |
+
+也就是说，只要 `~/source/ffmpeg_wasm_lib/` 里的 `.a` 还在，换一台没有 Docker 的机器
+照样能把播放器编出来。
+
+### 1.6 那次 libcurl 的尝试（`~/source/curl_py/`）
+
+`ffmpeg_wasm_lib/lib/libcurl.a`（446 KB，curl **8.8.0**）不是 ffmpeg 构建的产物，
+是你另外单独编的：
+
+```
+~/source/curl_py/
+  compile_curl.py    34 KB，用 Python 脚本驱动 curl 的 wasm 编译
+  curl/              curl 8.8.0 源码
+  libcurl/           产物
+  using_ssl.txt      connect easy getinfo http_digest http http_proxy
+```
+
+`using_ssl.txt` 是从 OMAF 代码里抽出、实际用到的 curl 符号清单 —— 也就是想编一个
+**最小化 curl**。这个库是 **HTTP-only、没有 TLS**。
+
+这条路最后被放弃了，原因是 wasm 里**没有 socket 层**：libcurl 需要一个
+`-sPROXY_POSIX_SOCKETS` + 一个 WebSocket→POSIX 的代理进程才能真正联网。
+所以最终改成了 `src/OmafDashAccess/local_curl/local_curl.cpp`：同样的 curl API 子集，
+改成**同步读 Emscripten 虚拟文件系统**。
+
+现在播放器的构建**已经完全不链接 curl**（`libcurl.a` 留在目录里但没被使用）。
+
+### 1.7 换机器时的检查清单
+
+按顺序确认：
+
+1. `emsdk` 装好且是 **3.1.40**：`emcc --version`
+2. `ffmpeg_wasm_lib/{include,lib}` 存在，且 `libavcodec.a` 是 wasm 目标文件
+3. `CMakeLists.txt` 里指向 `ffmpeg_wasm_lib` 的**绝对路径**已改成你的路径
+   （`src/player/app/CMakeLists.txt` 的 `target_include_directories` 和 `SET(LINK_LIB ...)`）
+4. 原始视频素材在 `~/source/IVS_webpage/gaslamp/Gaslamp`（256 MB / 14449 个文件）
+5. `cmake` ≥ 3.5、`python3` 可用
+6. 一个支持 WebGL2 + SharedArrayBuffer 的桌面浏览器
 
 ---
 
@@ -289,7 +489,13 @@ Module.ccall("em_probe_uploads_total", "number", [], [])         // 上传次数
 * **诊断代码还在树里**：`bigalloc_probe.cpp` 用 `emscripten_builtin_malloc/free` 接管了全局分配器做记账，
   对性能有影响；还有一处对 ≥512 KB 分配抓调用栈（限 40 次，打到 stderr）。
   正式发布建议把该文件从链接中去掉。
-* **ffmpeg 库路径硬编码**在 `CMakeLists.txt` 里。
+* **ffmpeg 库路径硬编码**在 `CMakeLists.txt` 里，换机器要改（见 1.7）。
+* **emsdk 版本被钉死在 3.1.40**：`ffmpeg_wasm_lib` 里的 `.a` 是这个版本编的，
+  升级 emcc 前需要先把 FFmpeg 库重编一遍。
+* **`~/source/ffmpeg.wasm` 是你自己的 fork**，与上游 `ffmpegwasm/ffmpeg.wasm` 已经分叉
+  （`Dockerfile`、`build/ffmpeg.sh`、`exe.sh` 都是本地改动）。将来 `git pull` 上游会有冲突。
+* **`libcurl.a` 还在 `ffmpeg_wasm_lib/lib/` 里但已无人使用**，可以删掉以免误导。
+  同理 `~/source/curl_py/` 是已废弃的实验。
 
 ---
 
