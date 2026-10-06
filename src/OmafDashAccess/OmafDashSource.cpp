@@ -147,7 +147,13 @@ int OmafDashSource::OpenMedia(std::string url, std::string cacheDir, void* exter
   int ret = ERROR_NONE;
   DownloadManager* pDM = DOWNLOADMANAGER::GetInstance();
 
-  if (!mIsLocalMedia) {
+  // NOTE: the segment client is created for local media too. In this build the
+  // "HTTP" client is backed by local_curl (src/OmafDashAccess/local_curl), which
+  // serves the preloaded virtual filesystem, so the reader pipeline is identical
+  // in both modes. Previously local media left dash_client_ null, which made
+  // OmafSegment::Open() fail with ERROR_NULL_PTR -- i.e. local playback could
+  // never have worked.
+  {
     pDM->SetMaxCacheSize(MAX_CACHE_SIZE);
 
     pDM->SetCacheFolder(cacheDir);
@@ -329,11 +335,30 @@ int OmafDashSource::OpenMedia(std::string url, std::string cacheDir, void* exter
   return ERROR_NONE;
 }
 
+// Debug switch, settable from the page (see render.cpp): when set, the reader
+// thread is not started, which isolates "MPD + decode/render loops" from the
+// whole download/parse/stitch path.
+static int g_debug_stop_reader = 0;
+
+extern "C" void omaf_debug_set_stop_reader(int v) {
+  g_debug_stop_reader = v;
+  std::cout << "[debug] stop_reader = " << g_debug_stop_reader << std::endl;
+}
+
 int OmafDashSource::StartStreaming()
 {
         std::cout << "start streaming" << std::endl;
-  if (!mIsLocalMedia) {
-        std::cout << "start thread not localmedia" << std::endl;
+  if (g_debug_stop_reader) {
+    std::cout << "[debug] reader thread suppressed" << std::endl;
+    this->SetStatus(STATUS_READY);
+    return ERROR_NONE;
+  }
+  // NOTE: the reader thread is started for local media too. Everything below it
+  // (reading segments from the client, feeding OmafReaderManager, stitching)
+  // is transport agnostic -- it is the network that was optional, not the
+  // pipeline. Without this, local media produced no packets at all.
+  {
+        std::cout << "start reader thread" << std::endl;
     StartThread();
     if (omaf_dash_params_.enable_in_time_viewport_update) {
         std::cout << "starting CatchupThreadWrapper" << std::endl;

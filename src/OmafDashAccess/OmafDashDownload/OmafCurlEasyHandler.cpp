@@ -235,7 +235,6 @@ OMAF_STATUS OmafCurlEasyDownloader::open(const std::string &url) noexcept {
 }
 
 OMAF_STATUS OmafCurlEasyDownloader::start(int64_t offset, int64_t size, onData dcb, onChunkData cdcb, onState scb) noexcept {
-    return ERROR_NONE;
   try {
     std::lock_guard<std::mutex> lock(easy_curl_mutex_);
     if (offset > 0 || size > 0) {
@@ -362,7 +361,6 @@ void OmafCurlEasyDownloader::receiveSB(std::unique_ptr<StreamBlock> sb) noexcept
 
 size_t OmafCurlEasyDownloader::curlBodyCallback(char *ptr, size_t size, size_t nmemb, void *userdata) noexcept {
   size_t bsize = size * nmemb;
-  return bsize;
 
   try {
     //OMAF_LOG(LOG_INFO, "Receive bytes size= %lld\n", bsize);

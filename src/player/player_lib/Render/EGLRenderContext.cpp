@@ -90,12 +90,21 @@ RenderStatus EGLRenderContext::GetStatusAndPose(HeadPose *pose, uint32_t* status
     glfwSetCursorPos((GLFWwindow *)m_window, m_windowWidth / 2, m_windowHeight / 2);
     if (glfwGetMouseButton((GLFWwindow *)m_window, GLFW_MOUSE_BUTTON_LEFT))
     {
-        m_horizontalAngle += m_mouseSpeed * float(m_windowWidth / 2 - xpos);
-        m_verticalAngle += m_mouseSpeed * float(m_windowHeight / 2 - ypos);
+        // Per-frame movement; see the comment on m_lastCursorX in
+        // RenderContext.h. Under Emscripten the glfwSetCursorPos() above does
+        // nothing, so the old centre-relative delta grew without bound.
+        double dx = 0.0, dy = 0.0;
+        ConsumeCursorDelta(xpos, ypos, &dx, &dy);
+        m_horizontalAngle -= m_mouseSpeed * float(dx);
+        m_verticalAngle   -= m_mouseSpeed * float(dy);
         if (m_verticalAngle > RENDER_PI / 2)
             m_verticalAngle = RENDER_PI / 2;
         if (m_verticalAngle < -RENDER_PI / 2)
             m_verticalAngle = -RENDER_PI / 2;
+    }
+    else
+    {
+        ResetCursorDelta();
     }
     if (glfwGetKey((GLFWwindow *)m_window, GLFW_KEY_UP) == GLFW_PRESS)
     {

@@ -8,3 +8,26 @@ player/OmafStructure.h
 player/data_type.h
 player/error.h
 player/ns_def.h
+**/.DS_Store
+src/GLU
+src/google_test
+src/build
+
+# --- WebAssembly port (see WASM_BUILD_AND_RUN.md) ----------------------------
+# Emscripten's cache/sysroot when EM_CACHE is pointed inside the workspace.
+.emcache/
+# Video content staged by tools/stage_content.sh (hard links to the original
+# material). Video never belongs in git.
+webcontent/
+# Output of --preload-file: the preloaded content is pulled into a .data file.
+*.data
+# Headless-browser profile used while debugging the page.
+.agent-browser/
+# Local scratch: editor leftovers and pre-edit copies.
+*.backup
+*.bak
+*.orig
+# Scratch notes from the earlier porting attempts.
+llm/
+# Screenshots captured while debugging; evidence stays local, not in git.
+porting-evidence/

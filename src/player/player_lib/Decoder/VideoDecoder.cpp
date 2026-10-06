@@ -37,7 +37,10 @@
 #include "../../../trace/E2E_latency_tp.h"
 #endif
 
-#define DECODE_THREAD_COUNT 16
+// 16 was far too many for the wasm build: each FFmpeg decoder thread keeps its
+// own pool of 8192x4096 frame buffers (~50 MB per YUV420 frame), which alone
+// exhausted the 2 GB wasm heap before any video appeared.
+#define DECODE_THREAD_COUNT 4
 #define MIN_REMAIN_SIZE_IN_FRAME 2
 
 VCD_NS_BEGIN
@@ -517,6 +520,31 @@ void VideoDecoder::Run()
 RenderStatus VideoDecoder::GetFrame(uint64_t pts, DecodedFrame *&frame, int64_t *corr_pts)
 {
     bool waitFlag = false;
+
+    // Bound the decoded-frame FIFO *before* the loop below.
+    //
+    // The trimming code further down only runs when the loop exits normally, but
+    // the RENDER_WAIT path returns from inside the loop. RENDER_WAIT is the
+    // normal case here ("Need to wait frame to match current pts"), so whenever
+    // the requested pts lagged the decoder the FIFO was never trimmed and grew
+    // without bound -- one 1-16 MB decoded frame per frame produced -- until the
+    // WebAssembly heap was exhausted. Measured: FIFO size climbed past 429 and
+    // the heap hit its 4 GB ceiling in ~20 s.
+    uint32_t max_frame_size = INT_MAX;
+    if (mDecodeInfo.frameRate_den != 0 && mDecodeInfo.segment_duration != 0) {
+        uint32_t framerate = round(float(mDecodeInfo.frameRate_num) / mDecodeInfo.frameRate_den);
+        if (framerate > 0) max_frame_size = framerate * mDecodeInfo.segment_duration * 2;
+    }
+    while (mDecCtx->get_size_of_frame() > max_frame_size) {
+        DecodedFrame *stale = mDecCtx->pop_frame();
+        if (stale == nullptr) break;
+        av_frame_free(&stale->av_frame);
+        if (stale->rwpk) SAFE_DELETE_ARRAY(stale->rwpk->rectRegionPacking);
+        SAFE_DELETE(stale->rwpk);
+        SAFE_DELETE_ARRAY(stale->qtyResolution);
+        SAFE_DELETE(stale);
+    }
+
     while(mDecCtx->get_size_of_frame() > 0){
         frame = mDecCtx->get_front_of_frame();
         LOG(INFO)<<"frame size is: " << mDecCtx->get_size_of_frame() << " and frame pts is: "<< frame->pts<<" and input pts is: "<<pts<<" video id is: "<<mVideoId<<endl;
@@ -551,9 +579,8 @@ RenderStatus VideoDecoder::GetFrame(uint64_t pts, DecodedFrame *&frame, int64_t 
     }
 
     // correct pts due to fifo over size
-    uint32_t max_frame_size = INT_MAX;
-    if (mDecodeInfo.frameRate_den != 0)
-        max_frame_size = round(float(mDecodeInfo.frameRate_num) / mDecodeInfo.frameRate_den) * mDecodeInfo.segment_duration * 2;
+    // (max_frame_size was computed and already enforced at the top of GetFrame;
+    // reusing it here instead of shadowing it)
     if (mDecCtx->get_size_of_frame() > max_frame_size && corr_pts != nullptr && !mDecCtx->bPacketEOS) {
         while (mDecCtx->get_size_of_frame() > max_frame_size / 2) {
             DecodedFrame *frame_d = mDecCtx->pop_frame();

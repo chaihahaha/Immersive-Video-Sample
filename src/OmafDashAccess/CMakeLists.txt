@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 OPTION(USE_ANDROID_NDK
 	"Use android ndk"
@@ -31,14 +31,20 @@ IF(USE_TRACE)
   ADD_DEFINITIONS("-D_USE_TRACE_")
 ENDIF()
 
-INCLUDE_DIRECTORIES(/Users/hasee/source/emsdk/upstream/emscripten/cache/sysroot/include ../utils ../isolib)
-LINK_DIRECTORIES(/Users/hasee/source/emsdk/upstream/emscripten/cache/sysroot/lib ../isolib/dash_parser ../build/client/isolib/dash_parser /Users/hasee/source/Immersive-Video-Sample/src/build/client/isolib/dash_parser/libdashparser.a)
+# NOTE: do NOT add an explicit -I to the emsdk sysroot here. emcc already supplies its
+# own sysroot; adding <emsdk>/cache/sysroot/include as a plain -I hijacks stddef.h /
+# math.h and makes every C++20 TU fail to compile ("no member named 'nullptr_t'").
+INCLUDE_DIRECTORIES(../utils ../isolib)
+LINK_DIRECTORIES(../isolib/dash_parser ${CMAKE_BINARY_DIR}/isolib/dash_parser)
 #ADD_SUBDIRECTORY("curl")
 #INCLUDE_DIRECTORIES("curl/include")
 #LINK_DIRECTORIES("curl/lib")
 ADD_COMPILE_OPTIONS(
     "-matomics"
     "-mbulk-memory"
+    # Leak hunting for the wasm heap: interpose the allocator so
+    # __lsan_do_leak_check() can name what is being leaked on the reader path.
+    
 )
 ADD_LINK_OPTIONS(
     "-pthread"
@@ -57,15 +63,20 @@ set(DIR_SRC
     ${DOWN_SRC}
     ${PARSE_SRC}
     ${PREDICT_SRC}
-    #"fake_curl/src/curl.cpp"
+    # Note: fake_curl/src/curl.cpp (the emscripten_fetch shim) stays disabled.
+    # It is replaced by local_curl/local_curl.cpp below.
 )
 
-ADD_LIBRARY(OmafDashAccess SHARED  ${DIR_SRC} ../utils/Log.cpp ../utils/tinyxml2.cpp)
+# local_curl implements the libcurl subset OmafDashAccess uses directly on top of
+# the Emscripten virtual filesystem. It is compiled into this library, and the
+# real libcurl is deliberately NOT linked any more: the WebAssembly build has no
+# usable POSIX socket backend (see commit 189987d and local_curl.cpp's header).
+ADD_LIBRARY(OmafDashAccess SHARED  ${DIR_SRC} local_curl/local_curl.cpp
+            ../utils/Log.cpp ../utils/tinyxml2.cpp)
 
 TARGET_LINK_LIBRARIES(OmafDashAccess glog)
 TARGET_LINK_LIBRARIES(OmafDashAccess dashparser)
 TARGET_LINK_LIBRARIES(OmafDashAccess 360SCVP)
-TARGET_LINK_LIBRARIES(OmafDashAccess curl)
 IF(USE_SAFE_MEM)
 TARGET_LINK_LIBRARIES(OmafDashAccess safestring_shared)
 ENDIF()

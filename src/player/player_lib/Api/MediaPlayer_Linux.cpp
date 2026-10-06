@@ -147,17 +147,32 @@ RenderStatus MediaPlayer_Linux::Start(void *render_context)
 RenderStatus MediaPlayer_Linux::Play()
 {
     std::chrono::high_resolution_clock clock;
-    uint64_t lastTime = 0;
-    uint64_t prevLastTime = 0;
-    uint64_t deltaTime = 0;
-    uint64_t renderCount = 0; // record render times
-    int64_t  correctCount = 0;
-    uint64_t start = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
-    bool quitFlag = false;
-    uint64_t needDropFrames = 0;
-    int64_t accumTimeDelay = 0;
+    // Play() is now called once per frame from the main loop (its internal
+    // do/while was removed for the browser build), so this per-playback state
+    // MUST survive between calls. As plain locals it was reset to zero on every
+    // frame, which pinned pose->pts / renderCount at 0 forever: the decoder
+    // produced frames with pts >= 1, GetFrame() answered RENDER_WAIT every time,
+    // and not a single frame was ever drawn.
+    static uint64_t lastTime = 0;
+    static uint64_t prevLastTime = 0;
+    static uint64_t deltaTime = 0;
+    static uint64_t renderCount = 0; // record render times
+    static int64_t  correctCount = 0;
+    static uint64_t start = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now().time_since_epoch()).count();
+    static bool quitFlag = false;
+    static uint64_t needDropFrames = 0;
+    static int64_t accumTimeDelay = 0;
     //do
     //{
+        // Play() is called once per frame from the browser main loop, which is
+        // the only thread that owns the WebGL context. Render sources are
+        // created on the OMAF reader thread, so their GL setup and the decoded
+        // frame uploads are queued and executed here.
+        if (m_rsFactory != NULL)
+        {
+            m_rsFactory->PumpMainThread();
+        }
+
         HeadPose *pose = new HeadPose;
         memset_s(pose, sizeof(HeadPose), 0);
         m_renderManager->GetStatusAndPose(pose, &m_status);

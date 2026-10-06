@@ -37,8 +37,16 @@
 #define _SWRENDERSOURCE_H_
 
 #include <vector>
+#include <deque>
+#include <memory>
+#include <mutex>
+#include <utility>
 #include "../Common/Common.h"
 #include "RenderSource.h"
+
+// Diagnostics (see omaf_debug_set_* in render.cpp).
+extern int g_debug_no_upload;
+extern int g_debug_no_gl;
 #include "../Render/RenderBackend.h"
 
 
@@ -82,9 +90,42 @@ public:
     //!
     virtual RenderStatus CreateRenderSource(bool hasInited);
 
+    //! \brief Queue a decoded frame for upload. Runs on the decoder/reader
+    //!        thread and performs no GL work: the pixel planes are copied out
+    //!        of the decoder's AVFrame (which the caller frees as soon as this
+    //!        returns) and uploaded later by PumpGL().
     virtual RenderStatus process(BufferInfo* bufInfo);
 
+    //! \brief Do all pending GL work: build shader/mesh/textures on first use,
+    //!        then upload every queued frame.
+    //!
+    //! MUST only be called from the thread that owns the GL context -- in the
+    //! wasm build that is the browser main thread, via
+    //! RenderSourceFactory::PumpMainThread().
+    RenderStatus PumpGL();
+
 private:
+
+    //! \brief Compile shader / build mesh / create textures and FBO, once.
+    RenderStatus EnsureGL();
+
+    // Reusable upload staging, one set per render source.
+    //
+    // The frame handed over by the decoder thread must be copied, because the
+    // decoder frees its AVFrame as soon as process() returns. Doing that with a
+    // fresh std::vector per frame allocated (and, in practice, retained)
+    // 1-4 MB per frame, which exhausted the wasm heap after ~90 s of playback.
+    // Resizing these buffers in place allocates only on the first frame and
+    // whenever the resolution changes.
+    std::vector<uint8_t> m_uploadPlanes[4];
+    bool                 m_hasPendingFrame;
+    uint32_t             m_pendingFrameW;
+    uint32_t             m_pendingFrameH;
+    uint32_t             m_pendingFrameStride[4];
+    PixelFormat::Enum    m_pendingFrameFormat;
+    uint64_t             m_pendingFramePts;
+    std::pair<int32_t, int32_t> m_pendingFrameViewId;
+
 
     //! \brief Create Source Texture
     //!
@@ -98,8 +139,17 @@ private:
     //!         RENDER_STATUS_OK if success, else fail reason
     //!
     RenderStatus CreateR2TFBO(bool hasInited);
+
 private:
     bool            bInited;
+    bool            m_glReady;
+    // deferred Initialize() parameters, applied inside EnsureGL()
+    bool            m_pendingResize;
+    int32_t         m_pendingPixFmt;
+    uint32_t        m_pendingWidth;
+    uint32_t        m_pendingHeight;
+
+    std::mutex                                 m_pendingMutex;
 };
 
 VCD_NS_END

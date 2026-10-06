@@ -38,8 +38,36 @@ VCD_NS_BEGIN
 static void CheckShaderError(GLuint shader, GLuint flag, bool isProgram, const std::string& errorMessage);
 static GLuint CreateShader(const std::string& text, GLenum shaderType);
 
+VideoShader::VideoShader()
+{
+    m_program = 0;
+    for (unsigned int i = 0; i < NUM_SHADERS; i++)
+    {
+        m_shaders[i] = 0;
+    }
+}
+
 VideoShader::VideoShader(const std::string& vertex,const std::string& fragment)
 {
+    m_program = 0;
+    for (unsigned int i = 0; i < NUM_SHADERS; i++)
+    {
+        m_shaders[i] = 0;
+    }
+    Init(vertex, fragment);
+}
+
+// Split out of the constructor so that a VideoShader can be default-constructed
+// on a worker thread and only compiled later on the thread that owns the GL
+// context. Every GL call in the wasm build must happen on the browser main
+// thread.
+void VideoShader::Init(const std::string& vertex, const std::string& fragment)
+{
+    if (m_program != 0)
+    {
+        return;  // already initialised
+    }
+
     m_shaders[0] = CreateShader(vertex, GL_VERTEX_SHADER);
     m_shaders[1] = CreateShader(fragment, GL_FRAGMENT_SHADER);
     m_program = glCreateProgram();
@@ -55,7 +83,6 @@ VideoShader::VideoShader(const std::string& vertex,const std::string& fragment)
 
     glValidateProgram(m_program);
     CheckShaderError(m_program, GL_VALIDATE_STATUS, true, "Error: Program invalid!");
-
 }
 
 VideoShader::~VideoShader()

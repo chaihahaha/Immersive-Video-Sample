@@ -3,75 +3,128 @@
 
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
-    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <!--
+      NOTE: COOP/COEP are deliberately NOT declared here as <meta http-equiv>.
+      Browsers ignore the http-equiv form for these two headers, so the page
+      would not be cross-origin isolated, SharedArrayBuffer would be missing and
+      this pthreads build could not start. They are sent as real HTTP response
+      headers by tools/serve_wasm.py instead. Opening this file with file:// or
+      with a plain static server will not work.
+    -->
+    <title>OMAF 360 player (wasm)</title>
     <link rel="shortcut icon" href="#"/>
+    <style>
+      body { margin: 0; background: #111; color: #ddd; font: 13px/1.5 monospace; }
+      #canvas { display: block; margin: 0 auto; background: #000; }
+      #status { padding: 8px 12px; white-space: pre-wrap; max-height: 30vh; overflow: auto; }
+      #status .err { color: #ff6b6b; }
+    </style>
 </head>
 
 <body>
 
-    <!-- Create the canvas that the C++ code will draw into -->
+    <!-- Exactly one canvas: the C++ side renders into this element. -->
     <canvas id="canvas" width="960" height="960" oncontextmenu="event.preventDefault()"></canvas>
+    <div id="status">booting…</div>
 
-<canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-<script>
-  var Module = {
-    canvas: (function() { return document.getElementById('canvas'); })(),
-      printErr: function(text) {
-          console.error(text);
-      },
-      //websocket: {
-      //    url: 'ws://127.0.0.1:8000',
-      //    subprotocol: 'binary',
-      //}
-  };
-  Module.onRuntimeInitialized = function() {
-        FS.mkdir('/cache');
-        FS.mount(IDBFS, {}, '/cache');
-        FS.syncfs(true, (err) => {
-              if (err) console.error(err);
-              else console.log('FS synced');
-        });
-        console.log("WASM initialized!");
-        //Module._start_app();
-        //Module.ccall('start_app_fake_curl_test_main_loop', null, [], []); 
+    <script>
+      var statusEl = document.getElementById('status');
+      var MAX_LINES = 200;   // the player is extremely chatty; keep the DOM bounded
+
+      // Lightweight instrumentation, readable via
+      //   agent-browser eval 'JSON.stringify(window.__stats)'
+      window.__stats = {
+        lines: 0, decoders: 0, errs: 0, top: {},
+        heapMB: function () { return Math.round(Module.HEAPU8.length / 1048576); },
+        topN: function (n) {
+          var e = [];
+          for (var k in window.__stats.top) e.push([k, window.__stats.top[k]]);
+          e.sort(function (a, b) { return b[1] - a[1]; });
+          return e.slice(0, n || 8);
+        }
       };
 
-  Module.canvas.addEventListener("click", function() {
-    // Call an exported C++ function if you want C++ to handle it
-    // Module.ccall('enablePointerLock', 'void', []);
-    // OR directly call the GLFW function if accessible (less common)
-    // OR (most common) use the browser's Pointer Lock API directly
-    Module.canvas.requestPointerLock();
-  });
+      // Counting happens for every line regardless of verbosity.
+      function tally(msg, isErr) {
+        window.__stats.lines++;
+        var key = msg.slice(0, 36);
+        window.__stats.top[key] = (window.__stats.top[key] || 0) + 1;
+        if (msg.indexOf('CreateVideoDecoder') >= 0) window.__stats.decoders++;
+        if (msg.indexOf('Failed to create the transfer') >= 0) window.__stats.xferFail = (window.__stats.xferFail || 0) + 1;
+        if (isErr) window.__stats.errs++;
+      }
 
-  // Optional: Handle pointer lock changes/errors
-  document.addEventListener('pointerlockchange', lockChangeAlert, false);
-  document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
-  document.addEventListener('pointerlockerror', lockErrorAlert, false);
-  document.addEventListener('mozpointerlockerror', lockErrorAlert, false);
+      function say(msg, isErr) {
+        var line = document.createElement('div');
+        if (isErr) line.className = 'err';
+        line.textContent = msg;
+        statusEl.appendChild(line);
+        while (statusEl.childNodes.length > MAX_LINES) {
+          statusEl.removeChild(statusEl.firstChild);
+        }
+        statusEl.scrollTop = statusEl.scrollHeight;
+        // stdout is not mirrored to the devtools console on purpose: the player
+        // emits tens of thousands of lines (some with broken printf formats that
+        // yield binary garbage), which makes the console unusable. Read
+        // #status instead.
+      }
 
-  function lockChangeAlert() {
-    if (document.pointerLockElement === Module.canvas ||
-        document.mozPointerLockElement === Module.canvas) {
-      console.log('The pointer lock status is now locked');
-      // You could potentially call a C++ function here to notify it
-      // Module.ccall('notifyPointerLockAcquired', 'void', []);
-    } else {
-      console.log('The pointer lock status is now unlocked');
-      // You could potentially call a C++ function here to notify it
-      // Module.ccall('notifyPointerLockReleased', 'void', []);
-    }
-  }
-  function lockErrorAlert() {
-    console.error('Error locking pointer.');
-  }
-</script>
-<!-- Load your main render.js script AFTER the Module definition -->
-<script src="render.js"></script>    
-   
-<p>Animate VR canvas through WebAssembly.</p>
+      // Cache-bust render.js / render.wasm / render.worker.js / render.data.
+      // A stale render.wasm silently masks every rebuild, which is very
+      // confusing while iterating on the port.
+      var BUILD_TAG = String(Date.now());
+      window.VERBOSE_LOGS = /(\?|&)verbose(=|&|$)/.test(location.search);
+
+      // URL flags the C++ side can read (see ivs_js_flag in render.cpp).
+      // e.g. ?stopReader=1 skips starting the OMAF reader thread, which
+      // isolates the decode/render loops from the download path.
+      window.__flags = {};
+      location.search.replace(/^\?/, '').split('&').forEach(function (kv) {
+        if (!kv) return;
+        var i = kv.indexOf('=');
+        var k = i < 0 ? kv : kv.slice(0, i);
+        var v = i < 0 ? '1' : kv.slice(i + 1);
+        window.__flags[k] = v;
+      });
+
+      var Module = {
+        canvas: (function () { return document.getElementById('canvas'); })(),
+        locateFile: function (path) { return path + '?v=' + BUILD_TAG; },
+        // The player emits ~9000 lines/second, so by default stdout is counted
+        // but not turned into DOM nodes. Append "?verbose" to the URL to render
+        // the last MAX_LINES lines on the page instead.
+        print: function (text) {
+          tally(text, false);
+          if (window.VERBOSE_LOGS) say(text, false);
+        },
+        printErr: function (text) {
+          tally('[stderr] ' + text, true);
+          if (window.VERBOSE_LOGS) say('[stderr] ' + text, true);
+          console.error(text);   // stderr is low volume and worth surfacing
+        }
+      };
+
+      Module.onRuntimeInitialized = function () {
+        say('WASM runtime initialized');
+        if (typeof SharedArrayBuffer === 'undefined') {
+          say('SharedArrayBuffer is unavailable — the page is not cross-origin ' +
+              'isolated, so pthreads cannot start. Serve it with tools/serve_wasm.py.', true);
+        }
+      };
+
+      Module.canvas.addEventListener('click', function () {
+        Module.canvas.requestPointerLock();
+      });
+
+      document.addEventListener('pointerlockchange', function () {
+        console.log(document.pointerLockElement === Module.canvas
+          ? 'pointer lock acquired' : 'pointer lock released');
+      }, false);
+      document.addEventListener('pointerlockerror', function () {
+        console.error('Error locking pointer.');
+      }, false);
+    </script>
+    <script src="render.js"></script>
 
 </body>
 

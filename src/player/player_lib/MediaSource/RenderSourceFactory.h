@@ -33,6 +33,8 @@
 #ifndef _RENDERSOURCEFACTORY_H_
 #define _RENDERSOURCEFACTORY_H_
 
+#include <list>
+#include <mutex>
 #include "../Common/Common.h"
 #include "RenderSource.h"
 #include "../Decoder/FrameHandlerFactory.h"
@@ -112,6 +114,14 @@ public:
 
      std::map<uint32_t, RenderSource*> GetRenderSources(){return mMapRenderSource;};
 
+     //! \brief Run all pending GL work for every render source.
+     //!
+     //! Render sources are created on the OMAF reader thread, which cannot touch
+     //! WebGL, so the shader/mesh/texture setup and the frame uploads are queued
+     //! and executed here. MUST be called from the thread that owns the GL
+     //! context -- the player calls it once per frame from the main render loop.
+     RenderStatus PumpMainThread();
+
      uint32_t GetHighTileRow(){return m_highTileRow;};
      void SetHighTileRow(uint32_t row) {m_highTileRow = row;};
 
@@ -128,6 +138,11 @@ private:
      int32_t                           m_sourceMode;
      void                              *share_window;
 
+     // Guards mMapRenderSource: CreateHandler/RemoveHandler run on the OMAF
+     // reader thread while PumpMainThread runs on the main thread.
+     std::mutex                        mMapMutex;
+     // Render sources whose GL objects must be deleted on the main thread.
+     std::list<RenderSource*>          mPendingDestroy;
 };
 
 VCD_NS_END

@@ -152,6 +152,10 @@ struct RenderConfig {
   uint32_t renderInterval;
   // glog level output setting
   int32_t minLogLevel;
+  // Cap for the local-filesystem curl backend, in bytes per second. 0 = no cap.
+  // Reading preloaded files is a memcpy, which lets the OMAF reader thread race
+  // far ahead of the renderer and exhaust the WebAssembly heap.
+  uint32_t localRateLimitBytesPerSec;
   // for stitching
   uint32_t maxVideoDecodeWidth;
   uint32_t maxVideoDecodeHeight;

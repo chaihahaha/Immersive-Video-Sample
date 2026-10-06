@@ -507,7 +507,10 @@ void DashMediaSource::Run() {
       ProcessAudioPacket();
     std::cout << "inside DashMediaSource::Run processd packet" << std::endl;
     }
-    usleep(1000);
+    // DIAGNOSTIC: 1 ms made this loop spin at ~340 Hz while reporting "no
+    // packet", and the wasm heap grew ~250 MB/s. 20 ms throttles the spin by
+    // 20x so we can tell whether the growth is per-iteration.
+    usleep(20000);
   }
 }
 

@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 OPTION(USE_OMAF
        "Use omaf"
@@ -70,6 +70,7 @@ ADD_COMPILE_OPTIONS(
     "-Wno-implicit-function-declaration"
     "-matomics"
     "-mbulk-memory"
+    
 )
 #ADD_COMPILE_OPTIONS("-s USE_GLFW=3" "-s USE_WEBGL2=1" "-s FULL_ES2=1" "-s MIN_WEBGL_VERSION=2")
 ADD_LINK_OPTIONS(

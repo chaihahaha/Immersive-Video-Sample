@@ -36,7 +36,11 @@
 
 VCD_NS_BEGIN
 
-RenderSource::RenderSource() : m_videoShaderOfR2T(shader_r2t_vs, shader_r2t_fs)
+// NOTE: deliberately no shader compilation here. Render sources are constructed
+// on the OMAF reader thread (RenderSourceFactory::CreateHandler), which has no
+// GL context in the wasm build. SWRenderSource::EnsureGL() builds the program on
+// the browser main thread instead.
+RenderSource::RenderSource()
 {
     m_sourceTextureHandle = NULL;
     m_sourceTextureNumber = 0;

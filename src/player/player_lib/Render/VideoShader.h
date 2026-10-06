@@ -67,8 +67,17 @@ VCD_NS_BEGIN
 class VideoShader
 {
 public:
-    VideoShader()=default;
+    // Default construction deliberately performs no GL work: in the wasm build
+    // render sources are allocated on the OMAF reader thread, which has no GL
+    // context. Call Init() later, from the browser main thread.
+    VideoShader();
     VideoShader(const std::string &vertexFileName, const std::string &fragmentFileName);
+
+    //! \brief Compile and link the program. Must run on the GL-owning thread.
+    //!        Calling it twice is a no-op.
+    void Init(const std::string &vertex, const std::string &fragment);
+
+    bool IsValid() const { return m_program != 0; }
     void Bind();
 
     virtual ~VideoShader();

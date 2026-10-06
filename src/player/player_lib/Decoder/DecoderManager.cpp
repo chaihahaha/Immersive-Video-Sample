@@ -181,8 +181,17 @@ RenderStatus DecoderManager::CheckVideoDecoders(vector<DashPacket*> packets, std
     return ret;
 }
 
+// Debug switch set from the page (see render.cpp / omaf_debug_set_stop_decode).
+// Skips the whole decode + frame-hand-off path while leaving download and parsing
+// running, to tell whether the heap growth comes from the decoder or from the
+// segment/parse side.
+static int g_debug_stop_decode = 0;
+
+extern "C" void omaf_debug_set_stop_decode(int v) { g_debug_stop_decode = v; }
+
 RenderStatus DecoderManager::SendVideoPackets( DashPacket* packets, uint32_t cnt )
 {
+    if (g_debug_stop_decode) return RENDER_STATUS_OK;
     std::cout << "decoder manager got dash packet size: ";
     for (int i=0; i< 16; i++) {
         std::cout <<  packets[i].size << ",";

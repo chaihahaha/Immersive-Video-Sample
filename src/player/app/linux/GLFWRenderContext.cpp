@@ -216,12 +216,24 @@ RenderStatus GLFWRenderContext::GetStatusAndPoseFor3D(HeadPose *pose, uint32_t* 
     glfwSetCursorPos((GLFWwindow *)m_window, m_windowWidth / 2, m_windowHeight / 2);
     if (glfwGetMouseButton((GLFWwindow *)m_window, GLFW_MOUSE_BUTTON_LEFT))
     {
-        m_horizontalAngle += m_mouseSpeed * float(m_windowWidth / 2 - xpos);
-        m_verticalAngle += m_mouseSpeed * float(m_windowHeight / 2 - ypos);
+        // Rotate by the movement since the previous frame, not by the distance
+        // from the window centre. See the comment on m_lastCursorX in
+        // RenderContext.h: the glfwSetCursorPos() call above is a no-op in the
+        // browser, so a centre-relative delta grows without bound while dragging
+        // and the view spins faster and faster (once per frame).
+        double dx = 0.0, dy = 0.0;
+        ConsumeCursorDelta(xpos, ypos, &dx, &dy);
+        m_horizontalAngle -= m_mouseSpeed * float(dx);
+        m_verticalAngle   -= m_mouseSpeed * float(dy);
         if (m_verticalAngle > RENDER_PI / 2)
             m_verticalAngle = RENDER_PI / 2;
         if (m_verticalAngle < -RENDER_PI / 2)
             m_verticalAngle = -RENDER_PI / 2;
+    }
+    else
+    {
+        // Button released: the next drag must start from a fresh reference.
+        ResetCursorDelta();
     }
     if (glfwGetKey((GLFWwindow *)m_window, GLFW_KEY_UP) == GLFW_PRESS)
     {
@@ -402,8 +414,15 @@ RenderStatus GLFWRenderContext::GetStatusAndPoseFor2D(HeadPose *pose, uint32_t* 
     pose->vViewId = -1;
     if (glfwGetMouseButton((GLFWwindow *)m_window, GLFW_MOUSE_BUTTON_LEFT))
     {
-        m_horizontalAngle -= m_mouseSpeed * float(m_windowWidth / 2 - xpos);
-        m_verticalAngle += m_mouseSpeed * float(m_windowHeight / 2 - ypos);
+        // Per-frame movement; see the same fix in GetStatusAndPoseFor3D.
+        double dx = 0.0, dy = 0.0;
+        ConsumeCursorDelta(xpos, ypos, &dx, &dy);
+        m_horizontalAngle += m_mouseSpeed * float(dx);
+        m_verticalAngle   -= m_mouseSpeed * float(dy);
+    }
+    else
+    {
+        ResetCursorDelta();
     }
     if (glfwGetKey((GLFWwindow *)m_window, GLFW_KEY_UP) == GLFW_PRESS)
     {

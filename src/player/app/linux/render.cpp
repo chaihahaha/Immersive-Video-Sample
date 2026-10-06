@@ -46,6 +46,27 @@
 #include "../../player_lib/Render/RenderContext.h"
 #include "GLFWRenderContext.h"
 
+// Implemented in src/OmafDashAccess/local_curl/local_curl.cpp. Declares where
+// the preloaded content directory is so segment URLs can be resolved to files
+// in the Emscripten virtual filesystem.
+extern "C" void em_local_curl_set_root(const char *root);
+// Aggregate delivery cap in bytes/second (0 = unlimited). Without it the reader
+// thread consumes the whole presentation in seconds and the wasm heap fills up.
+extern "C" void em_local_curl_set_rate_limit(double bytes_per_second);
+// Debug switches owned by OmafDashSource (see omaf_debug_set_stop_reader).
+extern "C" void omaf_debug_set_stop_reader(int v);
+extern "C" void omaf_debug_set_stop_stitch(int v);
+extern "C" void omaf_debug_set_stop_decode(int v);
+extern "C" void omaf_debug_set_no_upload(int v);
+extern "C" void omaf_debug_set_no_gl(int v);
+
+// Reads a flag from window.__flags in the page, so behaviour can be bisected
+// from the URL without rebuilding: index.html?stopReader=1
+EM_JS(int, ivs_js_flag, (const char *name), {
+  if (typeof window === 'undefined' || !window.__flags) return 0;
+  return window.__flags[UTF8ToString(name)] ? 1 : 0;
+});
+
 #define MAXFOV 140
 #define MINFOV 50
 #define MAXVIEWPORTLEN 2000
@@ -63,8 +84,13 @@ std::string config_string = R"(
     <!-- windowWidth/windowHeight is for width and height of window -->
     <windowWidth>960</windowWidth>
     <windowHeight>960</windowHeight>
-    <!-- Resource URL, can be remote or local -->
-    <url>http://127.0.0.1:8000/Gaslamp/Test.mpd</url>
+    <!-- Resource URL, can be remote or local.
+         A URL WITHOUT a scheme selects OMAF's "local media" mode: no HTTP
+         client is created outside the virtual filesystem, and the MPD plus all
+         segments are read from --preload-file content through local_curl.
+         (An http:// URL would additionally require MPDInfo::baseURL to contain
+         an "IP:port", which this MPD's "/VOD8K/" base does not.) -->
+    <url>/Gaslamp/Test.mpd</url>
     <!-- sourceType 0 is for DashSource -->
     <sourceType>0</sourceType>
     <!-- enableExtractor 0 is false and 1 is true -->
@@ -80,6 +106,11 @@ std::string config_string = R"(
     <viewportHeight>960</viewportHeight>
     <!-- cache path -->
     <cachePath>/Gaslamp</cachePath>
+    <!-- Pacing for the local-filesystem curl backend, in bytes per second.
+         The content is about 400 KB/s of video, so this is ~2x real time: fast
+         enough to buffer ahead, slow enough that the reader thread cannot race
+         hundreds of segments past the renderer. 0 disables the cap. -->
+    <localRateLimitBytesPerSec>1048576</localRateLimitBytesPerSec>
     <!-- log level: INFO < WARNING < ERROR < FATAL -->
     <minLogLevel>WARNING</minLogLevel>
     <!-- limited video decoder resolution -->
@@ -139,6 +170,16 @@ bool parseRenderFromXml(std::string xml_file, struct RenderConfig &renderConfig)
       LOG(ERROR) << " invalid params for windowWidth OR windowHeight! " << std::endl;
       return RENDER_ERROR;
     }
+    // Optional pacing knob for the local-filesystem curl backend.
+    // Without it the reader thread pulls the entire presentation in seconds and
+    // the resulting backlog exhausts the WebAssembly heap.
+    renderConfig.localRateLimitBytesPerSec = 0;
+    XMLElement* rateElem = info->FirstChildElement("localRateLimitBytesPerSec");
+    if (rateElem != NULL && rateElem->GetText() != NULL)
+    {
+      renderConfig.localRateLimitBytesPerSec = (uint32_t)atoll(rateElem->GetText());
+    }
+
     XMLElement* urlElem = info->FirstChildElement("url");
     if (urlElem != NULL)
     {
@@ -407,12 +448,46 @@ RenderContext* InitRenderContext(struct RenderConfig config)
   return context;
 }
 
+// ---------------------------------------------------------------------------
+// Diagnostic: the player writes ~9000 lines/second to std::cout, and the wasm
+// heap grows roughly 30-50 KB per line until it hits the 4 GB ceiling. Redirect
+// std::cout to a discarding buffer to find out whether the logging path is what
+// allocates. Set IVS_SILENCE_STDOUT to 0 to get the logs back.
+// ---------------------------------------------------------------------------
+#define IVS_SILENCE_STDOUT 0
+
+#if IVS_SILENCE_STDOUT
+namespace {
+class NullStreamBuf : public std::streambuf {
+ protected:
+  int overflow(int c) override { return c; }
+  std::streamsize xsputn(const char *, std::streamsize n) override { return n; }
+};
+NullStreamBuf g_null_buf;
+}  // namespace
+#endif
+
+// Heap accounting hook, implemented in bigalloc_probe.cpp.
+extern "C" void em_probe_report(const char *tag);
+
 void main_loop_play() {
+    static unsigned long frames = 0;
+    static const int probe_on = ivs_js_flag("probe");  // index.html?probe=1
+    ++frames;
+    if (probe_on && frames % 60 == 0) {
+        char tag[32];
+        snprintf(tag, sizeof(tag), "frame%lu", frames);
+        em_probe_report(tag);
+    }
     player->Play();
 }
 
 EMSCRIPTEN_KEEPALIVE
 int main() {
+#if IVS_SILENCE_STDOUT
+    std::cout.rdbuf(&g_null_buf);
+    std::cerr.rdbuf(&g_null_buf);
+#endif
     FILE *config_file = fopen("config.xml", "w");
     size_t config_file_size = config_string.size();
     fwrite(config_string.c_str(), 1, config_file_size, config_file);
@@ -431,6 +506,18 @@ int main() {
     }
     std::cout << "loaded config" << std::endl;
 
+    // Tell the local curl backend where the preloaded content lives. Every
+    // segment URL is resolved against this directory by basename.
+    em_local_curl_set_root(renderConfig.cachePath);
+    em_local_curl_set_rate_limit((double)renderConfig.localRateLimitBytesPerSec);
+    omaf_debug_set_stop_reader(ivs_js_flag("stopReader"));
+    omaf_debug_set_stop_stitch(ivs_js_flag("stopStitch"));
+    omaf_debug_set_stop_decode(ivs_js_flag("stopDecode"));
+    omaf_debug_set_no_upload(ivs_js_flag("noUpload"));
+    omaf_debug_set_no_gl(ivs_js_flag("noGL"));
+    std::cout << "content root = " << renderConfig.cachePath
+              << ", rate limit = " << renderConfig.localRateLimitBytesPerSec << " B/s" << std::endl;
+
     player->Create(renderConfig);
     RenderContext* context = InitRenderContext(renderConfig);
     if (player->Start(context) != RENDER_STATUS_OK) {
@@ -438,10 +525,13 @@ int main() {
       // Handle error
       return -1;
     }
-    //emscripten_set_main_loop(main_loop_play, 20, 1);
-    for (int i = 0; i < 5; i++) {
-        main_loop_play();
-    }
+
+    // Drive Player::Play() from the browser's event loop. Play() renders exactly
+    // one frame per call (its internal do/while is commented out on purpose),
+    // so the main loop is what makes the player tick. The old code called it
+    // five times in a row and returned, which looked like "it runs but nothing
+    // happens".
+    emscripten_set_main_loop(main_loop_play, 0, 1);
   return 0;
 }
 #endif

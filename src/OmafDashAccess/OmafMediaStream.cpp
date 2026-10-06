@@ -235,6 +235,21 @@ int OmafMediaStream::InitStream(std::string type) {
   return ERROR_NONE;
 }
 
+// The original code did
+//     memcpy_s(dst, 1024, someStdString.c_str(), 1024);
+// which copies 1024 bytes *out of* the std::string's heap buffer even though it
+// is typically only a few dozen bytes long. AddressSanitizer reports it as a
+// heap-buffer-overflow ("__asan_memcpy <- UpdateStreamInfo"), and because the
+// destination was never NUL-terminated, every later printf("%s") ran off the
+// end of it as well. Copy the real length and terminate explicitly.
+static void CopyStringToFixedBuffer(char *dst, size_t dstsz, const std::string &src) {
+  if (dst == nullptr || dstsz == 0) return;
+  size_t n = src.size();
+  if (n > dstsz - 1) n = dstsz - 1;
+  memcpy_s(dst, dstsz, src.c_str(), n);
+  dst[n] = '\0';
+}
+
 OMAF_STATUS OmafMediaStream::UpdateStreamInfo() {
     std::cout << "OmafMediaStream::UpdateStreamInfo" << std::endl;
   if (!mMediaAdaptationSet.size()) return OMAF_ERROR_INVALID_DATA;
@@ -252,8 +267,8 @@ OMAF_STATUS OmafMediaStream::UpdateStreamInfo() {
       m_pStreamInfo->height = mExtratorAdaptationSet->GetQualityRanking()->srqr_quality_infos[0].orig_height;
       m_pStreamInfo->mime_type = new char[1024];
       m_pStreamInfo->codec = new char[1024];
-      memcpy_s(const_cast<char*>(m_pStreamInfo->mime_type), 1024, mMainAdaptationSet->GetMimeType().c_str(), 1024);
-      memcpy_s(const_cast<char*>(m_pStreamInfo->codec), 1024, mMainAdaptationSet->GetCodec()[0].c_str(), 1024);
+      CopyStringToFixedBuffer(const_cast<char*>(m_pStreamInfo->mime_type), 1024, mMainAdaptationSet->GetMimeType());
+      CopyStringToFixedBuffer(const_cast<char*>(m_pStreamInfo->codec), 1024, mMainAdaptationSet->GetCodec()[0]);
       m_pStreamInfo->mFpt = (int32_t)mMainAdaptationSet->GetFramePackingType();
       m_pStreamInfo->mProjFormat = (int32_t)mMainAdaptationSet->GetProjectionFormat();
       m_pStreamInfo->mSourceMode = SourceMode_Omni;
@@ -306,8 +321,8 @@ OMAF_STATUS OmafMediaStream::UpdateStreamInfo() {
       m_pStreamInfo->width = vi.width;    // mExtratorAdaptationSet->GetVideoInfo().width;
       m_pStreamInfo->mime_type = new char[1024];
       m_pStreamInfo->codec = new char[1024];
-      memcpy_s(const_cast<char*>(m_pStreamInfo->mime_type), 1024, mMainAdaptationSet->GetMimeType().c_str(), 1024);
-      memcpy_s(const_cast<char*>(m_pStreamInfo->codec), 1024, mMainAdaptationSet->GetCodec()[0].c_str(), 1024);
+      CopyStringToFixedBuffer(const_cast<char*>(m_pStreamInfo->mime_type), 1024, mMainAdaptationSet->GetMimeType());
+      CopyStringToFixedBuffer(const_cast<char*>(m_pStreamInfo->codec), 1024, mMainAdaptationSet->GetCodec()[0]);
       m_pStreamInfo->mFpt = (int32_t)mMainAdaptationSet->GetFramePackingType();
       m_pStreamInfo->mProjFormat = (int32_t)mMainAdaptationSet->GetProjectionFormat();
       if (mode_ == OmafDashMode::MULTI_VIEW) m_pStreamInfo->mSourceMode = SourceMode_MultiView;
@@ -413,8 +428,8 @@ OMAF_STATUS OmafMediaStream::UpdateStreamInfo() {
 
       m_pStreamInfo->mime_type = new char[1024];
       m_pStreamInfo->codec = new char[1024];
-      memcpy_s(const_cast<char*>(m_pStreamInfo->mime_type), 1024, as->GetMimeType().c_str(), 1024);
-      memcpy_s(const_cast<char*>(m_pStreamInfo->codec), 1024, as->GetCodec()[0].c_str(), 1024);
+      CopyStringToFixedBuffer(const_cast<char*>(m_pStreamInfo->mime_type), 1024, as->GetMimeType());
+      CopyStringToFixedBuffer(const_cast<char*>(m_pStreamInfo->codec), 1024, as->GetCodec()[0]);
       m_pStreamInfo->segmentDuration = as->GetSegmentDuration();
       OMAF_LOG(LOG_INFO, "Audio mime type %s\n", m_pStreamInfo->mime_type);
       OMAF_LOG(LOG_INFO, "Audio codec %s\n", m_pStreamInfo->codec);

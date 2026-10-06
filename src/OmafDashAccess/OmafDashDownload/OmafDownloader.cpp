@@ -407,6 +407,10 @@ void OmafDashSegmentHttpClientImpl::threadRunner(void) noexcept {
           downloading_tasks_[task->url()] = task;
         }
         OMAF_LOG(LOG_INFO, "Start download for task count=%d. %s\n", task.use_count(), task->to_string().c_str());
+      } else {
+        // fetchReadyTask() returns immediately when the queue is empty, so
+        // without this the thread spins at 100% CPU.
+        usleep(1000);
       }
     }
   } catch (const std::exception &ex) {

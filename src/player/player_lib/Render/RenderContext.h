@@ -58,6 +58,9 @@ public:
          // Initial Field of View
          m_speed             = 0.005f; // 3 units / second
          m_mouseSpeed        = 0.005f;
+         m_lastCursorX       = 0.0;
+         m_lastCursorY       = 0.0;
+         m_hasLastCursor     = false;
          m_window            = NULL;
          m_windowWidth       = 0;
          m_windowHeight      = 0;
@@ -71,6 +74,41 @@ public:
     };
 
     virtual ~RenderContext()=default;
+
+    //! \brief Cursor movement since the previous frame, in pixels.
+    //!
+    //! Call once per frame, before using the result. Returns 0 on the first call
+    //! and on the first frame after the button was released, so that starting a
+    //! new drag does not make the view jump.
+    //!
+    //! \param  [in] xpos, ypos
+    //!         cursor position as returned by glfwGetCursorPos()
+    //!         [out] dx, dy
+    //!         movement since the previous call, in pixels
+    //!
+    void ConsumeCursorDelta(double xpos, double ypos, double *dx, double *dy)
+    {
+        if (!m_hasLastCursor)
+        {
+            m_lastCursorX = xpos;
+            m_lastCursorY = ypos;
+            m_hasLastCursor = true;
+        }
+        *dx = xpos - m_lastCursorX;
+        *dy = ypos - m_lastCursorY;
+        m_lastCursorX = xpos;
+        m_lastCursorY = ypos;
+    }
+
+    //! \brief Forget the previous cursor position.
+    //!
+    //! Call while the drag button is released, so the next drag starts from a
+    //! fresh reference and the first frame of that drag reports no movement.
+    //!
+    void ResetCursorDelta()
+    {
+        m_hasLastCursor = false;
+    }
 
     //! \brief swap buffer
     //!
@@ -184,6 +222,25 @@ protected:
 
     float                   m_speed; // 3 units / second
     float                   m_mouseSpeed;
+
+    // Cursor position sampled on the previous frame.
+    //
+    // The look-around code used to compute the drag delta as
+    // (windowCentre - cursorPos), relying on glfwSetCursorPos() to warp the
+    // cursor back to the centre after every frame. That works with a desktop
+    // GLFW, where warping is real. In the browser it is not: Emscripten's
+    // glfwSetCursorPos() is an empty function ("I believe it is not possible to
+    // move the mouse with javascript") and glfwGetCursorPos() returns the raw
+    // DOM cursor, which under pointer lock is accumulated with
+    // Browser.mouseX += Browser.mouseMovementX and never reset. The delta
+    // therefore grew with every pixel dragged -- the further you moved from the
+    // centre, the faster the view spun, once per frame.
+    //
+    // These members let the rotation use the real per-frame movement instead,
+    // which is what the old centre-relative delta emulated on the desktop.
+    double                  m_lastCursorX;
+    double                  m_lastCursorY;
+    bool                    m_hasLastCursor;
 
     int32_t                 m_projFormat;    //<! projection format for setting up view/projection model for 3D/2D
 

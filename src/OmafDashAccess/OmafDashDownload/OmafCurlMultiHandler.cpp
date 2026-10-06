@@ -150,9 +150,13 @@ OMAF_STATUS OmafCurlMultiDownloader::createTransferForTask(OmafDownloadTask::Ptr
     OMAF_LOG(LOG_INFO, "createTransferForTask: AFTER creating header downloader for Task ID %lld. Result: %d. Header_downloader handler: %p\n",
              task->id(), ret, (task->easy_h_downloader_ ? static_cast<void*>(task->easy_h_downloader_->handler()) : nullptr));
 
-    if (ret != ERROR_NONE || task->easy_h_downloader_.get() == nullptr)
-         OMAF_LOG(LOG_ERROR, "createTransferForTask: Failed to create header downloader for Task ID %lld.\n", task->id());
+    // NOTE: the braces are load-bearing. Without them the `return` below ran
+    // unconditionally and no transfer was ever created, which is why the player
+    // looped forever with "Failed to create the transfer!".
+    if (ret != ERROR_NONE || task->easy_h_downloader_.get() == nullptr) {
+      OMAF_LOG(LOG_ERROR, "createTransferForTask: Failed to create header downloader for Task ID %lld.\n", task->id());
       return ERROR_NULL_PTR;
+    }
 
     task->easy_h_downloader_->setType(OmafCurlEasyDownloader::Type::HEADER);
   }
@@ -163,9 +167,10 @@ OMAF_STATUS OmafCurlMultiDownloader::createTransferForTask(OmafDownloadTask::Ptr
     OMAF_LOG(LOG_INFO, "createTransferForTask: AFTER creating data downloader for Task ID %lld. Result: %d. Data_downloader handler: %p\n",
              task->id(), ret, (task->easy_d_downloader_ ? static_cast<void*>(task->easy_d_downloader_->handler()) : nullptr));
 
-    if (ret != ERROR_NONE || task->easy_d_downloader_.get() == nullptr)
-        OMAF_LOG(LOG_ERROR, "createTransferForTask: Failed to create data downloader for Task ID %lld.\n", task->id());
+    if (ret != ERROR_NONE || task->easy_d_downloader_.get() == nullptr) {
+      OMAF_LOG(LOG_ERROR, "createTransferForTask: Failed to create data downloader for Task ID %lld.\n", task->id());
       return ERROR_NULL_PTR;
+    }
 
     task->easy_d_downloader_->setType(OmafCurlEasyDownloader::Type::DATA);
   }
@@ -579,6 +584,14 @@ void OmafCurlMultiDownloader::threadRunner(void) noexcept {
       retriveDoneTask();
 
       ProcessDataTasks();
+
+      // The original loop relied on curl_multi_wait() to pace it, but that is
+      // only called when still_alive == max_parallel_, which never happens with
+      // the synchronous local-filesystem backend. With nothing in flight this
+      // becomes a 100% CPU busy loop, so yield explicitly.
+      if (still_alive == 0) {
+        usleep(1000);
+      }
     }
   } catch (const std::exception& ex) {
     OMAF_LOG(LOG_ERROR, "Exception in the multi thread worker, ex: %s\n", ex.what());
@@ -586,7 +599,6 @@ void OmafCurlMultiDownloader::threadRunner(void) noexcept {
 }
 
 OMAF_STATUS OmafCurlMultiDownloader::startTaskDownload(void) noexcept {
-    return ERROR_NONE;
   try {
     // start a new task
     if ((run_task_map_.size() < static_cast<size_t>(max_parallel_transfers_)) && (ready_task_list_.size() > 0)) {

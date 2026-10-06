@@ -31,7 +31,13 @@
 //! \brief    Implement class for RenderSourceFactory.
 //!
 
+
 #include "RenderSourceFactory.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#else
+#define EMSCRIPTEN_KEEPALIVE
+#endif
 #ifdef _ANDROID_OS_
 #include "MediaCodecRenderSource.h"
 #endif
@@ -39,6 +45,12 @@
 #include "SWRenderSource.h"
 #include <GLFW/glfw3.h>
 #endif
+
+// Diagnostics, see em_probe_render_sources / em_probe_pending_frames below.
+// Deliberately plain ints at global scope (not std::atomic, which would drag
+// atomics support into this translation unit): these are counters only.
+int g_render_source_count = 0;
+int g_pending_frame_count = 0;
 
 VCD_NS_BEGIN
 
@@ -58,43 +70,98 @@ RenderSourceFactory::RenderSourceFactory(void *window)
 RenderSourceFactory::~RenderSourceFactory()
 {
     RemoveAll();
+    // RemoveAll() only queues the releases; run them so the objects are not
+    // leaked at shutdown.
+    PumpMainThread();
 }
 
 FrameHandler* RenderSourceFactory::CreateHandler(uint32_t video_id, uint32_t tex_id)
 {
+    // NOTE: this runs on the OMAF reader thread (DashMediaSource::Run ->
+    // DecoderManager::CreateVideoDecoder). Under Emscripten there is exactly one
+    // WebGL context and it belongs to the browser main thread, so the previous
+    // glfwMakeContextCurrent(share_window) "share context in multiple thread"
+    // was a no-op and the following GL calls crashed the worker. SWRenderSource
+    // is now GL-free at construction; PumpMainThread() does the GL setup.
 #ifdef _LINUX_OS_
-    glfwMakeContextCurrent((GLFWwindow*)share_window); // share context in multiple thread
+    (void)share_window;
     SWRenderSource* rs = new SWRenderSource();
 #endif
 #ifdef _ANDROID_OS_
     MediaCodecRenderSource* rs = new MediaCodecRenderSource(tex_id);
 #endif
     rs->SetVideoID(video_id);
-    this->mMapRenderSource[video_id] = rs;
+    {
+        std::lock_guard<std::mutex> lock(mMapMutex);
+        if (this->mMapRenderSource.find(video_id) == this->mMapRenderSource.end()) {
+            g_render_source_count++;
+        }
+        this->mMapRenderSource[video_id] = rs;
+    }
 
     return rs;
 }
 
 RenderStatus RenderSourceFactory::RemoveHandler(uint32_t video_id)
 {
-    if(mMapRenderSource.find(video_id)==mMapRenderSource.end()) return RENDER_NOT_FOUND;
-    for(auto it=mMapRenderSource.begin(); it!=mMapRenderSource.end(); ++it){
-        if(video_id == it->first){
-            it->second->DestroyRenderSource();
-            SAFE_DELETE(it->second);
-            it=mMapRenderSource.erase(it);
-            break;
-        }
-    }
+    std::lock_guard<std::mutex> lock(mMapMutex);
+    auto it = mMapRenderSource.find(video_id);
+    if (it == mMapRenderSource.end()) return RENDER_NOT_FOUND;
+
+    // DestroyRenderSource() issues GL deletes, so it has to happen on the main
+    // thread; hand the object over to PumpMainThread() instead of deleting here.
+    mPendingDestroy.push_back(it->second);
+    mMapRenderSource.erase(it);
+    g_render_source_count--;
     return RENDER_STATUS_OK;
 }
 
 RenderStatus RenderSourceFactory::RemoveAll()
 {
-    for(auto it=mMapRenderSource.begin(); it!=mMapRenderSource.end(); ++it){
-        it->second->DestroyRenderSource();
-        SAFE_DELETE(it->second);
-        // it=mMapRenderSource.erase(it);
+    std::lock_guard<std::mutex> lock(mMapMutex);
+    for (auto it = mMapRenderSource.begin(); it != mMapRenderSource.end(); ++it) {
+        mPendingDestroy.push_back(it->second);
+    }
+    mMapRenderSource.clear();
+    return RENDER_STATUS_OK;
+}
+
+// Diagnostics: how many render sources are alive and how many pending frame
+// uploads they are each holding. One render source is created per OMAF video id
+// (i.e. per selected tile), so a growing count means they are not being
+// released, and each queued frame is a full tile-sized buffer.
+extern "C" EMSCRIPTEN_KEEPALIVE int em_probe_render_sources(void) {
+  return static_cast<int>(g_render_source_count);
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE int em_probe_pending_frames(void) {
+  return static_cast<int>(g_pending_frame_count);
+}
+
+// Runs on the browser main thread. Drains the GL work queued by the reader
+// thread: render source setup, frame uploads, and deferred destruction.
+RenderStatus RenderSourceFactory::PumpMainThread()
+{
+    std::map<uint32_t, RenderSource*> snapshot;
+    std::list<RenderSource*> toDestroy;
+    {
+        std::lock_guard<std::mutex> lock(mMapMutex);
+        snapshot = mMapRenderSource;
+        toDestroy.swap(mPendingDestroy);
+    }
+
+    for (auto it = toDestroy.begin(); it != toDestroy.end(); ++it) {
+        RenderSource* rs = *it;
+        if (rs == NULL) continue;
+        rs->DestroyRenderSource();
+        SAFE_DELETE(rs);
+    }
+
+    for (auto it = snapshot.begin(); it != snapshot.end(); ++it) {
+        SWRenderSource* rs = dynamic_cast<SWRenderSource*>(it->second);
+        if (rs != NULL) {
+            rs->PumpGL();
+        }
     }
     return RENDER_STATUS_OK;
 }

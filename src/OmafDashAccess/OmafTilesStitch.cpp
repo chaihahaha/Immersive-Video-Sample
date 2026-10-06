@@ -348,7 +348,15 @@ int32_t OmafTilesStitch::ParseVideoHeader(MediaPacket *tilePacket) {
   return ERROR_NONE;
 }
 
+// Debug switch set from the page (see render.cpp / omaf_debug_set_stop_stitch).
+// Used to isolate the tile-stitching path, which allocates a lot, from the rest
+// of the pipeline.
+static int g_debug_stop_stitch = 0;
+
+extern "C" void omaf_debug_set_stop_stitch(int v) { g_debug_stop_stitch = v; }
+
 int32_t OmafTilesStitch::UpdateSelectedTiles(std::map<uint32_t, MediaPacket *> &currPackets, bool needParams) {
+  if (g_debug_stop_stitch) return ERROR_NONE;
   if (0 == currPackets.size()) return OMAF_ERROR_INVALID_DATA;
 
   if (0 == m_allQualities.size()) {

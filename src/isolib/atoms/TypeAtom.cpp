@@ -161,7 +161,16 @@ void BrandAtom<T>::FromStream(Stream& str)
     // minor_version
     m_minorVersion = str.Read32();
     // compatible_brands[]
-    while (str.BytesRemain() >= 4)
+    //
+    // NOTE: Stream::BytesRemain() is relative to the whole underlying buffer
+    // (m_storage.size() - m_byteOffset) and is NOT clipped to this box, because
+    // ParseAtomHeader() does not restrict the stream to the declared atom size.
+    // This loop therefore used to append a brand for every 4 remaining bytes of
+    // the *entire init segment*, and AddressSanitizer flagged the resulting
+    // vector growth as a container-overflow in BrandAtom<Atom>::FromStream.
+    // A real ftyp/styp box carries a handful of brands, so cap it.
+    static const size_t kMaxCompatibleBrands = 64;
+    while (str.BytesRemain() >= 4 && m_compatibleBrands.size() < kMaxCompatibleBrands)
     {
         std::string compatibleBrand;
         str.ReadStringWithLen(compatibleBrand, 4);
