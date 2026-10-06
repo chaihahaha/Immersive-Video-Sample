@@ -146,14 +146,47 @@ ADD_LINK_OPTIONS(
 ADD_EXECUTABLE(render ${DIR_SRC})
 
 
+# Where the FFmpeg wasm static libraries live.
+#
+# Default: ~/source/ffmpeg_wasm_lib, the libraries produced by the Docker build
+# in ~/source/ffmpeg.wasm. tools/build_ffmpeg_wasm.sh builds the same thing
+# natively (no Docker) into build/ffmpeg-wasm/prefix; point this at it with
+#     -DIVS_FFMPEG_WASM_LIB_DIR=<repo>/build/ffmpeg-wasm/prefix
+SET(IVS_FFMPEG_WASM_LIB_DIR "$ENV{HOME}/source/ffmpeg_wasm_lib"
+    CACHE PATH "Directory holding the FFmpeg wasm include/ and lib/")
+
+# libx265 is an encoder. This player only decodes HEVC and references no x265
+# symbol, so a decode-only FFmpeg (built with tools/build_ffmpeg_wasm.sh, which
+# skips x265 by default) is enough. Set OFF when linking against such a build.
+OPTION(IVS_FFMPEG_WITH_X265 "Link libx265 (only needed for an x265-enabled FFmpeg)" ON)
+
+IF(NOT EXISTS "${IVS_FFMPEG_WASM_LIB_DIR}/lib/libavcodec.a")
+    MESSAGE(FATAL_ERROR
+        "libavcodec.a not found under ${IVS_FFMPEG_WASM_LIB_DIR}/lib.\n"
+        "Either point -DIVS_FFMPEG_WASM_LIB_DIR at an existing build, or create "
+        "one with tools/build_ffmpeg_wasm.sh")
+ENDIF()
+
 # NOTE: libcurl is intentionally absent. OmafDashAccess now carries
 # local_curl/local_curl.cpp, which serves the same API from the Emscripten
 # virtual filesystem instead of from sockets that WebAssembly cannot open.
-SET(LINK_LIB ${LINK_LIB} MediaPlayer GLU dl /Users/hasee/source/ffmpeg_wasm_lib/lib/libavcodec.a /Users/hasee/source/ffmpeg_wasm_lib/lib/libavutil.a /Users/hasee/source/ffmpeg_wasm_lib/lib/libswscale.a /Users/hasee/source/Immersive-Video-Sample/src/build/client/isolib/dash_parser/libdashparser.a /Users/hasee/source/Immersive-Video-Sample/src/build/client/360SCVP/lib360SCVP.a x264 x265 avcodec swscale swresample avformat avfilter avdevice avutil)
+SET(IVS_FFMPEG_LIBS
+    "${IVS_FFMPEG_WASM_LIB_DIR}/lib/libavcodec.a"
+    "${IVS_FFMPEG_WASM_LIB_DIR}/lib/libavutil.a"
+    "${IVS_FFMPEG_WASM_LIB_DIR}/lib/libswscale.a")
+IF(IVS_FFMPEG_WITH_X265 AND EXISTS "${IVS_FFMPEG_WASM_LIB_DIR}/lib/libx265.a")
+    SET(IVS_FFMPEG_LIBS ${IVS_FFMPEG_LIBS} x265)
+ENDIF()
+
+SET(LINK_LIB ${LINK_LIB} MediaPlayer GLU dl
+    ${IVS_FFMPEG_LIBS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../build/client/isolib/dash_parser/libdashparser.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../build/client/360SCVP/lib360SCVP.a
+    x264 avcodec swscale swresample avformat avfilter avdevice avutil)
 IF(USE_SAFE_MEM)
   SET(LINK_LIB ${LINK_LIB} safestring_shared)
 ENDIF()
-target_include_directories(render PRIVATE /Users/hasee/source/ffmpeg_wasm_lib/include /opt/homebrew/include)
-target_link_directories(render PRIVATE /Users/hasee/source/ffmpeg_wasm_lib/lib /opt/homebrew/lib)
+target_include_directories(render PRIVATE ${IVS_FFMPEG_WASM_LIB_DIR}/include /opt/homebrew/include)
+target_link_directories(render PRIVATE ${IVS_FFMPEG_WASM_LIB_DIR}/lib /opt/homebrew/lib)
 
 TARGET_LINK_LIBRARIES(render ${LINK_LIB})

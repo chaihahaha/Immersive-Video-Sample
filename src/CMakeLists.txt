@@ -40,6 +40,13 @@ SET(PLAYER_COMMON_DIR "player/player_lib/Common")
 # See WASM_BUILD_AND_RUN.md section 7.
 OPTION(IVS_PRELOAD_CONTENT "Bake webcontent/ into render.data" ON)
 
+# Where the FFmpeg wasm static libraries are, and whether to link libx265.
+# Forwarded to the nested player/app project below, for the same reason.
+# Build a fresh set without Docker using tools/build_ffmpeg_wasm.sh.
+SET(IVS_FFMPEG_WASM_LIB_DIR "$ENV{HOME}/source/ffmpeg_wasm_lib"
+    CACHE PATH "Directory holding the FFmpeg wasm include/ and lib/")
+OPTION(IVS_FFMPEG_WITH_X265 "Link libx265 (only needed for an x265-enabled FFmpeg)" ON)
+
 ADD_SUBDIRECTORY(360SCVP)
 ADD_SUBDIRECTORY(isolib)
 ADD_SUBDIRECTORY(OmafDashAccess)
@@ -77,6 +84,8 @@ ADD_CUSTOM_COMMAND(TARGET player
             emcmake cmake -DLINUX_OS=ON
                     -DUSE_TRACE=${USE_TRACE}
                     -DIVS_PRELOAD_CONTENT=${IVS_PRELOAD_CONTENT}
+                    -DIVS_FFMPEG_WASM_LIB_DIR=${IVS_FFMPEG_WASM_LIB_DIR}
+                    -DIVS_FFMPEG_WITH_X265=${IVS_FFMPEG_WITH_X265}
                     ${PLAYER_APP_FLAGS}
                     ${CMAKE_CURRENT_SOURCE_DIR}/${PLAYER_APP_DIR} &&
             make
@@ -85,3 +94,19 @@ ADD_CUSTOM_COMMAND(TARGET player
     VERBATIM)
 ADD_DEPENDENCIES(player OmafDashAccess)
 
+
+# ---------------------------------------------------------------------------
+# Rebuild the FFmpeg wasm static libraries natively with the local emsdk -- no
+# Docker, no OrbStack. See tools/build_ffmpeg_wasm.sh.
+#
+# Deliberately NOT part of the default build: it takes a few minutes and the
+# libraries almost never change. It also always writes to the script's own
+# default prefix (build/ffmpeg-wasm/prefix) rather than to
+# IVS_FFMPEG_WASM_LIB_DIR, so that running it can never overwrite an existing
+# library directory by surprise. Point the player at the result with:
+#     -DIVS_FFMPEG_WASM_LIB_DIR=<repo>/build/ffmpeg-wasm/prefix
+# ---------------------------------------------------------------------------
+ADD_CUSTOM_TARGET(ffmpeg-wasm
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../tools/build_ffmpeg_wasm.sh
+    COMMENT "Building FFmpeg wasm static libraries (native emsdk, no Docker)"
+    VERBATIM)
