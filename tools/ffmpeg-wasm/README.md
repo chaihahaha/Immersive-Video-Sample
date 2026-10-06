@@ -41,6 +41,33 @@ removes components the player never calls, and the mirror and `-j` change are
 about fetching and build parallelism. The fork is deliberate and does **not**
 need to be merged upstream.
 
+## What is and is not vendored
+
+**Vendored here** (everything needed to reproduce the build recipe):
+
+* the Dockerfile, the per-library `build/*.sh`, `exe.sh`, `Makefile`, `LICENSE`.
+
+**Not vendored, because it is upstream third-party source and about 200 MB**
+(`../build_ffmpeg_wasm.sh` fetches it):
+
+| Source | Where from | Size |
+|---|---|---|
+| FFmpeg `n5.1.4` | `ffmpeg/FFmpeg` | ~177 MB |
+| x265 `3.4` | `ffmpegwasm/x265` | ~15 MB |
+| x264 `4-cores` | `ffmpegwasm/x264` | ~12 MB |
+
+Those are the well-known public upstreams the original Dockerfile also pulled
+from, not a private fork, so nobody has to go hunting for a mystery repository.
+Baking 200 MB of third-party source into git would be worse than fetching it.
+
+**Fully offline builds are possible**: the script reuses anything already cloned
+under its `--work` directory, so point `--work` at a pre-populated tree (or run
+it once while online) and subsequent builds need no network.
+
+Nothing in this repository references `~/source/ffmpeg.wasm` at runtime or at
+build time. The only mentions are the provenance notes in this README and a
+comment in `../build_ffmpeg_wasm.sh`.
+
 ## How to actually build (no Docker)
 
 `../build_ffmpeg_wasm.sh` is the supported path. It performs the same stages

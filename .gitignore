@@ -1,5 +1,8 @@
 .vscode
-build
+# CMake build tree at the repo root, and the FFmpeg wasm build tree under it.
+# Anchored on purpose: an unanchored "build" also swallowed
+# tools/ffmpeg-wasm/build/, which is vendored source that must be tracked.
+/build
 FFmpeg
 player/360SCVPAPI.h
 player/MediaSource/360SCVPAPI.h
