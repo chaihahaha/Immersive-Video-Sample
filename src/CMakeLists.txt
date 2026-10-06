@@ -31,6 +31,15 @@ SET(PLAYER_APP_FLAGS "-DCMAKE_CXX_FLAGS= \
                       -L${CMAKE_BINARY_DIR}/360SCVP \
                       -L${CMAKE_BINARY_DIR}/player/player_lib")
 SET(PLAYER_COMMON_DIR "player/player_lib/Common")
+
+# Whether player/app bakes webcontent/ into render.data with --preload-file.
+# player/app is built by a nested, separate CMake project (see the custom
+# command below), so this has to be forwarded explicitly:
+#     emcmake cmake ../.. -DCMAKE_BUILD_TYPE=Release \
+#         -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DIVS_PRELOAD_CONTENT=OFF
+# See WASM_BUILD_AND_RUN.md section 7.
+OPTION(IVS_PRELOAD_CONTENT "Bake webcontent/ into render.data" ON)
+
 ADD_SUBDIRECTORY(360SCVP)
 ADD_SUBDIRECTORY(isolib)
 ADD_SUBDIRECTORY(OmafDashAccess)
@@ -67,6 +76,7 @@ ADD_CUSTOM_COMMAND(TARGET player
             mkdir -p ../../${PLAYER_APP_DIR} && cd ../../${PLAYER_APP_DIR} &&
             emcmake cmake -DLINUX_OS=ON
                     -DUSE_TRACE=${USE_TRACE}
+                    -DIVS_PRELOAD_CONTENT=${IVS_PRELOAD_CONTENT}
                     ${PLAYER_APP_FLAGS}
                     ${CMAKE_CURRENT_SOURCE_DIR}/${PLAYER_APP_DIR} &&
             make

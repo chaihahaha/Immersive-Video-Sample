@@ -50,6 +50,44 @@ AUX_SOURCE_DIRECTORY(linux LINUX_SRC)
 SET(DIR_SRC ${DIR_SRC} ${LINUX_SRC})
 SET(LINK_LIB ${LINK_LIB} OmafDashAccess)
 
+# ---------------------------------------------------------------------------
+# Content source.
+#
+# ON (default): tools/stage_content.sh output is baked into render.data by
+#   --preload-file, so the page works from any static server and needs no web
+#   server for the media. The trade-off is that all ~57 MB is transferred up
+#   front and stays resident in the tab for the whole session.
+#
+#   Note where it actually lives: file_packager stores the payload in MEMFS as
+#   a JS Uint8Array created from the XHR response, i.e. in the browser's JS
+#   heap, NOT in the WebAssembly linear memory. Measured: switching to OFF
+#   leaves em_probe_live_kb and HEAPU8.length unchanged. So this switch does not
+#   buy back wasm memory -- it saves JS memory and avoids shipping the whole
+#   package before playback starts.
+#
+# OFF: nothing is preloaded. The player asks local_curl for the MPD and each
+#   segment, and local_curl fetches whatever is not in the virtual filesystem
+#   from <contentBaseUrl> in config.xml, or from ?contentBase=... in the URL.
+#   Configure it like:
+#     emcmake cmake ../.. -DCMAKE_BUILD_TYPE=Release \
+#         -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DIVS_PRELOAD_CONTENT=OFF
+#   and see WASM_BUILD_AND_RUN.md section 7.
+# ---------------------------------------------------------------------------
+OPTION(IVS_PRELOAD_CONTENT "Bake webcontent/ into render.data" ON)
+
+IF(IVS_PRELOAD_CONTENT)
+    ADD_LINK_OPTIONS(
+        # Only the content the player actually reads: the MPD plus tile tracks
+        # 1..36. The 189 MB of OMAF extractor tracks (AdaptationSet 1000..1049)
+        # are unused with <enableExtractor>0</enableExtractor>. Run
+        # tools/stage_content.sh to (re)create this directory.
+        "SHELL:--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/../../../webcontent@/")
+    MESSAGE(STATUS "IVS: preloading webcontent/ into render.data")
+ELSE()
+    MESSAGE(STATUS "IVS: NOT preloading content; it must be served over HTTP "
+                   "(set <contentBaseUrl> or ?contentBase=...)")
+ENDIF()
+
 
 ADD_COMPILE_OPTIONS(
     "-matomics"
@@ -76,11 +114,9 @@ ADD_LINK_OPTIONS(
     "SHELL:-s USE_GLFW=3"
     "SHELL:-s USE_WEBGL2=1"
     "SHELL:-s EXPORTED_RUNTIME_METHODS=['ccall']"
-    # Only the content the player actually reads: the MPD plus tile tracks 1..36.
-    # The 189 MB of OMAF extractor tracks (AdaptationSet 1000..1049) are unused
-    # with <enableExtractor>0</enableExtractor> and would otherwise be resident in
-    # WebAssembly memory. Run tools/stage_content.sh to (re)create this directory.
-    "SHELL:--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/../../../webcontent@/"
+    # --preload-file is added above, only when IVS_PRELOAD_CONTENT is ON.
+    # The filesystem itself is always needed: render.cpp writes and reads
+    # config.xml through it, and local_curl needs MEMFS for its staging.
     "SHELL:-s FORCE_FILESYSTEM=1"
     "SHELL:-s NO_EXIT_RUNTIME=1"
 

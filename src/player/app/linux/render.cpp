@@ -50,6 +50,8 @@
 // the preloaded content directory is so segment URLs can be resolved to files
 // in the Emscripten virtual filesystem.
 extern "C" void em_local_curl_set_root(const char *root);
+extern "C" void em_local_curl_set_http_base(const char *base);
+extern "C" int em_local_curl_prefetch(const char *url);
 // Aggregate delivery cap in bytes/second (0 = unlimited). Without it the reader
 // thread consumes the whole presentation in seconds and the wasm heap fills up.
 extern "C" void em_local_curl_set_rate_limit(double bytes_per_second);
@@ -65,6 +67,32 @@ extern "C" void omaf_debug_set_no_gl(int v);
 EM_JS(int, ivs_js_flag, (const char *name), {
   if (typeof window === 'undefined' || !window.__flags) return 0;
   return window.__flags[UTF8ToString(name)] ? 1 : 0;
+});
+
+// Default HTTP content location: <page origin>/Gaslamp, i.e. the same server
+// that served index.html. Used when neither config.xml nor ?contentBase= says
+// otherwise, so the non-preloaded build works with no configuration at all.
+EM_JS(int, ivs_default_content_base, (char *out, int cap), {
+  if (typeof window === 'undefined' || !window.location || cap <= 0) return 0;
+  var v = window.location.origin + '/Gaslamp';
+  var n = lengthBytesUTF8(v);
+  if (n > cap - 1) n = cap - 1;
+  stringToUTF8(v, out, n + 1);
+  return n;
+});
+
+// Reads a string flag from window.__flags, e.g.
+//   index.html?contentBase=http://127.0.0.1:8123/Gaslamp
+// Returns the length written, or 0 if the flag is absent. Lets the content
+// source be switched at runtime instead of being baked into config.xml.
+EM_JS(int, ivs_js_string, (const char *name, char *out, int cap), {
+  if (typeof window === 'undefined' || !window.__flags || cap <= 0) return 0;
+  var v = window.__flags[UTF8ToString(name)];
+  if (!v) return 0;
+  var n = lengthBytesUTF8(v);
+  if (n > cap - 1) n = cap - 1;
+  stringToUTF8(v, out, n + 1);
+  return n;
 });
 
 #define MAXFOV 140
@@ -106,6 +134,16 @@ std::string config_string = R"(
     <viewportHeight>960</viewportHeight>
     <!-- cache path -->
     <cachePath>/Gaslamp</cachePath>
+    <!-- Optional HTTP base URL for content that is NOT preloaded into the
+         virtual filesystem. When set, local_curl fetches any resource it cannot
+         find in the VFS from here, so the mp4 files can be served by an ordinary
+         web server instead of being baked into render.data. This saves the
+         ~57 MB of MEMFS content from the browser's JS heap (it is not wasm
+         memory) and means content can change without recompiling. Example, for
+         tools/serve_wasm.py running on port 8123:
+             <contentBaseUrl>http://127.0.0.1:8123/Gaslamp</contentBaseUrl>
+         Leave empty for the purely filesystem-backed build. -->
+    <contentBaseUrl></contentBaseUrl>
     <!-- Pacing for the local-filesystem curl backend, in bytes per second.
          The content is about 400 KB/s of video, so this is ~2x real time: fast
          enough to buffer ahead, slow enough that the reader thread cannot race
@@ -296,6 +334,17 @@ bool parseRenderFromXml(std::string xml_file, struct RenderConfig &renderConfig)
     {
       LOG(ERROR) << " invalid params for cachePath! " << std::endl;
       return RENDER_ERROR;
+    }
+    // Optional: serve content that is not preloaded from an HTTP base instead.
+    // Absent or empty means "filesystem only", which is the original behaviour.
+    renderConfig.contentBaseUrl = new char[1024];
+    memset_s(renderConfig.contentBaseUrl, 1024 * sizeof(char), 0);
+    XMLElement* baseUrlElem = info->FirstChildElement("contentBaseUrl");
+    if (baseUrlElem != NULL && baseUrlElem->GetText() != NULL)
+    {
+      int n = std::min(int(strlen(baseUrlElem->GetText())), 1024 - 1);
+      memcpy_s(renderConfig.contentBaseUrl, n * sizeof(char),
+               (char *)baseUrlElem->GetText(), n * sizeof(char));
     }
     XMLElement* maxWidthElement = info->FirstChildElement("maxVideoDecodeWidth");
     XMLElement* maxHeightElement = info->FirstChildElement("maxVideoDecodeHeight");
@@ -509,6 +558,32 @@ int main() {
     // Tell the local curl backend where the preloaded content lives. Every
     // segment URL is resolved against this directory by basename.
     em_local_curl_set_root(renderConfig.cachePath);
+    // ?contentBase=... overrides <contentBaseUrl> from config.xml, so the content
+    // source can be switched from the URL bar instead of by editing config.xml.
+    char content_base[1024];
+    memset_s(content_base, sizeof(content_base), 0);
+    int content_base_len = ivs_js_string("contentBase", content_base, sizeof(content_base));
+    if (content_base_len <= 0 &&
+        (renderConfig.contentBaseUrl == NULL || renderConfig.contentBaseUrl[0] == '\0')) {
+      // Nothing configured: fall back to the page's own origin. Harmless in the
+      // preloaded build -- the VFS is consulted first, and the MPD prefetch
+      // below finds the file already there and does nothing.
+      content_base_len = ivs_default_content_base(content_base, sizeof(content_base));
+    }
+    const char *effective_base =
+        content_base_len > 0 ? content_base : renderConfig.contentBaseUrl;
+    em_local_curl_set_http_base(effective_base);
+
+    // The MPD is read with tinyxml2::LoadFile(), not through the curl shim, so
+    // when the content is served over HTTP it has to be put into the virtual
+    // filesystem before the player is created. It is 113 KB; the segments stay
+    // on demand. A no-op when the file is already there (preloaded build).
+    if (effective_base && effective_base[0]) {
+      if (em_local_curl_prefetch(renderConfig.url) != 0) {
+        std::cerr << "could not obtain the MPD from '" << effective_base
+                  << "'; playback will fail" << std::endl;
+      }
+    }
     em_local_curl_set_rate_limit((double)renderConfig.localRateLimitBytesPerSec);
     omaf_debug_set_stop_reader(ivs_js_flag("stopReader"));
     omaf_debug_set_stop_stitch(ivs_js_flag("stopStitch"));

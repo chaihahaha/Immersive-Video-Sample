@@ -58,6 +58,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include <sys/stat.h>
 #include <unistd.h>
 
 #ifdef __EMSCRIPTEN__
@@ -149,6 +150,198 @@ void candidate_paths(const std::string &url, std::vector<std::string> *out) {
   if (!base.empty()) out->push_back(base);
 }
 
+// ---------------------------------------------------------------------------
+// Optional HTTP backend.
+//
+// When a base URL is configured (config.xml <contentBaseUrl>), any resource that
+// is NOT already in the virtual filesystem is fetched over HTTP. That lets the
+// Gaslamp package be served by an ordinary web server instead of being baked
+// into render.data by --preload-file.
+//
+// What that saves is the browser's JS heap, not wasm memory: file_packager backs
+// MEMFS with a JS Uint8Array built from the XHR response, whereas this backend
+// wraps each response in an fmemopen() stream that is released as soon as the
+// transfer finishes. Measured with the preload build replaced by this one:
+// /Gaslamp holds 57 MB of MEMFS content vs 0.1 MB (just the MPD), while
+// em_probe_live_kb and HEAPU8.length are unchanged.
+//
+// The fetch is a *synchronous* XMLHttpRequest. That sounds impossible in a
+// browser, but it is not: synchronous XHR is only forbidden on the main thread,
+// and every caller of this file runs on an Emscripten pthread, which is a real
+// Web Worker. Emscripten's own FS.createLazyFile is built on the same trick and
+// says so in its source ("Lazy loading only works in web workers").
+//
+// Staying synchronous is the whole point: OmafDashAccess expects
+// curl_easy_perform()/curl_multi_perform() to have completed the transfer by the
+// time they return, so no call site has to change. Only small files are ever
+// fetched this way -- the MPD (113 KB) and one segment at a time (10-30 KB) --
+// so pulling the whole body in a single request is fine and HTTP Range support
+// is not needed.
+// ---------------------------------------------------------------------------
+std::string g_http_base;
+
+unsigned long g_http_fetches = 0;
+unsigned long g_http_bytes = 0;
+unsigned long g_http_failures = 0;
+int g_http_last_status = 0;
+
+#ifdef __EMSCRIPTEN__
+// Returns a malloc'd buffer holding the whole response body, or nullptr.
+// *out_len receives the byte count; *out_status receives the HTTP status, or -1
+// if the request itself failed. Ownership passes to the caller (free() it).
+EM_JS(void *, ivs_http_get_sync, (const char *url, int *out_len, int *out_status), {
+  setValue(out_len, 0, 'i32');
+  setValue(out_status, 0, 'i32');
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', UTF8ToString(url), false);   // false => synchronous
+    xhr.responseType = 'arraybuffer';
+    xhr.send();
+    setValue(out_status, xhr.status, 'i32');
+    if (xhr.status < 200 || xhr.status >= 300) return 0;
+    var bytes = new Uint8Array(xhr.response);
+    var ptr = _malloc(bytes.length ? bytes.length : 1);
+    if (!ptr) return 0;
+    HEAPU8.set(bytes, ptr);
+    setValue(out_len, bytes.length, 'i32');
+    return ptr;
+  } catch (err) {
+    setValue(out_status, -1, 'i32');
+    return 0;
+  }
+});
+#endif
+
+// fmemopen() streams read from a buffer that the caller still owns, so the
+// buffer has to outlive the FILE*. Track it here and release it in close_file().
+std::mutex g_mem_stream_mutex;
+std::unordered_map<FILE *, void *> g_mem_streams;
+
+FILE *open_memory(void *data, size_t len) {
+  if (!data) return nullptr;
+  FILE *f = fmemopen(data, len, "rb");
+  if (!f) {
+    free(data);
+    return nullptr;
+  }
+  {
+    std::lock_guard<std::mutex> lock(g_mem_stream_mutex);
+    g_mem_streams[f] = data;
+  }
+  return f;
+}
+
+// The single close path for both virtual-filesystem files and memory streams.
+// Safe to call on a plain VFS FILE*.
+void close_file(FILE *f) {
+  if (!f) return;
+  void *owned = nullptr;
+  {
+    std::lock_guard<std::mutex> lock(g_mem_stream_mutex);
+    auto it = g_mem_streams.find(f);
+    if (it != g_mem_streams.end()) {
+      owned = it->second;
+      g_mem_streams.erase(it);
+    }
+  }
+  fclose(f);
+  free(owned);  // never reachable for VFS files: owned stays nullptr
+}
+
+void http_candidates(const std::string &url, std::vector<std::string> *out) {
+  if (g_http_base.empty()) return;
+  const std::string p = path_part_of(url);
+  const std::string base = basename_of(p);
+  // The staged content directory is flat, so <base>/<basename> is the one that
+  // normally hits. The second form mirrors the URL's own path underneath the
+  // base, for a server that keeps the DASH directory structure.
+  if (!base.empty()) out->push_back(g_http_base + "/" + base);
+  if (!p.empty()) out->push_back(g_http_base + "/" + (p[0] == '/' ? p.substr(1) : p));
+}
+
+// Downloads one of the HTTP candidates for `url`. On success returns the
+// malloc'd body and stores its size in *out_len; the caller owns the buffer.
+void *http_fetch(const std::string &url, int *out_len) {
+  *out_len = 0;
+#ifdef __EMSCRIPTEN__
+  std::vector<std::string> candidates;
+  http_candidates(url, &candidates);
+  if (candidates.empty()) return nullptr;
+
+  for (const std::string &c : candidates) {
+    int len = 0;
+    int status = 0;
+    void *data = ivs_http_get_sync(c.c_str(), &len, &status);
+    g_http_last_status = status;
+    if (!data) continue;
+    g_http_fetches++;
+    g_http_bytes += static_cast<unsigned long>(len);
+    *out_len = len;
+    return data;
+  }
+  g_http_failures++;
+#else
+  (void)url;
+#endif
+  return nullptr;
+}
+
+FILE *open_over_http(const std::string &url) {
+  int len = 0;
+  void *data = http_fetch(url, &len);
+  if (!data) return nullptr;
+  return open_memory(data, static_cast<size_t>(len));
+}
+
+// Fetches `url` over HTTP and writes it into the virtual filesystem.
+//
+// Needed because not every reader goes through this curl shim: the MPD in
+// particular is loaded by OmafXMLParser with tinyxml2's XMLDocument::LoadFile(),
+// i.e. a plain file read. Materialising it in the VFS first makes that work
+// unchanged.
+//
+// The transfer is run on a helper thread on purpose. A synchronous
+// XMLHttpRequest may only set responseType = 'arraybuffer' from a worker -- a
+// document thread throws InvalidAccessError -- and this is called from main().
+// An Emscripten pthread is a real Web Worker, so the request happens there while
+// the caller still gets a synchronous answer.
+int prefetch_impl(const std::string &url) {
+  std::vector<std::string> candidates;
+  candidate_paths(url, &candidates);
+  if (candidates.empty()) return -1;
+
+  // Already present (preloaded, or a previous prefetch): nothing to do.
+  for (const std::string &c : candidates) {
+    FILE *f = fopen(c.c_str(), "rb");
+    if (f) {
+      fclose(f);
+      return 0;
+    }
+  }
+  if (g_http_base.empty()) return -1;
+
+  int len = 0;
+  void *data = http_fetch(url, &len);
+  if (!data) return -1;
+
+  // The parent directory may not exist in the virtual filesystem yet.
+  const std::string &dest = candidates[0];
+  const size_t slash = dest.find_last_of('/');
+  if (slash != std::string::npos && slash > 0) {
+    mkdir(dest.substr(0, slash).c_str(), 0777);  // ignore EEXIST
+  }
+
+  FILE *out = fopen(dest.c_str(), "wb");
+  if (!out) {
+    free(data);
+    return -1;
+  }
+  const size_t written = fwrite(data, 1, static_cast<size_t>(len), out);
+  fclose(out);
+  free(data);
+  return written == static_cast<size_t>(len) ? 0 : -1;
+}
+
 // url -> resolved VFS path. Every segment is requested repeatedly, and the
 // original implementation probed up to four candidates with fopen()/fclose()
 // on every single transfer, which is a lot of stdio churn for no benefit.
@@ -182,6 +375,17 @@ FILE *open_resolved(const std::string &url, std::string *path_out) {
       return f;
     }
   }
+  // Not in the virtual filesystem: fall back to HTTP when a base URL is set.
+  // Deliberately not recorded in g_path_cache, which maps a URL to a VFS path
+  // that can be reopened later with fopen(); a fetched body is not that.
+  if (!g_http_base.empty()) {
+    FILE *f = open_over_http(url);
+    if (f) {
+      *path_out = url;
+      return f;
+    }
+  }
+
   *path_out = candidates.empty() ? std::string() : candidates[0];
   return nullptr;
 }
@@ -284,13 +488,21 @@ CURLcode perform_transfer(EasyHandle *e) {
   std::string path;
   FILE *f = open_resolved(e->url, &path);
   if (!f) {
-    std::string msg = "cannot open local resource '" + path + "' for URL '" + e->url + "'";
+    std::string msg = "cannot open '" + path + "' for URL '" + e->url + "'";
+    if (!g_http_base.empty()) {
+      msg += " and HTTP fetch from base '" + g_http_base + "' failed";
+      if (g_http_last_status == -1) {
+        msg += " (request error)";
+      } else if (g_http_last_status != 0) {
+        msg += " (HTTP " + std::to_string(g_http_last_status) + ")";
+      }
+    }
     set_error(e, CURLE_FILE_COULDNT_READ_FILE, msg.c_str());
     return e->result;
   }
 
   if (fseek(f, 0, SEEK_END) != 0) {
-    fclose(f);
+    close_file(f);
     set_error(e, CURLE_FILE_COULDNT_READ_FILE, "seek to end failed");
     return e->result;
   }
@@ -302,7 +514,7 @@ CURLcode perform_transfer(EasyHandle *e) {
 
   if (!e->range.empty()) {
     if (!parse_range(e->range, total, &start, &len)) {
-      fclose(f);
+      close_file(f);
       set_error(e, CURLE_RANGE_ERROR, "invalid CURLOPT_RANGE value");
       return e->result;
     }
@@ -314,7 +526,7 @@ CURLcode perform_transfer(EasyHandle *e) {
   if (e->nobody) {
     // HEAD: no body, but Content-Length still describes the resource.
     e->content_length_download = total;
-    fclose(f);
+    close_file(f);
     g_transfer_count++;
     return e->result;
   }
@@ -322,7 +534,7 @@ CURLcode perform_transfer(EasyHandle *e) {
   e->content_length_download = len;
 
   if (fseek(f, static_cast<long>(start), SEEK_SET) != 0) {
-    fclose(f);
+    close_file(f);
     set_error(e, CURLE_FILE_COULDNT_READ_FILE, "seek to range start failed");
     return e->result;
   }
@@ -337,7 +549,7 @@ CURLcode perform_transfer(EasyHandle *e) {
     if (e->write_fn) {
       size_t written = e->write_fn(buf.data(), 1, got, e->write_data);
       if (written < got) {
-        fclose(f);
+        close_file(f);
         set_error(e, CURLE_WRITE_ERROR, "write callback accepted fewer bytes than supplied");
         return e->result;
       }
@@ -347,7 +559,7 @@ CURLcode perform_transfer(EasyHandle *e) {
     g_bytes_delivered += static_cast<unsigned long>(got);
     pace_bytes(got);
   }
-  fclose(f);
+  close_file(f);
   g_transfer_count++;
 
   if (remaining > 0) {
@@ -364,6 +576,45 @@ extern "C" void em_local_curl_set_root(const char *root) {
   g_root = (root && root[0]) ? std::string(root) : std::string();
   while (g_root.size() > 1 && g_root.back() == '/') g_root.pop_back();
   fprintf(stderr, "[local_curl] content root = '%s'\n", g_root.c_str());
+}
+
+// Enables the HTTP backend: resources that are not in the virtual filesystem
+// are fetched from this base URL (RenderConfig::contentBaseUrl). An empty string
+// keeps the player purely filesystem-backed.
+extern "C" void em_local_curl_set_http_base(const char *base) {
+  g_http_base = (base && base[0]) ? std::string(base) : std::string();
+  while (g_http_base.size() > 1 && g_http_base.back() == '/') g_http_base.pop_back();
+  if (!g_http_base.empty()) {
+    fprintf(stderr, "[local_curl] HTTP content base = '%s'\n", g_http_base.c_str());
+  }
+}
+
+// Materialises an HTTP resource in the virtual filesystem so readers that use
+// plain file I/O -- the MPD parser in particular -- can find it. Returns 0 when
+// the file is available afterwards (already present, or downloaded).
+extern "C" int em_local_curl_prefetch(const char *url) {
+  if (!url || !url[0]) return -1;
+  const std::string target(url);
+  int rc = -1;
+  // See prefetch_impl: the XHR has to happen on a worker thread.
+  std::thread helper([&rc, &target]() { rc = prefetch_impl(target); });
+  helper.join();
+  if (rc != 0) {
+    fprintf(stderr, "[local_curl] prefetch failed for '%s'\n", url);
+  }
+  return rc;
+}
+
+extern "C" LOCAL_CURL_EXPORT unsigned long em_local_curl_http_fetches(void) {
+  return g_http_fetches;
+}
+
+extern "C" LOCAL_CURL_EXPORT unsigned long em_local_curl_http_bytes(void) {
+  return g_http_bytes;
+}
+
+extern "C" LOCAL_CURL_EXPORT unsigned long em_local_curl_http_failures(void) {
+  return g_http_failures;
 }
 
 // Caps the aggregate delivery rate (bytes/second). 0 means "as fast as the

@@ -270,7 +270,11 @@ docker buildx ls
 ## 2. 内容准备
 
 播放器需要的内容**不在这个仓库里**（视频文件太大）。
-原始素材在 `~/source/IVS_webpage/gaslamp`，用脚本把它"搬"到仓库的 `webcontent/`：
+原始素材在 `~/source/IVS_webpage/gaslamp`，用脚本把它"搬"到仓库的 `webcontent/`。
+
+`webcontent/` 有两种用法：默认被 `--preload-file` 打进 `render.data`；
+也可以由 web 服务器直接提供（`IVS_PRELOAD_CONTENT=OFF`，见第 7 章）。
+**两种模式都用同一个 `webcontent/` 目录**，准备步骤完全一样。
 
 ```bash
 tools/stage_content.sh
@@ -433,6 +437,7 @@ http://127.0.0.1:8123/index.html
 | `?noUpload=1` | 跳过帧从解码线程到主线程的拷贝 |
 | `?noGL=1` | 保留拷贝、跳过 GL 上传 |
 | `?probe=1` | 每 60 帧 dump 一次堆分配分布 |
+| `?contentBase=<url>` | 改内容来源（HTTP 模式，见第 7 章）。例如 `?contentBase=http://192.168.1.10:9000/Gaslamp` |
 
 可以组合，例如 `index.html?stopDecode=1&verbose=1`。
 
@@ -475,160 +480,231 @@ Module.ccall("em_probe_uploads_total", "number", [], [])         // 上传次数
 | `CMAKE_MINIMUM_REQUIRED` 相关报错 | CMake 太新，加 `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` |
 | 改了代码但浏览器行为没变 | `index.html` 需要手动 copy；另外确认 `locateFile` 的 cache-bust 生效（页面里用 `BUILD_TAG` 做了）。也可能需要强制刷新 |
 | 反复重载后 WebGL 上下文耗尽 / `GLFW window create error` | 换一个干净的浏览器进程/会话 |
-| 想让 mp4 / MPD 由 HTTP 服务器提供，而不是预加载进内存 | 见第 7 章。核心是在 `local_curl` 的 `open_resolved()` 里加同步 XHR（worker 里合法） |
+| 想让 mp4 / MPD 由 HTTP 服务器提供，而不是预加载 | 见第 7 章。用 `-DIVS_PRELOAD_CONTENT=OFF` 构建，并用 `serve_wasm.py --content webcontent` 起服务 |
+| HTTP 模式下一片漆黑、日志里 `httpFetches` 一直是 0 | 内容服务器没起或路径不对。看 `?verbose=1` 里有没有 `cannot open '...' and HTTP fetch from base '...' failed (HTTP 404)` |
 
 ---
 
-## 7. 进阶：把视频内容改成 HTTP 加载（不再预加载 59 MB 进内存）
+## 7. 内容来源：预加载 vs HTTP 服务
 
-### 7.1 现在的做法
+播放器有两种内容来源模式，**源码完全相同**，只差一个 CMake 开关：
 
-`--preload-file .../webcontent@/` 会把 `webcontent/` 里的每个文件
-**原样拼进一个 `render.data`**（`file_packager` 的格式，文件内容首尾相接），
-页面加载时由 `render.js` 一次性读进 **Emscripten 的 MEMFS**：
+|  | 预加载（默认） | HTTP |
+|---|---|---|
+| 构建参数 | `IVS_PRELOAD_CONTENT=ON` | `-DIVS_PRELOAD_CONTENT=OFF` |
+| 内容存放 | `--preload-file` 打进 `render.data`（59 MB） | `webcontent/` 由 web 服务器提供 |
+| 加载方式 | 启动时整体载入 Emscripten 的 MEMFS | 按需 HTTP 取，读完即释放 |
+| 需要内容服务器 | 不需要 | 需要 |
+| MEMFS 里的内容 | **57 MB**（`/Gaslamp` 下 6000+ 个文件） | **0.1 MB**（只有 `Test.mpd`） |
+| 占的是哪块内存 | **浏览器的 JS 堆** | 几乎没有 |
+| 占多少 wasm 线性内存 | **0** | **0**（两种模式一样） |
+| 换内容要重新编译吗 | 要 | 不要 |
+| 适合 | 单文件部署、离线演示 | 内容大、内容会更新、想少占标签页内存 |
+
+> ⚠️ **一个容易搞错的地方**：`--preload-file` 的内容**不在 wasm 线性内存里**。
+> `file_packager` 交给 MEMFS 的是一个由 JS ArrayBuffer 构造的 `Uint8Array`
+> （见生成代码里的 `new Uint8Array(arrayBuffer)` + `FS_createDataFile`），
+> 也就是**浏览器的 JS 堆**。所以切到 HTTP 模式**并不会**给你省出 wasm 堆空间
+> （`MAXIMUM_MEMORY=4GB` 那边的压力完全不变），它省的是标签页的 JS 内存。
+> 这一点是实测出来的，见 7.5。
+
+两种模式下都可以用 URL 参数 `?contentBase=<url>` 覆盖运行时地址。
+
+### 7.1 用 HTTP 模式构建
+
+```bash
+cd ~/source/Immersive-Video-Sample
+source ~/source/emsdk/emsdk_env.sh
+export EM_CACHE=$PWD/.emcache          # 注意顺序：先 source 再 export
+
+mkdir -p src/build/client && cd src/build/client
+emcmake cmake ../.. -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DIVS_PRELOAD_CONTENT=OFF
+make player -j8
+```
+
+配置阶段应该看到：
 
 ```
-render.wasm   49.8 MB   只有代码，视频不在里面
-render.data   59.2 MB   视频内容（MPD + tile 轨道），启动时整体载入 wasm 内存
+-- IVS: NOT preloading content; it must be served over HTTP (set <contentBaseUrl> or ?contentBase=...)
 ```
 
-> 所以严格说：**mp4 没有被"编进 wasm"**，而是打进 `render.data` 并**常驻在 wasm 堆内存里**。
-> 这也是为什么 `.gitignore` 要排除 `*.data` —— 它是构建产物，不是一个需要版本管理的源文件。
+构建产物里**不再有 `render.data`**，`render.js` 也从 845 KB 降到 265 KB。
 
-`src/OmafDashAccess/local_curl/local_curl.cpp` 用 `fopen()` / `fread()` 从 MEMFS 里同步读，
-上层 OMAF 的下载器代码完全不知道数据是从哪来的。
+切回预加载模式就是把开关改成 `ON` 再配置一次：
 
-### 7.2 能不能改成 HTTP 服务？—— 能
-
-关键前提是一个浏览器平台事实，这里**实测验证过**：
-
-> **在 Web Worker 里，同步 XHR 是允许的**（在主线程才被限制）。
-> 而 Emscripten 的 pthread 就是真正的 Web Worker。
-
-实测（在本项目的页面上开一个 Worker 做同步 XHR）：
-
-```json
-{ "small": { "status": 200, "bytes": 5408, "ct": "text/html" }, "ok": true }
+```bash
+emcmake cmake ../.. -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DIVS_PRELOAD_CONTENT=ON
+make player -j8
 ```
 
-Emscripten 自己的惰性加载机制也基于同一事实，
-`src/library_fs.js` 里的注释写得很直接：
+> **注意**：`player/app` 是被 `src/CMakeLists.txt` 里的一个 `ADD_CUSTOM_TARGET`
+> **另起一次嵌套 cmake 配置**构建的，所以开关必须在 `src/CMakeLists.txt` 里显式转发
+> （已经做好了）。只给最外层传参而不转发是不会生效的。
+
+### 7.2 起内容服务器
+
+`tools/serve_wasm.py` 现在可以同时服务"播放器产物"和"视频内容"两个目录：
+
+```bash
+python3 tools/serve_wasm.py \
+    --root src/build/client/player/app \
+    --content webcontent \
+    --port 8123
+```
+
+启动时会打印：
+
+```
+serving .../player/app at http://127.0.0.1:8123/
+content .../webcontent/Gaslamp at http://127.0.0.1:8123/Gaslamp/
+  -> use ?contentBase=http://127.0.0.1:8123/Gaslamp
+```
+
+`--content` 既可以给"装着 `Gaslamp/` 的目录"（`webcontent`），也可以直接给 `webcontent/Gaslamp`，
+脚本会自动识别。内容目录默认发布在 `/Gaslamp`，可用 `--content-prefix` 改。
+
+COOP/COEP 两个头照旧会带上 —— 那是给 `SharedArrayBuffer` 用的，和内容从哪来无关。
+
+### 7.3 零配置
+
+如果既没写 `<contentBaseUrl>`，也没传 `?contentBase=`，播放器会**默认用页面自己的源**：
+
+```
+<location.origin>/Gaslamp
+```
+
+所以上面那条命令之后，直接打开 `http://127.0.0.1:8123/index.html` 就能播，不用加任何参数。
+要指向别处（另一个端口、CDN、另一台机器）再显式传：
+
+```
+http://127.0.0.1:8123/index.html?contentBase=http://192.168.1.10:9000/Gaslamp
+```
+
+也可以写进 `config.xml`：
+
+```xml
+<contentBaseUrl>http://192.168.1.10:9000/Gaslamp</contentBaseUrl>
+```
+
+（`config.xml` 是 `render.cpp` 里内嵌的模板，运行时写到虚拟文件系统再读回来。）
+
+### 7.4 实现原理
+
+改动集中在两处：`local_curl.cpp` 加了一个 HTTP 后端，`render.cpp` 打通配置。
+
+**（1）为什么可以保持同步 API**
+
+OMAF 的下载器要求 `curl_easy_perform()` / `curl_multi_perform()` 返回时传输已经完成，
+所以整条链条是同步的。好消息是**这个形状可以原样保留**：
+
+> **在 Web Worker 里，同步 XHR 是允许的**；而被限制的只有 document（主线程）。
+> Emscripten 的 pthread 就是真正的 Web Worker。
+
+Emscripten 自己的惰性加载机制基于同一事实，`src/library_fs.js` 里写得很直白：
 
 ```js
-// Creates a file record for lazy-loading from a URL. XXX This requires a synchronous
-// XHR, which is not possible in browsers except in a web worker!
+// XXX This requires a synchronous XHR, which is not possible in browsers
+// except in a web worker!
 createLazyFile: (parent, name, url, canRead, canWrite) => { ... }
 ```
 
-也就是说：**"同步读"这个 API 形状可以原样保留**，不需要为了联网把整条 OMAF 读取链改成异步。
+**（2）取数据：`open_resolved()` 里加一次回退**
 
-还有一个让事情变简单的观察：播放器实际只会读**小文件** ——
-
-| 读的东西 | 大小 |
-|---|---|
-| `Test.mpd` | 113 KB |
-| 每个 tile 分片 | 约 10–30 KB |
-| init segment | 几 KB |
-
-所以**整个文件 GET 下来**就够了，不需要 HTTP Range。
-（OMAF 在续传路径上确实会设 `CURLOPT_RANGE`，但那可以在本地已有的缓存上切片满足，不必真的走网络 Range。）
-
-### 7.3 做法 A（推荐）：给 `local_curl` 加一个 HTTP 后端
-
-改动集中在 `local_curl.cpp` 的一个函数里 —— `open_resolved()`。
-它现在只查 VFS；加上"查不到就去取"即可：
-
-```
-open_resolved(url):
-    1. 在 IVF / MEMFS 里找（现有逻辑，保持不变）
-    2. 命中 → 返回 FILE*，结束
-    3. 未命中且处于 HTTP 模式 → 把 url 映射成一个 HTTP 地址，同步 XHR 下载
-    4. 把字节写进 MEMFS（FS.writeFile），并把路径记进缓存
-    5. 回到第 1 步再 fopen 一次
-```
-
-伪代码（用 `EM_JS` 暴露一个同步取字节的函数）：
+它原本只查虚拟文件系统。现在查不到、且配置了 base URL 时，
+用 `EM_JS` 暴露的 `ivs_http_get_sync()` 做一次同步 GET，把结果包成内存文件返回：
 
 ```cpp
-// 返回 malloc 出来的 buffer 指针，长度通过 *out_len 带回；失败返回 nullptr。
-EM_JS(void *, ivs_http_get_sync, (const char *url, int *out_len), {
-  try {
-    var x = new XMLHttpRequest();
-    x.open('GET', UTF8ToString(url), false);   // false = 同步（worker 里合法）
-    x.responseType = 'arraybuffer';
-    x.send();
-    if (x.status !== 200) return 0;
-    var bytes = new Uint8Array(x.response);
-    var ptr = _malloc(bytes.length);
-    HEAPU8.set(bytes, ptr);
-    setValue(out_len, bytes.length, 'i32');
-    return ptr;
-  } catch (e) { return 0; }
-});
+FILE *open_resolved(url, path_out) {
+    1. 路径缓存命中        -> fopen
+    2. VFS 候选路径        -> fopen（预加载内容走这里，优先）
+    3. open_over_http(url) -> 同步 XHR -> fmemopen()
+}
 ```
 
-这个做法的好处：
+**上层 OMAF / 解码 / 渲染一行都没改**，因为返回的还是一个普通 `FILE*`。
 
-* **上层 OMAF / 解码 / 渲染代码一行都不用改**（API 形状没变）；
-* 不需要服务器支持 Range，只要普通 GET；
-* 可以彻底去掉 `--preload-file`，**省掉 59 MB 常驻 wasm 内存**（改成按需，且只保留当前用到的分片）；
-* 加一层缓存后，重复请求同一个分片不会重复下载；
-* 换内容不用重新编译。
+**（3）为什么用 `fmemopen` 而不是写进 MEMFS**
 
-需要注意的：
+写进 MEMFS 会让文件永久驻留 —— 最后又变成 67 MB 常驻，等于白做。
+`fmemopen()` 把响应体包成一个内存流，读完 `fclose` 就释放：
+`local_curl.cpp` 里维护了 `FILE* -> buffer` 的映射，统一在 `close_file()` 里释放
+（`perform_transfer` 的所有 `fclose` 都改走它了）。
 
-* **仍然是同步阻塞**：worker 会卡在那次 XHR 上，但因为每个分片只有几十 KB，可以接受。
-  这就是原来 `local_curl` 的语义，没有变坏。
-* **失败要能报错**：网络错误要映射成 curl 的错误码（`CURLE_COULDNT_CONNECT` 之类），
-  否则上层会一直重试。
-* **地址映射**：`render.cpp` 里已有 `<url>` 配置和 `em_local_curl_set_root()`，
-  可以把 root 从 `/Gaslamp` 换成一个 HTTP base，例如
-  `em_local_curl_set_root("http://127.0.0.1:8123/Gaslamp")`，
-  `candidate_paths()` 再把 `Test.mpd` / `Test_track33.20.mp4` 拼上去。
-* **仍然需要 COOP/COEP**：跨源隔离是为了 `SharedArrayBuffer`（pthreads），
-  和内容从哪来无关，所以 `tools/serve_wasm.py` 的两个响应头必须保留。
+顺带避免了并发问题：OMAF 有多个下载线程，写 MEMFS 需要为每个临时文件生成唯一名字，
+用内存流就没有这个问题。
 
-### 7.4 做法 B：用 Emscripten 的 `createLazyFile`
+**（4）MPD 是个例外**
+
+MPD **不经过 curl** —— `OmafXMLParser::Generate()` 用的是
+`tinyxml2::XMLDocument::LoadFile()`，一次普通的文件读取。所以在 HTTP 模式下，
+创建播放器之前必须先把 MPD 放进虚拟文件系统：
 
 ```cpp
-// 必须从 pthread（worker）里调用
-EM_ASM({
-  FS.createLazyFile('/', 'Test_track33.20.mp4', '/Gaslamp/Test_track33.20.mp4', true, false);
-});
+em_local_curl_prefetch(renderConfig.url);
 ```
 
-它会先发一个**同步 HEAD** 拿长度，然后按 chunk 用 **Range** 请求按需加载。
+只有这一个文件（113 KB）。实现上有个细节：**主线程不允许给同步请求设置
+`responseType`**（规范限制，会抛 `InvalidAccessError`），所以这个 prefetch
+内部起一个辅助线程去发请求再 `join`，对调用方仍然是同步的。
 
-* 优点：大文件友好，内存占用只跟访问范围有关。
-* 缺点：
-  * 需要服务器支持 **HEAD + Range** —— 当前的 `tools/serve_wasm.py` **不支持**
-    （实测带 `Range` 头仍返回 `200` + 全量 59 MB，`Content-Range` 为空）；
-  * 每个文件都要显式注册一次，路径映射得和 `local_curl` 的候选路径对齐；
-  * 分片很小，用不上它的优势。
+### 7.5 实测结果
 
-**做 A 就够，B 只在将来要串流大文件时才有意义。**
+#### HTTP 模式跑起来的样子
 
-### 7.5 服务器要改什么
+`IVS_PRELOAD_CONTENT=OFF`，内容由 `serve_wasm.py --content webcontent` 提供，
+页面地址不带任何参数（走 7.3 的默认值）：
 
-| 需求 | 做法 A | 做法 B |
+```
+httpFetches   125 -> 613 -> 997        逐段增长，每段一次请求
+httpMB        1.4 -> 8.2 -> 13         累计取回
+httpFail      0
+decoders      2
+errors        0
+```
+
+画面正常播放（截图 `porting-evidence/http_mode_playback.png`，本地文件未入库）。
+
+#### A/B：到底省了什么
+
+同一台机器、同一个页面，只切换 `IVS_PRELOAD_CONTENT`，加载后约 70 秒各测一次：
+
+| 指标 | 预加载 ON | HTTP OFF |
 |---|---|---|
-| 普通 GET 静态文件 | ✅ 现在就有 | ✅ |
-| COOP/COEP 响应头 | ✅ 现在就有 | ✅ |
-| HEAD | 不需要 | **需要加** |
-| Range (`206` + `Content-Range`) | **不需要** | **需要加** |
-| 不再需要 `--preload-file` | 是 | 是 |
-| 不再需要 `FORCE_FILESYSTEM` | 否（还要写 MEMFS） | 是 |
+| `/Gaslamp` 条目数 | 6051 | **3**（`.` `..` `Test.mpd`） |
+| `/Gaslamp` 内容字节 | **57 MB** | **0.1 MB** |
+| `em_probe_live_kb()`（wasm 分配器存活） | 245684 KB | 244871 KB |
+| `Module.HEAPU8.length` | 369 MB | 369 MB |
+| `httpFetches` | 0 | 997 |
 
-`tools/serve_wasm.py` 基于 Python 的 `http.server`，它本身不支持 Range。
-如果要做 B，最省事的是换成支持 Range 的静态服务器（或给 handler 加 `send_head` 的 Range 分支）。
+结论有两层，第二层是必须说清楚的：
 
-### 7.6 一个更省事的中间方案
+1. **内容确实不再驻留**：从页面里清点 MEMFS，`/Gaslamp` 下 6000+ 个文件、57 MB，
+   变成只剩一个 113 KB 的 MPD。分片是 `fmemopen` 内存流，传输结束就释放。
+2. **省的是 JS 堆，不是 wasm 堆**：`liveKB` 只差 813 KB，`HEAPU8.length` 完全相同。
+   这和 7.4 的原理一致 —— 预加载数据是 JS ArrayBuffer，从来没进过 wasm 线性内存。
+   所以如果你的动机是"缓解 4 GB 的 wasm 堆压力"，**这个开关帮不上忙**；
+   它的价值是少传 57 MB、少占标签页内存、以及换内容不用重编译。
 
-不想改 C++ 的话，还有一个"半步"做法：**只预加载 MPD，其余走 HTTP**。
-但它一样要解决"分片从哪来"的问题，所以本质上还是要落到做法 A 或 B。
-真要省内存，直接做 A。
+> 判断内存时不要用 `Module.HEAPU8.length`。那是 wasm 内存的**大小**，按几何步长增长，
+> 两种模式会停在同一个数值上。要看真实占用用 `Module.ccall('em_probe_live_kb', ...)`
+> （见 5.3），或者像上面这样直接清点 MEMFS。
 
----
+### 7.6 需要注意
+
+* **失败时的表现**：内容 URL 不对会报
+  `cannot open '...' and HTTP fetch from base '...' failed (HTTP 404)`，
+  在 `?verbose=1` 下能看到。不会再出现"什么都不播也不报错"。
+* **同步阻塞**：每个分片会阻塞所在 worker 一次 XHR。分片只有 10–30 KB，
+  和原来读 VFS 的语义一致，没有变坏。
+* **仍然需要 COOP/COEP**：跨源隔离是为 `SharedArrayBuffer`（pthreads），
+  不是为内容。
+* **跨域内容**：如果内容在别的源上，那个源也要发 `Cross-Origin-Resource-Policy`
+  或 CORS 头，否则 COEP 会拦掉。
+* **`server/serve_wasm.py` 现在支持 Range**（返回 `206` + `Content-Range`），
+  但 HTTP 模式**并不需要**它 —— 分片很小，一次 GET 就取完。
+  加它是为了将来若改用 `FS.createLazyFile` 时可用。
 
 ## 8. 已知限制
 
@@ -666,6 +742,7 @@ tools/stage_content.sh
 # 2) 配置 + 编译
 mkdir -p src/build/client && cd src/build/client
 emcmake cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+#     加 -DIVS_PRELOAD_CONTENT=OFF 则改为 HTTP 模式（见第 7 章）
 make player -j8
 cd ../../..
 
@@ -673,7 +750,11 @@ cd ../../..
 cp webpage/index.html src/build/client/player/app/index.html
 
 # 4) 起服务
+#    预加载模式：内容已在 render.data 里，--content 可以省略
 python3 tools/serve_wasm.py --root src/build/client/player/app --port 8123
+#    HTTP 模式：必须把内容目录也服务出去
+# python3 tools/serve_wasm.py --root src/build/client/player/app \
+#         --content webcontent --port 8123
 
 # 5) 浏览器打开
 #    http://127.0.0.1:8123/index.html

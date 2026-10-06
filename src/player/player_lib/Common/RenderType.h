@@ -156,6 +156,14 @@ struct RenderConfig {
   // Reading preloaded files is a memcpy, which lets the OMAF reader thread race
   // far ahead of the renderer and exhaust the WebAssembly heap.
   uint32_t localRateLimitBytesPerSec;
+  // Optional HTTP base URL for content that is NOT preloaded into the virtual
+  // filesystem, e.g. "http://127.0.0.1:8123/Gaslamp". Empty (the default) keeps
+  // the player purely filesystem-backed. When set, local_curl fetches a missing
+  // resource over HTTP before giving up, so the mp4 files can be served by an
+  // ordinary web server instead of being baked into render.data. That drops the
+  // ~57 MB of MEMFS content from the browser's JS heap (not from wasm memory --
+  // file_packager stores the payload as a JS Uint8Array).
+  char* contentBaseUrl;
   // for stitching
   uint32_t maxVideoDecodeWidth;
   uint32_t maxVideoDecodeHeight;
