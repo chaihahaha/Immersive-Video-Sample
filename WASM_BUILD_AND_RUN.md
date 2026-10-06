@@ -18,7 +18,7 @@
 
 * 视频内容通过 `--preload-file` 打进 Emscripten 虚拟文件系统（VFS），
   原始的 libcurl 被 [src/OmafDashAccess/local_curl/local_curl.cpp](src/OmafDashAccess/local_curl/local_curl.cpp)
-  替换成**同步读 VFS**；
+  替换成**同步读 VFS**（想让内容改由 HTTP 服务器提供、不再预加载进内存，见第 7 章）；
 * HEVC 解码是 **FFmpeg 5.1.4 编译出的 wasm 软解**（无硬件加速）；
 * 渲染用 **WebGL2**，而且**所有 GL 调用都在主线程**（帧数据从解码线程拷到主线程再上传）；
 * 因为用了 pthreads，页面**必须处于跨源隔离（cross-origin isolated）状态**才能拿到 `SharedArrayBuffer`。
@@ -475,10 +475,162 @@ Module.ccall("em_probe_uploads_total", "number", [], [])         // 上传次数
 | `CMAKE_MINIMUM_REQUIRED` 相关报错 | CMake 太新，加 `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` |
 | 改了代码但浏览器行为没变 | `index.html` 需要手动 copy；另外确认 `locateFile` 的 cache-bust 生效（页面里用 `BUILD_TAG` 做了）。也可能需要强制刷新 |
 | 反复重载后 WebGL 上下文耗尽 / `GLFW window create error` | 换一个干净的浏览器进程/会话 |
+| 想让 mp4 / MPD 由 HTTP 服务器提供，而不是预加载进内存 | 见第 7 章。核心是在 `local_curl` 的 `open_resolved()` 里加同步 XHR（worker 里合法） |
 
 ---
 
-## 7. 已知限制
+## 7. 进阶：把视频内容改成 HTTP 加载（不再预加载 59 MB 进内存）
+
+### 7.1 现在的做法
+
+`--preload-file .../webcontent@/` 会把 `webcontent/` 里的每个文件
+**原样拼进一个 `render.data`**（`file_packager` 的格式，文件内容首尾相接），
+页面加载时由 `render.js` 一次性读进 **Emscripten 的 MEMFS**：
+
+```
+render.wasm   49.8 MB   只有代码，视频不在里面
+render.data   59.2 MB   视频内容（MPD + tile 轨道），启动时整体载入 wasm 内存
+```
+
+> 所以严格说：**mp4 没有被"编进 wasm"**，而是打进 `render.data` 并**常驻在 wasm 堆内存里**。
+> 这也是为什么 `.gitignore` 要排除 `*.data` —— 它是构建产物，不是一个需要版本管理的源文件。
+
+`src/OmafDashAccess/local_curl/local_curl.cpp` 用 `fopen()` / `fread()` 从 MEMFS 里同步读，
+上层 OMAF 的下载器代码完全不知道数据是从哪来的。
+
+### 7.2 能不能改成 HTTP 服务？—— 能
+
+关键前提是一个浏览器平台事实，这里**实测验证过**：
+
+> **在 Web Worker 里，同步 XHR 是允许的**（在主线程才被限制）。
+> 而 Emscripten 的 pthread 就是真正的 Web Worker。
+
+实测（在本项目的页面上开一个 Worker 做同步 XHR）：
+
+```json
+{ "small": { "status": 200, "bytes": 5408, "ct": "text/html" }, "ok": true }
+```
+
+Emscripten 自己的惰性加载机制也基于同一事实，
+`src/library_fs.js` 里的注释写得很直接：
+
+```js
+// Creates a file record for lazy-loading from a URL. XXX This requires a synchronous
+// XHR, which is not possible in browsers except in a web worker!
+createLazyFile: (parent, name, url, canRead, canWrite) => { ... }
+```
+
+也就是说：**"同步读"这个 API 形状可以原样保留**，不需要为了联网把整条 OMAF 读取链改成异步。
+
+还有一个让事情变简单的观察：播放器实际只会读**小文件** ——
+
+| 读的东西 | 大小 |
+|---|---|
+| `Test.mpd` | 113 KB |
+| 每个 tile 分片 | 约 10–30 KB |
+| init segment | 几 KB |
+
+所以**整个文件 GET 下来**就够了，不需要 HTTP Range。
+（OMAF 在续传路径上确实会设 `CURLOPT_RANGE`，但那可以在本地已有的缓存上切片满足，不必真的走网络 Range。）
+
+### 7.3 做法 A（推荐）：给 `local_curl` 加一个 HTTP 后端
+
+改动集中在 `local_curl.cpp` 的一个函数里 —— `open_resolved()`。
+它现在只查 VFS；加上"查不到就去取"即可：
+
+```
+open_resolved(url):
+    1. 在 IVF / MEMFS 里找（现有逻辑，保持不变）
+    2. 命中 → 返回 FILE*，结束
+    3. 未命中且处于 HTTP 模式 → 把 url 映射成一个 HTTP 地址，同步 XHR 下载
+    4. 把字节写进 MEMFS（FS.writeFile），并把路径记进缓存
+    5. 回到第 1 步再 fopen 一次
+```
+
+伪代码（用 `EM_JS` 暴露一个同步取字节的函数）：
+
+```cpp
+// 返回 malloc 出来的 buffer 指针，长度通过 *out_len 带回；失败返回 nullptr。
+EM_JS(void *, ivs_http_get_sync, (const char *url, int *out_len), {
+  try {
+    var x = new XMLHttpRequest();
+    x.open('GET', UTF8ToString(url), false);   // false = 同步（worker 里合法）
+    x.responseType = 'arraybuffer';
+    x.send();
+    if (x.status !== 200) return 0;
+    var bytes = new Uint8Array(x.response);
+    var ptr = _malloc(bytes.length);
+    HEAPU8.set(bytes, ptr);
+    setValue(out_len, bytes.length, 'i32');
+    return ptr;
+  } catch (e) { return 0; }
+});
+```
+
+这个做法的好处：
+
+* **上层 OMAF / 解码 / 渲染代码一行都不用改**（API 形状没变）；
+* 不需要服务器支持 Range，只要普通 GET；
+* 可以彻底去掉 `--preload-file`，**省掉 59 MB 常驻 wasm 内存**（改成按需，且只保留当前用到的分片）；
+* 加一层缓存后，重复请求同一个分片不会重复下载；
+* 换内容不用重新编译。
+
+需要注意的：
+
+* **仍然是同步阻塞**：worker 会卡在那次 XHR 上，但因为每个分片只有几十 KB，可以接受。
+  这就是原来 `local_curl` 的语义，没有变坏。
+* **失败要能报错**：网络错误要映射成 curl 的错误码（`CURLE_COULDNT_CONNECT` 之类），
+  否则上层会一直重试。
+* **地址映射**：`render.cpp` 里已有 `<url>` 配置和 `em_local_curl_set_root()`，
+  可以把 root 从 `/Gaslamp` 换成一个 HTTP base，例如
+  `em_local_curl_set_root("http://127.0.0.1:8123/Gaslamp")`，
+  `candidate_paths()` 再把 `Test.mpd` / `Test_track33.20.mp4` 拼上去。
+* **仍然需要 COOP/COEP**：跨源隔离是为了 `SharedArrayBuffer`（pthreads），
+  和内容从哪来无关，所以 `tools/serve_wasm.py` 的两个响应头必须保留。
+
+### 7.4 做法 B：用 Emscripten 的 `createLazyFile`
+
+```cpp
+// 必须从 pthread（worker）里调用
+EM_ASM({
+  FS.createLazyFile('/', 'Test_track33.20.mp4', '/Gaslamp/Test_track33.20.mp4', true, false);
+});
+```
+
+它会先发一个**同步 HEAD** 拿长度，然后按 chunk 用 **Range** 请求按需加载。
+
+* 优点：大文件友好，内存占用只跟访问范围有关。
+* 缺点：
+  * 需要服务器支持 **HEAD + Range** —— 当前的 `tools/serve_wasm.py` **不支持**
+    （实测带 `Range` 头仍返回 `200` + 全量 59 MB，`Content-Range` 为空）；
+  * 每个文件都要显式注册一次，路径映射得和 `local_curl` 的候选路径对齐；
+  * 分片很小，用不上它的优势。
+
+**做 A 就够，B 只在将来要串流大文件时才有意义。**
+
+### 7.5 服务器要改什么
+
+| 需求 | 做法 A | 做法 B |
+|---|---|---|
+| 普通 GET 静态文件 | ✅ 现在就有 | ✅ |
+| COOP/COEP 响应头 | ✅ 现在就有 | ✅ |
+| HEAD | 不需要 | **需要加** |
+| Range (`206` + `Content-Range`) | **不需要** | **需要加** |
+| 不再需要 `--preload-file` | 是 | 是 |
+| 不再需要 `FORCE_FILESYSTEM` | 否（还要写 MEMFS） | 是 |
+
+`tools/serve_wasm.py` 基于 Python 的 `http.server`，它本身不支持 Range。
+如果要做 B，最省事的是换成支持 Range 的静态服务器（或给 handler 加 `send_head` 的 Range 分支）。
+
+### 7.6 一个更省事的中间方案
+
+不想改 C++ 的话，还有一个"半步"做法：**只预加载 MPD，其余走 HTTP**。
+但它一样要解决"分片从哪来"的问题，所以本质上还是要落到做法 A 或 B。
+真要省内存，直接做 A。
+
+---
+
+## 8. 已知限制
 
 * **软解**：HEVC 全靠 CPU，8K 级别的画面帧率不高。原生的硬件解码路径（VAAPI / VideoToolbox）在 wasm 里没有。
 * **内容必须是预打包的**：现在没有网络栈，播放器从 VFS 同步读文件。
@@ -492,14 +644,15 @@ Module.ccall("em_probe_uploads_total", "number", [], [])         // 上传次数
 * **ffmpeg 库路径硬编码**在 `CMakeLists.txt` 里，换机器要改（见 1.7）。
 * **emsdk 版本被钉死在 3.1.40**：`ffmpeg_wasm_lib` 里的 `.a` 是这个版本编的，
   升级 emcc 前需要先把 FFmpeg 库重编一遍。
-* **`~/source/ffmpeg.wasm` 是你自己的 fork**，与上游 `ffmpegwasm/ffmpeg.wasm` 已经分叉
-  （`Dockerfile`、`build/ffmpeg.sh`、`exe.sh` 都是本地改动）。将来 `git pull` 上游会有冲突。
+* **`~/source/ffmpeg.wasm` 是你自己的 fork**（`Dockerfile`、`build/ffmpeg.sh`、`exe.sh` 是本地改动）。
+  这个分叉是**有意的、不需要跟上游合并**：改动只是裁掉用不到的前置库、把 `make -j` 降成 `-j 2` 省内存，
+  **不影响编出来的 ffmpeg 库的可用性**。把它当成一个"一次性编库工程"看待即可。
 * **`libcurl.a` 还在 `ffmpeg_wasm_lib/lib/` 里但已无人使用**，可以删掉以免误导。
   同理 `~/source/curl_py/` 是已废弃的实验。
 
 ---
 
-## 8. 一览：从零到跑起来
+## 9. 一览：从零到跑起来
 
 ```bash
 # 0) 环境
