@@ -434,10 +434,126 @@ nohup python3 tools/serve_wasm.py \
 它会额外做两件事：`Cache-Control: no-store`（迭代时避免拿到旧的 `render.wasm`），
 以及为 `.wasm` / `.data` / `.mpd` / `.mp4` 等返回正确的 MIME 类型。
 
-### 4.2 打开页面
+### 4.2 局域网上用别的电脑打开：必须走 HTTPS
+
+本机用 `http://127.0.0.1:8123` 一切正常，换成 `--host 0.0.0.0` 让同事在隔壁机器
+上打开 `http://192.168.1.4:9999/` 就会白屏，控制台报：
+
+```
+The Cross-Origin-Opener-Policy header has been ignored, because the URL's
+origin was untrustworthy.
+Uncaught ReferenceError: SharedArrayBuffer is not defined
+```
+
+原因不是服务器没发头（头照发），而是 **浏览器按来源决定要不要认这两个头**。
+"可信来源"（potentially trustworthy origin）只有三种：
+
+| 来源 | 可信？ |
+|---|---|
+| `https://anything` | ✅ |
+| `http://localhost` / `http://127.0.0.1` / `http://[::1]` | ✅ |
+| `http://192.168.x.x` / `http://主机名.local` | ❌ |
+
+私网 IP 不算可信来源 → COOP/COEP 被丢弃 → `crossOriginIsolated === false` →
+`SharedArrayBuffer` 在页面里根本不存在 → pthreads 版 `render.js` 第一行就崩。
+所以**本机能跑不代表别的机器能跑**，区别只在 URL 是 `127.0.0.1` 还是 `192.168.x.x`。
+
+自检最快的方法是在目标机器的控制台里看一眼：
+
+```js
+crossOriginIsolated           // 应该是 true
+typeof SharedArrayBuffer      // 应该是 "function"
+```
+
+#### 修法 1：`--tls`（推荐）
+
+`tools/serve_wasm.py` 已内置 TLS 支持，会自动生成证书，SAN 覆盖本机所有网卡 IP：
+
+```bash
+python3 tools/serve_wasm.py \
+    --root src/build/client/player/app --host 0.0.0.0 --port 9999 --tls
+```
+
+启动后它会打印所有可用地址，例如：
+
+```
+serving .../player/app at https://0.0.0.0:9999/
+TLS: mkcert (certificate ./.wasm-dev-cert/cert.pem)
+  https://192.168.1.4:9999/
+```
+
+证书缓存于当前目录的 `.wasm-dev-cert/`（已在 `.gitignore` 里），换网络后如果本机
+IP 变了，脚本发现 SAN 没覆盖会自动重签，不需要手动删。
+
+签名者按顺序取：
+
+1. 有 `mkcert` 就用 mkcert 的本地 CA（`--tls-ca mkcert` 强制）。
+   本机已经 `mkcert -install` 过，所以**本机浏览器直接就是绿锁**。
+2. 没有就用 `openssl` 自签一张（`--tls-ca self` 强制）。
+
+**别的电脑需要单独建立信任**，这是私网 IP 绕不过去的一步（任何公共 CA 都不会给
+`192.168.x.x` 签证书）：
+
+```bash
+mkcert -CAROOT     # 拿到 rootCA.pem 所在目录
+```
+
+| 客户端系统 | 安装根证书 |
+|---|---|
+| macOS | `sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain rootCA.pem` |
+| Windows | `certutil -addstore -f Root rootCA.pem`（或用"受信任的根证书颁发机构"导入） |
+| Linux | `sudo cp rootCA.pem /usr/local/share/ca-certificates/mkcert.crt && sudo update-ca-certificates` |
+| iOS / Android | 把 `rootCA.pem` 传到手机，在"设置 → 通用 → 关于 → 证书信任设置"里手动信任 |
+
+#### 修法 2：自签 + 点"继续访问"
+
+不想给每台机器装根证书，就 `--tls-ca self` 生成一次性的自签证书，客户端浏览器会
+拦一次，点"高级 → 继续前往"即可。**凑合能用**：证书警告被绕过之后文档依然是
+https 源，`isSecureContext` 为真，COOP/COEP 生效，`SharedArrayBuffer` 可用。
+缺点是每次换证书/换 IP 都要再点一次，且部分企业策略会直接禁止绕过。
+
+#### 修法 3：不改服务器，只改客户端（最省事）
+
+Chrome / Edge 可以把某个不安全的来源手动提升为可信来源，连证书都不用配：
+
+1. 打开 `chrome://flags/#unsafely-treat-insecure-origin-as-secure`
+2. 填 `http://192.168.1.4:9999`（要带端口，多个用逗号分隔）
+3. 设为 `Enabled` → 重启浏览器
+
+或者用命令行参数（不影响全局设置）：
+
+```bash
+open -a "Google Chrome" --args \
+  --unsafely-treat-insecure-origin-as-secure=http://192.168.1.4:9999
+```
+
+Safari / Firefox 没有等价开关，手机上也很难操作 —— 所以长期方案还是修法 1。
+
+#### 修法 4：隧道（有公网时最省事）
+
+```bash
+cloudflared tunnel --url http://127.0.0.1:9999
+```
+
+它给你一个 `https://xxx.trycloudflare.com` 的正式证书域名，任何设备直接打开就能用，
+代价是流量绕公网一圈，360 视频的码率扛不住长时间的播放大流量。
+
+#### 补充：`--content` 模式同样受影响
+
+用 `-DIVS_PRELOAD_CONTENT=OFF` 构建时，`?contentBase=` 必须和页面同一个 scheme，
+否则浏览器会按混合内容（mixed content）拦掉。加了 `--tls` 之后脚本会自动打印
+`https://` 版本的 `contentBase`，照抄即可。
+
+### 4.3 打开页面
 
 ```
 http://127.0.0.1:8123/index.html
+```
+
+局域网其他机器（已按 4.2 处理）：
+
+```
+https://192.168.1.4:9999/index.html
 ```
 
 **不要**用 `file://` 直接打开，也不要用不带这两个头的普通静态服务器 —— 会看到
@@ -513,6 +629,7 @@ Module.ccall("em_probe_uploads_total", "number", [], [])         // 上传次数
 | 现象 | 原因 / 处理 |
 |---|---|
 | 页面提示 `SharedArrayBuffer is unavailable` | 没有跨源隔离。必须用 `tools/serve_wasm.py`（或自己加 COOP/COEP 响应头） |
+| 本机能播，局域网另一台机器打开就报 `SharedArrayBuffer is not defined` + `Cross-Origin-Opener-Policy header has been ignored, because the URL's origin was untrustworthy` | `http://192.168.x.x` 不是可信来源，COOP/COEP 被浏览器丢弃。加 `--tls`，或按 §4.2 的修法 3 在客户端把该来源提升为可信 |
 | 画面全黑、但日志显示在解码 | 检查 `render count` 是否在递增；如果卡在 0，说明 `Play()` 的帧计数器没有跨调用保持（见 `MediaPlayer_Linux.cpp` 里的 `static`） |
 | `Tried to spawn a new thread, but the thread pool is exhausted` | `PTHREAD_POOL_SIZE` 太小或为 0，改成 32 |
 | `Aborted(Cannot enlarge memory arrays ...)` | `MAXIMUM_MEMORY` 不够，或又有新的内存泄漏 |
