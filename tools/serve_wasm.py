@@ -34,6 +34,7 @@ Usage:
 """
 
 import argparse
+import errno
 import functools
 import http.server
 import ipaddress
@@ -196,6 +197,13 @@ class Server(socketserver.ThreadingTCPServer):
     allow_reuse_address = True
     daemon_threads = True
 
+    def handle_error(self, request, client_address):
+        """A browser aborting a 40 MB wasm download is normal, not a bug."""
+        exc = sys.exc_info()[1]
+        if isinstance(exc, (BrokenPipeError, ConnectionResetError)):
+            return
+        super().handle_error(request, client_address)
+
 
 # --------------------------------------------------------------------- TLS bits
 #
@@ -305,6 +313,16 @@ def _cert_covers(cert_path, names):
             if name.lower() not in dns:
                 return False
     return True
+
+
+def _who_listens(port):
+    """Best-effort "pid command" of the process holding a TCP port."""
+    out = _run(["lsof", "-nP", "-tiTCP:%d" % port, "-sTCP:LISTEN"])
+    if not out:
+        return None
+    pid = out.split()[0]
+    cmd = _run(["ps", "-p", pid, "-o", "command="])
+    return "%s (%s)" % (pid, (cmd or "").strip()[:90]) if cmd else pid
 
 
 def _mkcert_ca():
@@ -441,7 +459,24 @@ def main():
 
     handler = functools.partial(Handler, directory=root)
     scheme = _scheme(args)
-    with Server((args.host, args.port), handler) as httpd:
+    try:
+        httpd = Server((args.host, args.port), handler)
+    except OSError as exc:
+        if exc.errno != errno.EADDRINUSE:
+            raise
+        # The classic footgun: an older server is still holding the port, so the
+        # browser keeps talking to *it*, and none of the new flags take effect.
+        holder = _who_listens(args.port)
+        lines = ["port %d is already in use%s" % (args.port, " by " + holder if holder else "")]
+        lines.append("  A server started earlier is still running, so the browser is")
+        lines.append("  talking to that one -- not to this one. Restart it before the")
+        lines.append("  browser will see any change:")
+        if holder:
+            lines.append("    kill %s" % holder.split()[0])
+        else:
+            lines.append("    lsof -nP -iTCP:%d -sTCP:LISTEN" % args.port)
+        sys.exit("\n".join(lines))
+    with httpd:
         if args.tls:
             ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
             ctx.minimum_version = ssl.TLSVersion.TLSv1_2
