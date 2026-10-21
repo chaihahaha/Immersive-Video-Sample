@@ -196,13 +196,44 @@ class _BoundedFile:
 class Server(socketserver.ThreadingTCPServer):
     allow_reuse_address = True
     daemon_threads = True
+    # Set by main() when --tls is used. The handshake is done per connection
+    # inside its own thread, never in accept(); see get_request().
+    tls_context = None
+    handshake_timeout = 20.0
 
     def handle_error(self, request, client_address):
         """A browser aborting a 40 MB wasm download is normal, not a bug."""
         exc = sys.exc_info()[1]
-        if isinstance(exc, (BrokenPipeError, ConnectionResetError)):
+        if isinstance(exc, (BrokenPipeError, ConnectionResetError, ssl.SSLError)):
             return
         super().handle_error(request, client_address)
+
+    def get_request(self):
+        """accept() only. Never wrap the listening socket in TLS.
+
+        Wrapping it means the handshake happens inside accept(), which runs on
+        the single serve_forever() thread. Browsers open speculative
+        connections and leave them silent for a while, so one idle socket would
+        freeze every other request until it timed out -- which is exactly the
+        "render.wasm / render.data: ERR_CONNECTION_RESET" the client saw, while
+        index.html and render.js (small, requested first) worked.
+        """
+        sock, addr = self.socket.accept()
+        return sock, addr
+
+    def process_request_thread(self, request, client_address):
+        if self.tls_context is not None:
+            raw = request
+            try:
+                request.settimeout(self.handshake_timeout)
+                request = self.tls_context.wrap_socket(raw, server_side=True)
+                # Back to a blocking socket: a timeout in the middle of a 50 MB
+                # write would abort the transfer.
+                request.settimeout(None)
+            except (ssl.SSLError, OSError):
+                self.shutdown_request(raw)
+                return
+        super().process_request_thread(request, client_address)
 
 
 # --------------------------------------------------------------------- TLS bits
@@ -481,7 +512,7 @@ def main():
             ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
             ctx.minimum_version = ssl.TLSVersion.TLSv1_2
             ctx.load_cert_chain(cert, key)
-            httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True)
+            httpd.tls_context = ctx
         print("serving %s at %s://%s:%d/" % (root, scheme, args.host, args.port))
         if Handler.content_dir:
             print("content %s at %s://%s:%d%s/"

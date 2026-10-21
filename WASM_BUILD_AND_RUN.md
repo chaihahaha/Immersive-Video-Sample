@@ -538,6 +538,33 @@ cloudflared tunnel --url http://127.0.0.1:9999
 它给你一个 `https://xxx.trycloudflare.com` 的正式证书域名，任何设备直接打开就能用，
 代价是流量绕公网一圈，360 视频的码率扛不住长时间的播放大流量。
 
+#### 加了 `--tls` 之后仍然 `ERR_CONNECTION_RESET`（已修）
+
+如果现象变成"页面能打开、`render.js` 能加载，但 `render.wasm` / `render.data` 报
+`net::ERR_CONNECTION_RESET`，`render.js` 里出现 `NetworkError for: render.data`"，
+并且控制台里**不再有** `SharedArrayBuffer is not defined`（说明跨源隔离已经生效），
+那问题出在服务器的 TLS 实现上，不是网络：
+
+旧版脚本用 `ctx.wrap_socket(httpd.socket, server_side=True)` 包住**监听 socket**。
+这样 TLS 握手发生在 `accept()` 里，而 `accept()` 只跑在 `serve_forever()` 那一个线程上。
+浏览器会预先开几条"备用连接"但先不发数据（preconnect），第一条这样的空连接就能把
+整个服务器**卡死**——其他所有请求全部排队直到超时，浏览器于是报 `ERR_CONNECTION_RESET`。
+小文件（`index.html`、`render.js`）先请求完所以看起来正常，大文件必然失败。
+
+实测确认（一个不发数据的连接 + 一个正常请求）：
+
+```
+# 修复前：正常请求被饿死
+curl: (28) Connection timed out after 8002 milliseconds
+
+# 修复后：3 个空连接挂着，大文件照常
+render.wasm http=200 size=40750727 t=0.25s
+render.data http=200 size=59248923 t=0.33s
+```
+
+现在的实现把握手放进每个连接自己的线程里（`Server.process_request_thread`），
+并给握手加了 20 秒超时，任一条连接卡住都不再影响别人。
+
 #### 补充：`--content` 模式同样受影响
 
 用 `-DIVS_PRELOAD_CONTENT=OFF` 构建时，`?contentBase=` 必须和页面同一个 scheme，
@@ -629,6 +656,7 @@ Module.ccall("em_probe_uploads_total", "number", [], [])         // 上传次数
 | 现象 | 原因 / 处理 |
 |---|---|
 | 页面提示 `SharedArrayBuffer is unavailable` | 没有跨源隔离。必须用 `tools/serve_wasm.py`（或自己加 COOP/COEP 响应头） |
+| 加了 `--tls` 后能进页面，但 `render.wasm` / `render.data` 报 `net::ERR_CONNECTION_RESET` | 旧版脚本把 TLS 握手放在 `accept()` 里，浏览器的一条空预连接就能卡死整个服务器。已修，见 §4.2 |
 | 本机能播，局域网另一台机器打开就报 `SharedArrayBuffer is not defined` + `Cross-Origin-Opener-Policy header has been ignored, because the URL's origin was untrustworthy` | `http://192.168.x.x` 不是可信来源，COOP/COEP 被浏览器丢弃。加 `--tls`，或按 §4.2 的修法 3 在客户端把该来源提升为可信 |
 | 画面全黑、但日志显示在解码 | 检查 `render count` 是否在递增；如果卡在 0，说明 `Play()` 的帧计数器没有跨调用保持（见 `MediaPlayer_Linux.cpp` 里的 `static`） |
 | `Tried to spawn a new thread, but the thread pool is exhausted` | `PTHREAD_POOL_SIZE` 太小或为 0，改成 32 |
