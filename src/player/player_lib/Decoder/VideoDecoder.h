@@ -196,6 +196,31 @@ public:
           return frame;
      };
 
+     //! \brief  keep only the newest `maxFrames` decoded frames
+     //!
+     //! The renderer always pulls the newest frame for its current PTS, so older
+     //! ones are dead weight. Without a bound, a decoder that runs ahead of the
+     //! renderer -- or whose output is never pulled at all -- appends one frame
+     //! of several MB per decoded picture, which is what grows the wasm heap by
+     //! ~100 MB/s until it hits the 4 GB ceiling.
+     void trim_frames(uint32_t maxFrames)
+     {
+          ScopeLock lock(FrameLock);
+          while (listFrame.size() > maxFrames) {
+               DecodedFrame* frame = listFrame.front();
+               listFrame.pop_front();
+               if (frame) {
+                    if (frame->rwpk) {
+                         SAFE_DELETE_ARRAY(frame->rwpk->rectRegionPacking);
+                         SAFE_DELETE(frame->rwpk);
+                    }
+                    SAFE_DELETE_ARRAY(frame->qtyResolution);
+                    av_frame_free(&frame->av_frame);
+                    SAFE_DELETE(frame);
+               }
+          }
+     }
+
      DecodedFrame* get_front_of_frame()
      {
           ScopeLock lock(FrameLock);

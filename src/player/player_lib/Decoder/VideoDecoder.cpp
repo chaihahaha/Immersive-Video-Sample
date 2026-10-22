@@ -315,6 +315,12 @@ RenderStatus VideoDecoder::DecodeFrame(AVPacket *pkt, uint32_t video_id, uint64_
     }
     LOG(INFO)<<"[FrameSequences][Decode]: Push one decoded frame at:"<<data->pts<<" video id is:"<<video_id << " and frame fifo size is " << mDecCtx->get_size_of_frame()<<endl;
     mDecCtx->push_frame(frame);
+    // Bound the decoded-frame queue. Dropping *decoded* frames is safe -- the
+    // reference pictures live inside libavcodec, not in this list -- and without
+    // the bound a decoder that runs ahead of the renderer (or whose output is
+    // never pulled) adds several MB per picture until the wasm heap hits its
+    // 4 GB ceiling.
+    mDecCtx->trim_frames(8);
 #ifdef _USE_TRACE_
     // trace
     tracepoint(mthq_tp_provider, T9_push_frame_to_fifo, data->pts, video_id);
