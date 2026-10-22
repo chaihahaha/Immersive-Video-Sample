@@ -611,8 +611,16 @@ void* GLFWRenderContext::InitContext()
     // initialize opengl
     // glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+#ifndef __EMSCRIPTEN__
+    // GL_TEXTURE_2D is a fixed-function capability that only exists in desktop
+    // compatibility profiles. WebGL/GLES rejects it with GL_INVALID_ENUM, which
+    // the browser prints as "WebGL: INVALID_ENUM: enable: invalid capability".
+    // The renderer is shader based and samples its textures through uniforms,
+    // so nothing here needs the capability; skip it under Emscripten as well as
+    // in a core profile.
     std::cout << "enable texture 2d" << std::endl;
     glEnable(GL_TEXTURE_2D);
+#endif
     std::cout << "enable depth" << std::endl;
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);

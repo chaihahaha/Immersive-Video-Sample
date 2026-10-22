@@ -1084,6 +1084,22 @@ int32_t OmafMediaStream::TaskRun(OmafTilesStitch *stitch, std::pair<uint64_t, st
     return ERROR_NONE;
 }
 
+// A stitched frame can fail for transient reasons: the viewport moves while a
+// segment is in flight, so the packet set for one frame no longer matches the
+// tile set the stitcher was configured with. Those errors used to `return` out
+// of TilesStitching(), which kills the stitching thread for good -- the last
+// decoded frame stays on screen, every part of the sphere that was not in view
+// at that moment renders black, and turning the head back is the only thing
+// that still shows a picture. Drop the frame and keep the thread alive instead.
+static void ReportStitchRecovery(const char *why) {
+  static long failures = 0;
+  ++failures;
+  if (failures <= 20 || (failures % 200) == 0) {
+    std::cerr << "[stitch] " << why << " -- frame dropped, stitching continues (failures="
+              << failures << ")" << std::endl;
+  }
+}
+
 int32_t OmafMediaStream::TilesStitching() {
     std::cout << "OmafMediaStream::TilesStitching" << std::endl;
   if (!m_stitch) {
@@ -1172,8 +1188,13 @@ int32_t OmafMediaStream::TilesStitching() {
           }
           if (currWaitTimes >= selectionWaitTimes)
           {
+            // selectionWaitTimes * 50us is only half a second, which a busy
+            // wasm build can miss at startup. Breaking out of the loop here
+            // used to end the stitching thread silently, so the player would
+            // never produce another merged packet; wait for the next round
+            // instead.
             OMAF_LOG(LOG_ERROR, "Wait too much time for tiles selection, timed out !\n");
-            break;
+            continue;
           }
           currWaitTimes = 0;
 
@@ -1523,7 +1544,9 @@ int32_t OmafMediaStream::TilesStitching() {
         }
 	    allPackets.clear();
         selectedPackets.clear();
-        return ret;
+        ReportStitchRecovery("failed to initialize the tile stitcher");
+        usleep(1000);
+        continue;
       }
     } else {
       if (!isEOS && m_status != STATUS_STOPPED) {
@@ -1545,7 +1568,9 @@ int32_t OmafMediaStream::TilesStitching() {
           }
 	      allPackets.clear();
           selectedPackets.clear();
-          return ret;
+          ReportStitchRecovery("failed to update the stitched tile set");
+          usleep(1000);
+          continue;
         }
 
         if (currFramePTS > 0)
@@ -1583,7 +1608,9 @@ int32_t OmafMediaStream::TilesStitching() {
     {
         OMAF_LOG(LOG_ERROR, "Failed to generate tiles stitched media packet !\n");
         selectedPackets.clear();
-        return ERROR_INVALID;
+        ReportStitchRecovery("the stitcher produced no packet");
+        usleep(1000);
+        continue;
     }
 
     MediaPacket *one = NULL;
@@ -1592,7 +1619,9 @@ int32_t OmafMediaStream::TilesStitching() {
     {
         OMAF_LOG(LOG_ERROR, "Tiles stitched media packet is NULL !\n");
         selectedPackets.clear();
-        return ERROR_NULL_PTR;
+        ReportStitchRecovery("the stitcher produced a null packet");
+        usleep(1000);
+        continue;
     }
 
 #ifndef _ANDROID_NDK_OPTION_

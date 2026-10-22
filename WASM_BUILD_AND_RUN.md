@@ -668,6 +668,40 @@ Module.ccall("em_probe_uploads_total", "number", [], [])         // 上传次数
 | 反复重载后 WebGL 上下文耗尽 / `GLFW window create error` | 换一个干净的浏览器进程/会话 |
 | 想让 mp4 / MPD 由 HTTP 服务器提供，而不是预加载 | 见第 7 章。用 `-DIVS_PRELOAD_CONTENT=OFF` 构建，并用 `serve_wasm.py --content webcontent` 起服务 |
 | HTTP 模式下一片漆黑、日志里 `httpFetches` 一直是 0 | 内容服务器没起或路径不对。看 `?verbose=1` 里有没有 `cannot open '...' and HTTP fetch from base '...' failed (HTTP 404)` |
+| 转动视角后新视角全黑，转回原来的方向又有画面（而且一直不恢复） | 拼接线程 `OmafMediaStream::TilesStitching()` 已经退出，见 §6.1 |
+
+### 6.1 转动视角后画面全黑，转回去又有画面
+
+**现象**：视频本来正常；鼠标转到别的方向，新方向整屏（或整片视野）是黑的；把视角转回原来的方向，
+画面又出现了。等多久都不会自己恢复，控制台里也没有明显报错。
+
+**原理**：这套内容是视口自适应码流，播放器只下载"当前视口覆盖到的瓦片"，再由
+`OmafMediaStream::TilesStitching()` 把瓦片拼成一帧送进解码器。拼好的帧只覆盖当时选中的那块球面，
+球面其余部分本来就是黑的。所以只要拼接线程停了，屏幕上就永远停在最后一帧的那块区域：
+新方向是黑的，转回去还是那块旧画面。
+
+**根因**：`TilesStitching()` 里有多处"一帧拼不出来就 `return`"，而它是线程入口，`return`
+等于**把拼接线程永久结束掉**。这些失败本身是瞬态的 —— 视口恰好在某个 segment 传输到一半时变了，
+这一帧的瓦片包集合和拼接器配置对不上（`Failed to initialize stitch class` /
+`Failed to update media packets for tiles merge` / `Failed to generate tiles stitched media packet`）。
+在快的机器上多半碰不到，慢的机器或者局域网客户端上就容易踩中。
+
+另外 `Wait too much time for tiles selection` 那条超时用的是 `break`，而那个等待只有
+`selectionWaitTimes * 50us = 0.5 s`，启动时被 wasm 初始化挤一下就会超时，同样会静默结束线程。
+
+**修法**（已提交）：这两种失败改成记日志、丢掉这一帧、`continue`，线程继续活着，
+下一个 segment 自然就恢复了。日志打到 stderr（浏览器控制台可见）：
+
+```
+[stitch] failed to update the stitched tile set -- frame dropped, stitching continues (failures=1)
+```
+
+正常播放时这条**一次都不该出现**；如果频繁出现，说明瓦片选择确实跟不上视角变化，那是另一类问题
+（调 `localRateLimitBytesPerSec`、换更快的机器，或者开 §8 提到的 `intimeviewportupdate`）。
+
+**注意区分**：如果黑块是"松手后 1–2 秒自己补上"，那是正常的下载/解码延迟，不是这个 bug。
+本机实测：以 85°/s 拖动、4 倍 CPU 降速、刚出第一帧就拖动，黑像素比例都在 0.3% 以下
+（而且集中在画面阴影里），说明约 1 s 内能补齐。
 
 ---
 
