@@ -26,6 +26,7 @@
  */
 
 #include <cmath>
+#include <chrono>
 #include "OmafDashRangeSync.h"
 #include "OmafReaderManager.h"
 #include "OmafTileTracksSelector.h"
@@ -104,6 +105,10 @@ OmafMediaStream::~OmafMediaStream() {
     mExtractors.clear();
   }
   }
+  // Make sure a stitching thread that is blocked on the merged-packet queue
+  // can see the shutdown and leave before it is joined.
+  m_status = STATUS_STOPPED;
+  m_packetsCond.notify_all();
   if (m_stitchThread) {
     pthread_join(m_stitchThread, NULL);
     m_stitchThread = 0;
@@ -162,6 +167,8 @@ void OmafMediaStream::Close() {
   if (m_status != STATUS_STOPPED) {
     m_status = STATUS_STOPPED;
     m_catchup_status = STATUS_STOPPED;
+    // Release the stitching thread if it is waiting for the renderer.
+    m_packetsCond.notify_all();
     if (m_stitchThread) {
       pthread_join(m_stitchThread, NULL);
       m_stitchThread = 0;
@@ -1600,30 +1607,35 @@ int32_t OmafMediaStream::TilesStitching() {
     }
 
     {
-      std::lock_guard<std::mutex> lock(m_packetsMutex);
-      // Bounded queue. The stitching thread is driven by the segment reader,
-      // which is rate limited but not tied to the renderer's frame rate, while
-      // the consumer is one call to GetOutTilesMergedPackets() per rendered
-      // frame. Each entry is a whole stitched frame and, for this content, the
+      std::unique_lock<std::mutex> lock(m_packetsMutex);
+      // Back-pressure, not frame dropping. The stitching thread is driven by the
+      // segment reader, which is rate limited but not tied to the renderer's
+      // frame rate, while the consumer is one call to GetOutTilesMergedPackets()
+      // per rendered frame. Each entry is a whole stitched frame and the
       // stitcher reserves width*height*3/2/2 bytes for it -- 3 MB for the
-      // 2048x2048 quality-1 layout and 1.5 MB for the 2048x1024 one. On a
-      // client whose decoder cannot keep up (a slower machine, a bigger window,
-      // a laptop on battery) the producer therefore outruns the consumer and
-      // the queue grows without bound: measured +275 MB after a single viewport
-      // change, which is how the wasm heap eventually reaches its 4 GB ceiling,
-      // after which FFmpeg's get_buffer() fails and the runtime aborts with
+      // 2048x2048 quality-1 layout, 1.5 MB for the 2048x1024 one -- so an
+      // unbounded queue grows without limit whenever the renderer cannot keep
+      // up (slower machine, bigger window, throttled CPU). Measured: +275 MB
+      // per viewport change, which eventually reaches the 4 GB wasm ceiling;
+      // FFmpeg then fails in get_buffer() and the runtime aborts with
       // "corrupted its heap memory area (address zero)".
       //
-      // The renderer only ever wants recent frames, so drop the oldest ones
-      // instead of queueing them forever.
+      // The frames must NOT be dropped to bound the queue: they are
+      // inter-predicted, so skipping one leaves the decoder without a
+      // reference picture ("Could not find ref with POC n") and the picture
+      // flickers. Wait for the renderer to consume one instead.
       static const size_t kMaxQueuedMergedFrames = 6;
-      while (m_mergedPackets.size() >= kMaxQueuedMergedFrames) {
-        std::list<MediaPacket *> &oldest = m_mergedPackets.front();
-        for (std::list<MediaPacket *>::iterator itOld = oldest.begin(); itOld != oldest.end(); ++itOld) {
-          SAFE_DELETE(*itOld);
+      while (m_mergedPackets.size() >= kMaxQueuedMergedFrames &&
+             m_status != STATUS_STOPPED && m_status != STATUS_EXITING) {
+        m_packetsCond.wait_for(lock, std::chrono::milliseconds(20));
+      }
+      if (m_status == STATUS_STOPPED || m_status == STATUS_EXITING) {
+        for (std::list<MediaPacket *>::iterator itDrop = mergedPackets.begin();
+             itDrop != mergedPackets.end(); ++itDrop) {
+          SAFE_DELETE(*itDrop);
         }
-        oldest.clear();
-        m_mergedPackets.pop_front();
+        mergedPackets.clear();
+        continue;
       }
       m_mergedPackets.push_back(mergedPackets);
     }
@@ -1672,6 +1684,8 @@ std::list<MediaPacket*> OmafMediaStream::GetOutTilesMergedPackets() {
   if (m_mergedPackets.size()) {
     outPackets.splice(outPackets.end(), m_mergedPackets.front());
     m_mergedPackets.pop_front();
+    // Wake the stitching thread, which waits here when it is running ahead.
+    m_packetsCond.notify_one();
   }
   }
   {

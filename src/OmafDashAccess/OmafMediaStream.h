@@ -45,6 +45,7 @@
 #include "OmafReader.h"
 #include "OmafTilesStitch.h"
 #include <mutex>
+#include <condition_variable>
 
 VCD_OMAF_BEGIN
 
@@ -412,6 +413,8 @@ private:
   std::mutex m_catchupPacketsMutex;
   //<! list of output tiles merged media packets
   std::list<std::list<MediaPacket*>> m_mergedPackets;
+  //<! signalled by the consumer so the stitching thread can stop waiting
+  std::condition_variable m_packetsCond;
 
   std::map<uint32_t, std::list<std::list<MediaPacket*>>> m_catchupMergedPackets;
 
