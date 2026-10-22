@@ -1601,6 +1601,30 @@ int32_t OmafMediaStream::TilesStitching() {
 
     {
       std::lock_guard<std::mutex> lock(m_packetsMutex);
+      // Bounded queue. The stitching thread is driven by the segment reader,
+      // which is rate limited but not tied to the renderer's frame rate, while
+      // the consumer is one call to GetOutTilesMergedPackets() per rendered
+      // frame. Each entry is a whole stitched frame and, for this content, the
+      // stitcher reserves width*height*3/2/2 bytes for it -- 3 MB for the
+      // 2048x2048 quality-1 layout and 1.5 MB for the 2048x1024 one. On a
+      // client whose decoder cannot keep up (a slower machine, a bigger window,
+      // a laptop on battery) the producer therefore outruns the consumer and
+      // the queue grows without bound: measured +275 MB after a single viewport
+      // change, which is how the wasm heap eventually reaches its 4 GB ceiling,
+      // after which FFmpeg's get_buffer() fails and the runtime aborts with
+      // "corrupted its heap memory area (address zero)".
+      //
+      // The renderer only ever wants recent frames, so drop the oldest ones
+      // instead of queueing them forever.
+      static const size_t kMaxQueuedMergedFrames = 6;
+      while (m_mergedPackets.size() >= kMaxQueuedMergedFrames) {
+        std::list<MediaPacket *> &oldest = m_mergedPackets.front();
+        for (std::list<MediaPacket *>::iterator itOld = oldest.begin(); itOld != oldest.end(); ++itOld) {
+          SAFE_DELETE(*itOld);
+        }
+        oldest.clear();
+        m_mergedPackets.pop_front();
+      }
       m_mergedPackets.push_back(mergedPackets);
     }
     std::list<MediaPacket*>::iterator it = mergedPackets.begin();

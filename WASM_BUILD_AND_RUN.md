@@ -703,6 +703,50 @@ Module.ccall("em_probe_uploads_total", "number", [], [])         // 上传次数
 本机实测：以 85°/s 拖动、4 倍 CPU 降速、刚出第一帧就拖动，黑像素比例都在 0.3% 以下
 （而且集中在画面阴影里），说明约 1 s 内能补齐。
 
+### 6.2 拖一会儿之后整个页面崩掉（wasm 堆涨到 4 GB）
+
+**现象**：一开始播放正常，反复拖动视角一段时间后，控制台刷出成片的
+
+```
+[hevc @ 0x...] get_buffer() failed
+[hevc @ 0x...] thread_get_buffer() failed
+[hevc @ 0x...] Error parsing NAL unit #3.
+...
+Aborted(Stack overflow! Stack cookie has been overwritten at 0x00000004 ...)
+RuntimeError: Aborted(Runtime error: The application has corrupted its heap memory area (address zero)!)
+```
+
+之后画面彻底不动，转到哪里都是黑的（或者只剩最后那一帧的区域有画面）。
+
+**根因**：拼接线程把"缝合后的一帧"放进 `OmafMediaStream::m_mergedPackets` 这个
+`std::list<std::list<MediaPacket*>>`，消费端每渲染一帧只取一个 —— 这个队列**没有上限**。
+而每帧的缓冲是按 `width * height * 3 / 2 / 2` 预留的：
+
+| layout | 预留 |
+|---|---|
+| 2048 x 2048（quality 1） | 3 MB |
+| 2048 x 1024（quality 2） | 1.5 MB |
+
+生产端跟着 segment 下载走（1 MB/s 限速），消费端跟着渲染帧率走。客户端一旦渲染跟不上
+（机器慢、窗口大、省电模式），队列就只进不出。用 `em_probe_report` 实测：**一次视角切换
+就让堆涨 275 MB**（2^22 段 +56 个块、2^21 段 +39 个块），拖十几次就能堆到 4 GB 上限。
+到上限后 FFmpeg 的 `av_frame_get_buffer()` 返回失败（`get_buffer() failed`），
+随后堆被写坏（`corrupted its heap memory area (address zero)`），Emscripten 直接 abort。
+
+**修法**（已提交）：队列上限 6 帧，超了就丢掉最老的（渲染端本来只要最新的帧）。
+
+**效果**（同一台机器，4 倍 CPU 降速）：
+
+| | 修复前 | 修复后 |
+|---|---|---|
+| 反复拖动 20 轮 | 1113 → 1601 MB，持续上涨 | 1015 MB，全程不动 |
+| 拖动 12 次 | 443 → 822 MB 且不回落 | 443 → 725 MB 后持平 |
+| abort | 最终 4 GB 崩 | 无 |
+
+**自检**：控制台执行 `Module.HEAPU8.length/1048576`，正常播放时应当在几百 MB 稳定；
+如果拖一次就涨一两百 MB 且不回落，就是这里又退化了。
+
+
 ---
 
 ## 7. 内容来源：预加载 vs HTTP 服务
