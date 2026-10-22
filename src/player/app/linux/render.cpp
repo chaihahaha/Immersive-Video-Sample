@@ -35,6 +35,7 @@
 
 #include <functional>
 #include <emscripten.h>
+#include <emscripten/heap.h>
 #include <dirent.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -529,10 +530,27 @@ void main_loop_play() {
         em_probe_report(tag);
     }
     player->Play();
+
+    // Heap watermark, once every 5 s, on stderr so it lands in the browser
+    // console. The wasm heap is capped at 4 GB: if it reaches that ceiling every
+    // further allocation fails, FFmpeg stops producing frames and the picture
+    // freezes with only the already-decoded tiles visible. Seeing the curve is
+    // the quickest way to tell "leaks from the start" from "leaks while
+    // dragging".
+    static double lastHeapLog = 0.0;
+    const double nowMs = emscripten_get_now();
+    if (nowMs - lastHeapLog > 5000.0) {
+        lastHeapLog = nowMs;
+        std::cerr << "[heap] " << (emscripten_get_heap_size() >> 20) << " MB" << std::endl;
+    }
 }
 
 EMSCRIPTEN_KEEPALIVE
 int main() {
+    // Build identity + startup heap, so a bug report says which binary it came
+    // from and where the heap started.
+    std::cerr << "[build] " << __DATE__ << " " << __TIME__
+              << "  heap=" << (emscripten_get_heap_size() >> 20) << " MB" << std::endl;
 #if IVS_SILENCE_STDOUT
     std::cout.rdbuf(&g_null_buf);
     std::cerr.rdbuf(&g_null_buf);
