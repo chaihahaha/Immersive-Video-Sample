@@ -1847,6 +1847,15 @@ int32_t OmafTilesStitch::GenerateOutputMergedPackets() {
       uint32_t height = layOut[index]->mergedHeight;
       uint32_t initWidth = initLayOut.size() < index + 1 ? 0 : initLayOut[index]->mergedWidth;
       uint32_t initHeight = initLayOut.size() < index + 1 ? 0 : initLayOut[index]->mergedHeight;
+      // A bad layout would otherwise ask for a multi-gigabyte buffer: the
+      // merged frame is allocated as width*height*3/2/2 bytes, so a garbage
+      // 65536x65536 layout requests 3 GB in one go, which grows the wasm heap
+      // straight to its 4 GB ceiling and starves every later allocation. The
+      // largest legitimate layout here is the 8192x4096 panorama.
+      if (width == 0 || height == 0 || width > 16384 || height > 16384) {
+        OMAF_LOG(LOG_ERROR, "Implausible merged tile layout %ux%u, skipping the frame\n", width, height);
+        return OMAF_ERROR_INVALID_DATA;
+      }
       MediaPacket *mergedPacket = new MediaPacket();
       uint32_t packetSize = ((width * height * 3) / 2) / 2;
       mergedPacket->ReAllocatePacket(packetSize);
