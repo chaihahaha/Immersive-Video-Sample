@@ -56,6 +56,10 @@ extern "C" int em_local_curl_prefetch(const char *url);
 // Aggregate delivery cap in bytes/second (0 = unlimited). Without it the reader
 // thread consumes the whole presentation in seconds and the wasm heap fills up.
 extern "C" void em_local_curl_set_rate_limit(double bytes_per_second);
+// Allocation accounting from bigalloc_probe.cpp / SWRenderSource.cpp.
+extern "C" int em_probe_live_kb(void);
+extern "C" void em_probe_report(const char *tag);
+extern "C" long em_probe_pending_frames_live(void);
 // Debug switches owned by OmafDashSource (see omaf_debug_set_stop_reader).
 extern "C" void omaf_debug_set_stop_reader(int v);
 extern "C" void omaf_debug_set_stop_stitch(int v);
@@ -538,10 +542,22 @@ void main_loop_play() {
     // the quickest way to tell "leaks from the start" from "leaks while
     // dragging".
     static double lastHeapLog = 0.0;
+    static double lastProbeLog = 0.0;
     const double nowMs = emscripten_get_now();
     if (nowMs - lastHeapLog > 5000.0) {
         lastHeapLog = nowMs;
-        std::cerr << "[heap] " << (emscripten_get_heap_size() >> 20) << " MB" << std::endl;
+        // malloc_live covers everything that goes through the global operator
+        // new / malloc (OMAF, the player, FFmpeg's realloc). If the heap grows
+        // while malloc_live stays flat, the memory is being taken by something
+        // that bypasses those entry points -- in practice av_malloc/memalign
+        // inside libavcodec.
+        std::cerr << "[heap] " << (emscripten_get_heap_size() >> 20)
+                  << " MB  malloc_live=" << (em_probe_live_kb() >> 10)
+                  << " MB  probe_frames=" << em_probe_pending_frames_live() << std::endl;
+    }
+    if (nowMs - lastProbeLog > 30000.0) {
+        lastProbeLog = nowMs;
+        em_probe_report("periodic");
     }
 }
 
