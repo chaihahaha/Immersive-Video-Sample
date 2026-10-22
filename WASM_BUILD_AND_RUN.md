@@ -703,9 +703,9 @@ Module.ccall("em_probe_uploads_total", "number", [], [])         // 上传次数
 本机实测：以 85°/s 拖动、4 倍 CPU 降速、刚出第一帧就拖动，黑像素比例都在 0.3% 以下
 （而且集中在画面阴影里），说明约 1 s 内能补齐。
 
-### 6.2 拖一会儿之后整个页面崩掉（wasm 堆涨到 4 GB）
+### 6.2 播一会儿之后整个页面崩掉（wasm 堆涨到 4 GB）
 
-**现象**：一开始播放正常，反复拖动视角一段时间后，控制台刷出成片的
+**现象**：一开始播放正常，过几十秒到一两分钟，控制台刷出成片的
 
 ```
 [hevc @ 0x...] get_buffer() failed
@@ -716,42 +716,74 @@ Aborted(Stack overflow! Stack cookie has been overwritten at 0x00000004 ...)
 RuntimeError: Aborted(Runtime error: The application has corrupted its heap memory area (address zero)!)
 ```
 
-之后画面彻底不动，转到哪里都是黑的（或者只剩最后那一帧的区域有画面）。
+之后画面彻底不动。崩溃前控制台里的 `[heap]` 行会一路涨：256 → 627 → 916 → 1399 → 2077 →
+2756 → 3045 → 3431 → 3913 MB，大约 **+60～120 MB/s**，与机器快慢无关，只与播放进度有关。
 
-**根因**：拼接线程把"缝合后的一帧"放进 `OmafMediaStream::m_mergedPackets` 这个
-`std::list<std::list<MediaPacket*>>`，消费端每渲染一帧只取一个 —— 这个队列**没有上限**。
-而每帧的缓冲是按 `width * height * 3 / 2 / 2` 预留的：
+这里其实是**两个**独立的问题，都修掉了：
 
-| layout | 预留 |
-|---|---|
-| 2048 x 2048（quality 1） | 3 MB |
-| 2048 x 1024（quality 2） | 1.5 MB |
+#### (A) 读线程的预读没有上限（主因）
 
-生产端跟着 segment 下载走（1 MB/s 限速），消费端跟着渲染帧率走。客户端一旦渲染跟不上
-（机器慢、窗口大、省电模式），队列就只进不出。用 `em_probe_report` 实测：**一次视角切换
-就让堆涨 275 MB**（2^22 段 +56 个块、2^21 段 +39 个块），拖十几次就能堆到 4 GB 上限。
-到上限后 FFmpeg 的 `av_frame_get_buffer()` 返回失败（`get_buffer() failed`），
-随后堆被写坏（`corrupted its heap memory area (address zero)`），Emscripten 直接 abort。
+`OmafReaderManager` 的 parse 线程会一直往下解析 segment，直到把整段视频都解析进内存。
+解析一个 sample 就在 `OmafSegmentNode::cachePackets()` 里 `new MediaPacket` +
+`ReAllocatePacket(width*height*3/2/2)`：1024×1024 的 tile 是 **768 KB**。
 
-**修法**（已提交）：队列上限 6 帧，**满了让拼接线程等**（条件变量反压），而不是丢帧。
+用下面的按调用点统计（见 (C)），泄漏点被直接点名（4 倍 CPU 降速 + 连续拖动 75 s）：
 
-> 踩过的坑：第一版是"超了丢最老的帧"，结果本机就出现**到处闪灰屏**，控制台刷
-> `[hevc @ ...] Could not find ref with POC 4 / 8 / 14 ...`。原因是这些缝合帧之间是
-> 帧间预测的，丢掉任意一帧就断了参考帧链，解码器找不到参考图像，只能输出灰/花屏。
-> 所以必须**反压**（生产端等消费端），不能丢帧 —— 队列有界靠的是等待，不是丢弃。
+```
+[heap]      1988 MB  malloc_live=1830 MB  big_live=1306 MB  nodes=588/518 live=70
+[leaksite]  #1 live= 1336327 KB / 1740 blocks  peak= 1379335 KB  ever=13740
+              at VCD::OMAF::MediaPacket::ReAllocatePacket(unsigned long)
+              <- at VCD::OMAF::OmafSegmentNode::cachePackets(shared_ptr<OmafReader>)
+```
 
-**效果**（同一台机器）：
+即 **1.34 GB 全在 segment 的解析缓存里**（1740 个 768 KB 块，`nodes live` 同步增长）。
+修复后同一测试：堆在 825 MB 持平，`nodes live` 归零，`merged` 正常推进。
 
-| | 修复前 | 丢帧版（错误） | 反压版（当前） |
-|---|---|---|---|
-| 反复拖动 8～20 轮 | 1113 → 1601 MB 持续上涨 | 堆平稳 | 369 → 531 MB 后全程持平 |
-| `Could not find ref with POC` | 无 | **大量**，画面闪灰 | **0** |
-| 画面 | 最终 4 GB 崩 | 闪灰、花屏 | 连续推进，无灰屏 |
-| abort | 有 | 无 | 无 |
+为什么没有上限：内容是通过 `--preload-file` 打进 MEMFS 的，读文件没有任何 IO 延迟，
+parse 线程跑得比渲染快几个数量级。而且一个 segment 的缓存很大 —— 实测一个 timeline
+有 **约 204 个包 ≈ 150 MB**（32 个 tile + 4 个高清 tile，每个 track 若干 sample）。
+不在当前视角里的 tile 的包**永远不会被取走**，只有整个 timeline set 被删除时才会释放，
+而 set 只有在播放越过它之后才会被删 —— 于是"解析到未来的 set"只进不出。
 
-**自检**：控制台执行 `Module.HEAPU8.length/1048576`，正常播放时应当在几百 MB 稳定；
-如果拖一次就涨一两百 MB 且不回落，就是这里又退化了。
-如果出现 `Could not find ref with POC`，说明又有人在丢缝合帧，检查 `m_mergedPackets` 的写入路径。
+**修法**（`OmafReaderManager::threadRunner`）：限制 **已解析但未消费的 timeline set 数量**
+（`kMaxParsedSetsAhead = 3`）。超过就让 parse 线程等（20 ms 轮询），消费端继续播，
+旧 set 被删掉之后解析自动继续。**仍然不丢包**：这些包是帧间预测的，丢一个就断参考帧链。
+
+> 踩过的坑：第一版限制的是"队列里的包总数"（192 个包）。结果是**画面完全不动**
+> （`merged=0/0`，`[reader] hold queued=204 sets=1`）——因为一个 segment 本身就有 204 个包，
+> 阈值比一个 segment 还小，把当前 segment 里"视角要用到的那几个 tile"也一起卡住了。
+> 所以上限必须按 **set（时间线）** 来算，不能按字节/包数算。
+
+#### (B) 缝合帧队列没有上限（次因，已修）
+
+拼接线程把"缝合后的一帧"放进 `OmafMediaStream::m_mergedPackets`，消费端每渲染一帧只取一个，
+这个队列原来没有上限，每帧缓冲按 `width*height*3/2/2` 预留（2048×2048 → 3 MB，
+2048×1024 → 1.5 MB）。实测**一次视角切换就能让堆涨 275 MB**。
+
+修法：队列上限 6 帧，满了让拼接线程等（条件变量反压）。**不能丢帧** —— 第一版试过丢最老的帧，
+本机立刻到处闪灰屏，控制台刷 `Could not find ref with POC 4 / 8 / 14 ...`，因为缝合帧之间
+也是帧间预测的。有界队列靠等待，不靠丢弃。
+
+#### (C) 诊断工具（保留在代码里）
+
+`bigalloc_probe.cpp` 会把 ≥512 KB 的分配按**调用点**记账（`[leaksite]`），并在第一次见到某个
+调用点时打印它的 C 栈（`[site N]`）。`render.cpp` 每 5 s 打一行：
+
+```
+[heap] 531 MB  malloc_live=252 MB  big_live=196 MB  probe_frames=0  merged=1410/1410  nodes=174/174 live=0
+```
+
+| 字段 | 含义 | 健康值 |
+|---|---|---|
+| `malloc_live` | 全局 malloc/new 的存活字节 | 与 `[heap]` 同步，不持续上涨 |
+| `big_live` | ≥512 KB 块的存活字节 | 同上 |
+| `merged=生产/消费` | 缝合帧进出队列的数量 | 差值稳定（≈ 队列深度 6 帧 × 每帧包数） |
+| `nodes=创建/销毁 live=` | segment 节点存活数 | `live` 应回到 0 或很小且不单调增长 |
+
+`[leaksite]` 表里 `live=` 单调上涨、`ever=` 也在涨的那个 `#N` 就是泄漏点；
+`peak=` 高但 `live=` 回落的只是高水位，不是泄漏。
+
+自检：控制台执行 `Module.HEAPU8.length/1048576`，正常播放时应当在几百 MB 稳定。
 
 
 ---

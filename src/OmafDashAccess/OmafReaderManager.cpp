@@ -121,6 +121,14 @@ class OmafAudioPacketParams : public VCD::NonCopyable {
 };
 
 // FIXME use better class name?
+// Diagnostics: how many segment nodes (and therefore cached packet queues) are
+// alive. A queue of tile packets is ~768 KB per sample, so a rising
+// created-minus-destroyed count is exactly the packet leak.
+static volatile long g_nodes_created = 0;
+static volatile long g_nodes_destroyed = 0;
+extern "C" long omaf_nodes_created(void) { return g_nodes_created; }
+extern "C" long omaf_nodes_destroyed(void) { return g_nodes_destroyed; }
+
 class OmafSegmentNode : public VCD::NonCopyable {
  public:
   using Ptr = std::shared_ptr<OmafSegmentNode>;
@@ -137,9 +145,12 @@ class OmafSegmentNode : public VCD::NonCopyable {
         depends_size_(depends_size),
         bExtractor_(isExtractor),
         bCatchup_(isCatchup),
-        chunk_id_(chunk_id) {}
+        chunk_id_(chunk_id) {
+    ++g_nodes_created;
+  }
 
   virtual ~OmafSegmentNode() {
+    ++g_nodes_destroyed;
     OMAF_LOG(LOG_INFO, "Release the segment node %s packet size=%lld\n", to_string().c_str(), media_packets_.size());
     // relase packet
     std::lock_guard<std::mutex> lock(packet_mutex_);
@@ -1315,6 +1326,57 @@ void OmafReaderManager::threadRunner() noexcept {
         std::unique_lock<std::mutex> lock(segment_opened_mutex_);
         segment_opened_cv_.wait(lock);
         continue;
+      }
+
+      // 1.2 keep the read-ahead bounded.
+      //
+      // The content is served from a preloaded MEMFS, so without this the reader
+      // parses the whole clip into memory as fast as it can: every cached sample
+      // keeps a 768 KB tile buffer (1024x1024x3/2/2), plus the 1.5/3 MB merged
+      // frames further downstream, and the wasm heap races to its 4 GB ceiling
+      // in under a minute. Measured on a throttled client: +120 MB/s, 1746 live
+      // 768 KB blocks, all owned by OmafSegmentNode::cachePackets.
+      //
+      // The limit is expressed in whole timeline sets, not bytes or packets: one
+      // segment of this content is a few hundred packets (~150 MB), and the
+      // packets of the tiles that are not in the current viewport are only
+      // released when the whole set is erased, which happens once playback has
+      // moved past it. Counting packets instead would starve the stitcher
+      // outright (measured: merged=0/*, i.e. no frame ever reached the decoder).
+      //
+      // Throttle the producer here rather than dropping packets: the packets are
+      // inter-predicted, so dropping one breaks the reference chain ("Could not
+      // find ref with POC n" in the decoder log). The renderer keeps consuming
+      // from the parsed list, which lets the oldest set be erased and parsing
+      // resume.
+      static const size_t kMaxParsedSetsAhead = 3;
+      // Keep the diagnostic line portable: this file also builds for the native
+      // player, where emscripten_get_now() does not exist.
+      auto now_ms = []() {
+        return static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(
+                                       std::chrono::steady_clock::now().time_since_epoch())
+                                       .count());
+      };
+      double last_hold_log = 0;
+      while (breader_working_) {
+        size_t sets = 0;
+        {
+          std::unique_lock<std::mutex> lock(segment_parsed_mutex_);
+          sets = segment_parsed_list_.size();
+          if (sets <= kMaxParsedSetsAhead) break;
+          const double now = now_ms();
+          if (now - last_hold_log > 5000.0) {
+            last_hold_log = now;
+            fprintf(stderr, "[reader] hold sets=%zu ready_timeline=%lld last=%lld parsed=", sets,
+                    (long long)ready_dash_node->getTimelinePoint(), (long long)timeline_point_);
+            for (auto &nodeset : segment_parsed_list_) {
+              fprintf(stderr, "%lld ", (long long)nodeset.timeline_point_);
+            }
+            fprintf(stderr, "\n");
+            fflush(stderr);
+          }
+          segment_parsed_cv_.wait_for(lock, std::chrono::milliseconds(20));
+        }
       }
 
       // 2. parse the ready segment/dash_node

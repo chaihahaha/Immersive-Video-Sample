@@ -58,12 +58,18 @@ extern "C" int em_local_curl_prefetch(const char *url);
 extern "C" void em_local_curl_set_rate_limit(double bytes_per_second);
 // Allocation accounting from bigalloc_probe.cpp / SWRenderSource.cpp.
 extern "C" int em_probe_live_kb(void);
+extern "C" int em_probe_big_live_kb(void);
 extern "C" void em_probe_report(const char *tag);
 extern "C" long em_probe_pending_frames_live(void);
 // Implemented in OmafMediaStream.cpp: how many stitched packets have been
 // produced and how many the renderer has taken.
 extern "C" long omaf_merged_produced(void);
 extern "C" long omaf_merged_consumed(void);
+// Implemented in OmafReaderManager.cpp: live segment-node count. Each node owns a
+// queue of parsed tile packets (~768 KB per sample), so this names the leak in
+// one number.
+extern "C" long omaf_nodes_created(void);
+extern "C" long omaf_nodes_destroyed(void);
 // Debug switches owned by OmafDashSource (see omaf_debug_set_stop_reader).
 extern "C" void omaf_debug_set_stop_reader(int v);
 extern "C" void omaf_debug_set_stop_stitch(int v);
@@ -527,6 +533,7 @@ NullStreamBuf g_null_buf;
 
 // Heap accounting hook, implemented in bigalloc_probe.cpp.
 extern "C" void em_probe_report(const char *tag);
+extern "C" int em_probe_big_live_kb(void);
 
 void main_loop_play() {
     static unsigned long frames = 0;
@@ -557,11 +564,14 @@ void main_loop_play() {
         // inside libavcodec.
         std::cerr << "[heap] " << (emscripten_get_heap_size() >> 20)
                   << " MB  malloc_live=" << (em_probe_live_kb() >> 10)
+                  << " MB  big_live=" << (em_probe_big_live_kb() >> 10)
                   << " MB  probe_frames=" << em_probe_pending_frames_live()
                   << "  merged=" << omaf_merged_produced() << "/" << omaf_merged_consumed()
+                  << "  nodes=" << omaf_nodes_created() << "/" << omaf_nodes_destroyed()
+                  << " live=" << (omaf_nodes_created() - omaf_nodes_destroyed())
                   << std::endl;
     }
-    if (nowMs - lastProbeLog > 30000.0) {
+    if (nowMs - lastProbeLog > 60000.0) {
         lastProbeLog = nowMs;
         em_probe_report("periodic");
     }
