@@ -43,6 +43,15 @@
 
 VCD_OMAF_BEGIN
 
+// Production/consumption counters for the merged-packet queue. If these drift
+// apart the leak is in this hand-off; if they stay together the memory is being
+// taken somewhere else and the allocator probe has to name that caller instead.
+static volatile long g_merged_produced = 0;
+static volatile long g_merged_consumed = 0;
+extern "C" long omaf_merged_produced() { return g_merged_produced; }
+extern "C" long omaf_merged_consumed() { return g_merged_consumed; }
+
+
 OmafMediaStream::OmafMediaStream() {
     std::cout << "OmafMediaStream::OmafMediaStream" << std::endl;
   mMainAdaptationSet = NULL;
@@ -1637,6 +1646,7 @@ int32_t OmafMediaStream::TilesStitching() {
         mergedPackets.clear();
         continue;
       }
+      g_merged_produced += static_cast<long>(mergedPackets.size());
       m_mergedPackets.push_back(mergedPackets);
     }
     std::list<MediaPacket*>::iterator it = mergedPackets.begin();
@@ -1682,6 +1692,7 @@ std::list<MediaPacket*> OmafMediaStream::GetOutTilesMergedPackets() {
   {
   std::lock_guard<std::mutex> lock(m_packetsMutex);
   if (m_mergedPackets.size()) {
+    g_merged_consumed += static_cast<long>(m_mergedPackets.front().size());
     outPackets.splice(outPackets.end(), m_mergedPackets.front());
     m_mergedPackets.pop_front();
     // Wake the stitching thread, which waits here when it is running ahead.

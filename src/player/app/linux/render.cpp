@@ -60,6 +60,10 @@ extern "C" void em_local_curl_set_rate_limit(double bytes_per_second);
 extern "C" int em_probe_live_kb(void);
 extern "C" void em_probe_report(const char *tag);
 extern "C" long em_probe_pending_frames_live(void);
+// Implemented in OmafMediaStream.cpp: how many stitched packets have been
+// produced and how many the renderer has taken.
+extern "C" long omaf_merged_produced(void);
+extern "C" long omaf_merged_consumed(void);
 // Debug switches owned by OmafDashSource (see omaf_debug_set_stop_reader).
 extern "C" void omaf_debug_set_stop_reader(int v);
 extern "C" void omaf_debug_set_stop_stitch(int v);
@@ -553,7 +557,9 @@ void main_loop_play() {
         // inside libavcodec.
         std::cerr << "[heap] " << (emscripten_get_heap_size() >> 20)
                   << " MB  malloc_live=" << (em_probe_live_kb() >> 10)
-                  << " MB  probe_frames=" << em_probe_pending_frames_live() << std::endl;
+                  << " MB  probe_frames=" << em_probe_pending_frames_live()
+                  << "  merged=" << omaf_merged_produced() << "/" << omaf_merged_consumed()
+                  << std::endl;
     }
     if (nowMs - lastProbeLog > 30000.0) {
         lastProbeLog = nowMs;

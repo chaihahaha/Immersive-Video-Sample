@@ -124,6 +124,29 @@ const int kStackReportsMax = 40;
 int g_stack_reports = 0;
 thread_local bool t_in_stack_hook = false;
 
+// The 1-2 MB bucket is worth reporting without limit: on the affected client it
+// held 2079 live blocks (~3 GB) -- one YUV frame of 1024x1024 is 1.5 MB, so this
+// is where a per-frame leak hides. Print a stack for the first few and then for
+// every 500th allocation of that size, which keeps the console readable while
+// still naming the caller.
+void report_leak_1mb(size_t n) {
+  static long count = 0;
+  if (n < (1u << 20) || n >= (2u << 20) || t_in_stack_hook) return;
+  ++count;
+  if (count > 3 && (count % 500) != 0) return;
+  t_in_stack_hook = true;
+#ifdef __EMSCRIPTEN__
+  char stack[2000];
+  stack[0] = '\0';
+  emscripten_get_callstack(EM_LOG_C_STACK | EM_LOG_JS_STACK, stack, sizeof(stack));
+  fprintf(stderr, "[leak] 1MB-bucket alloc #%ld %zu KB\n%s\n", count, n / 1024, stack);
+#else
+  fprintf(stderr, "[leak] 1MB-bucket alloc #%ld %zu KB\n", count, n / 1024);
+#endif
+  fflush(stderr);
+  t_in_stack_hook = false;
+}
+
 void report_large_alloc(size_t n) {
   if (n < kStackThreshold || g_stack_reports >= kStackReportsMax || t_in_stack_hook) return;
   t_in_stack_hook = true;
@@ -142,6 +165,7 @@ void report_large_alloc(size_t n) {
 }  // namespace
 
 extern "C" void *malloc(size_t n) {
+  report_leak_1mb(n);
   report_large_alloc(n);
   void *p = emscripten_builtin_malloc(n);
   account_alloc(n, p);
@@ -155,6 +179,7 @@ extern "C" void free(void *p) {
 
 extern "C" void *calloc(size_t n, size_t size) {
   const size_t total = n * size;
+  report_leak_1mb(total);
   void *p = emscripten_builtin_malloc(total);
   if (p) memset(p, 0, total);
   account_alloc(total, p);
@@ -163,6 +188,7 @@ extern "C" void *calloc(size_t n, size_t size) {
 
 extern "C" void *realloc(void *p, size_t n) {
   if (p == nullptr) return malloc(n);
+  report_leak_1mb(n);
   const size_t old_usable = usable_of(p);
   // The builtin realloc is not exposed; emulate it.
   void *q = emscripten_builtin_malloc(n);
